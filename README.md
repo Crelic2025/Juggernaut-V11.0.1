@@ -84,3 +84,10 @@ Verified-real but low-urgency items from the audit: M4 (history pruning at 250 s
 - Local served copy: `/Users/Crelic/Desktop/apps-server/juggernaut.html`
 
 Note: repository name is historical (`Juggernaut-V11.0.1`), but `index.html` now contains v11.0.2.
+
+## Latest Visible-Version Build
+
+- Current canonical build: v11.0.2
+- Promoted: 2026-05-30 from Telegram TXT upload
+- SHA256: `3ae33a83953f035a931d3e29cee33e832e9803011889bcb076a7c65e6143981a`
+- This is the v11.0.2 build where the latest version is visible throughout the app UI.
