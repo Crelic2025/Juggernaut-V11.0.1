@@ -75,3 +75,12 @@ Verified-real but low-urgency items from the audit: M4 (history pruning at 250 s
 - **v11.0** — Inverted Juggernaut Method 2.0 ship: AMRAP-first waves, backoff sets, readiness system (0-30 scale), fatigue management, fire-day extensions, guided warmup modal with emoji feedback, weak-point-aware accessory swaps, AI coaching overlay (Anthropic Sonnet 4).
 - **v10** — Legacy hybrid with inline warmup feedback UI (removed in v11.0.1 per M13).
 - **v9 and earlier** — See prior handoffs.
+
+## Current Version
+
+- Current canonical build: v11.0.2
+- Promoted: 2026-05-30
+- Source artifact: `/Users/Crelic/Downloads/juggernaut_v11.0.2.html`
+- Local served copy: `/Users/Crelic/Desktop/apps-server/juggernaut.html`
+
+Note: repository name is historical (`Juggernaut-V11.0.1`), but `index.html` now contains v11.0.2.

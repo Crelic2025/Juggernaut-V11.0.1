@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://api.anthropic.com https: blob:; worker-src 'self' blob:; manifest-src 'self' blob:; frame-ancestors 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://openrouter.ai https://api.anthropic.com https: blob:; worker-src 'self' blob:; manifest-src 'self' blob:; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v11.0.1</title>
+<title>Juggernaut Method 2.0 — v11.0.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -153,6 +153,25 @@ input:focus,select:focus,textarea:focus{
   outline:none;
   border-color:var(--accent-mid);
   background:rgba(86,212,165,.04);
+}
+
+/* ─── A11Y: visible keyboard focus ─── */
+:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+  border-radius:6px;
+}
+/* Don't double-ring inputs (they already get a border treatment) */
+input:focus-visible,select:focus-visible,textarea:focus-visible{ outline:none; }
+
+/* ─── A11Y: respect reduced-motion preference ─── */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
 }
 
 /* ─── BUTTONS ─── */
@@ -1881,11 +1900,17 @@ body.performance-mode *{animation:none!important;transition:none!important}
             </div>
             <div class="row" style="margin-top:10px">
               <div>
-                <label for="anthropicKey">Anthropic API Key (for coaching)</label>
-                <input id="anthropicKey" type="password" placeholder="sk-ant-..." style="font-size:16px">
+                <label for="openrouterKey">OpenRouter API Key (for coaching)</label>
+                <input id="openrouterKey" type="password" placeholder="sk-or-v1-..." autocomplete="off" style="font-size:16px">
               </div>
             </div>
-            <div class="install-help">Optional. Enables post-session coaching insight via Claude Sonnet. Key stored locally only.</div>
+            <div class="row" style="margin-top:8px">
+              <div>
+                <label for="aiModel">Coaching model (OpenRouter slug)</label>
+                <input id="aiModel" type="text" placeholder="anthropic/claude-haiku-4.5" autocomplete="off" spellcheck="false" style="font-size:16px">
+              </div>
+            </div>
+            <div class="install-help">Optional. Enables post-session coaching insight via OpenRouter. Default model is fast &amp; cheap; you can paste any OpenRouter model slug (e.g. <code>anthropic/claude-sonnet-4.6</code>, <code>openai/gpt-5</code>). Key is stored locally only and stripped from exports.</div>
           </div>
         </div>
       </div>
@@ -1984,6 +2009,24 @@ body.performance-mode *{animation:none!important;transition:none!important}
               <label class="check">
                 <input id="performanceMode" type="checkbox">
                 <span style="font-size:13px">Performance mode (reduce blur &amp; animations)</span>
+              </label>
+            </div>
+            <div style="margin-top:8px">
+              <label class="check">
+                <input id="uiWakeLock" type="checkbox">
+                <span style="font-size:13px">Keep screen awake during a workout</span>
+              </label>
+            </div>
+            <div style="margin-top:8px">
+              <label class="check">
+                <input id="uiHaptics" type="checkbox">
+                <span style="font-size:13px">Haptic feedback (vibrate on set logged / rest done)</span>
+              </label>
+            </div>
+            <div style="margin-top:8px">
+              <label class="check">
+                <input id="uiSound" type="checkbox">
+                <span style="font-size:13px">Sound cue when rest timer finishes</span>
               </label>
             </div>
           </div>
@@ -2663,9 +2706,10 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '11.0.1';
+  const APP_VERSION = '11.0.2';
   // Session-only storage for Anthropic API key
-  let sessionAnthropicKey = '';
+  let sessionApiKey = '';
+  let _audioCtx = null;
   const DB_NAME = 'JuggernautTrackerDB';
   const DB_VERSION = 1;
   const LEGACY_STORAGE_KEYS = ['juggernaut2_single_file_v1', 'juggernaut_v2_indexeddb_migrated', 'juggernaut_v4_backup'];
@@ -3238,9 +3282,9 @@ body.performance-mode *{animation:none!important;transition:none!important}
       amrap:{ maxExtraRepsCredited:10, underTargetStreakForPrompt:2, suggestedTmReductionLow:0.05, suggestedTmReductionHigh:0.10, enableBackoffSets:false, enableGuidedWarmup:true },
       restMatrix:{ ...PROGRAM.defaultRestMatrix },
       remoteEndpoint:'',
-ui:{ haptics:true, wakeLock:true, performanceMode:false },
+ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
       equipment:{ barbell:true, dumbbell:true, cable:true, band:true, machine:true, pullup_bar:true },
-      ai:{ enableReadiness:true, enableRPE:true, anthropicKey:'' },
+      ai:{ enableReadiness:true, enableRPE:true, openrouterKey:'', model:'anthropic/claude-haiku-4.5' },
       // v11: Training profile drives individualized MEV/MRV volume landmarks
       profile:{ ageBracket:'25-34', experienceYears:3, pedAssisted:false, bodyweightLb:0, lifestyleStress:3 }
     },
@@ -3253,6 +3297,7 @@ ui:{ haptics:true, wakeLock:true, performanceMode:false },
     program:{ index:0, completion:{} },
     activeSession:null,
     history:[],
+    records:{}, // v11.0.2: persistent lifetime PR ledger — survives history pruning
     bodyweight:[], // v10: array of { date:ISO, weight:number }
     accessories:{
       byLift:{
@@ -3280,6 +3325,86 @@ ui:{ haptics:true, wakeLock:true, performanceMode:false },
   let sessionTimerInterval = null;
   let _confirmResolve = null;
   let restMiniBadgeInterval = null;
+
+  /* ═══ v11.0.2: WAKE LOCK / HAPTICS / SOUND ═══ */
+  async function requestWakeLock(){
+    try{
+      if (!state.settings?.ui?.wakeLock) return;
+      if (!('wakeLock' in navigator)) return;
+      if (wakeLockSentinel) return;
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+      wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; });
+    }catch(_){ wakeLockSentinel = null; /* often rejected when tab not visible — re-acquired on visibilitychange */ }
+  }
+  async function releaseWakeLock(){
+    try{ if (wakeLockSentinel){ const s = wakeLockSentinel; wakeLockSentinel = null; await s.release(); } }
+    catch(_){ wakeLockSentinel = null; }
+  }
+  // Vibrate only if the user has haptics enabled (and the device supports it).
+  function haptic(pattern){
+    try{ if (state.settings?.ui?.haptics && navigator.vibrate) navigator.vibrate(pattern); }catch(_){}
+  }
+  // Lazily create + unlock the AudioContext. Call from a user gesture (e.g. tapping DONE → openRest)
+  // so iOS allows the later beep that fires when the rest timer completes without a gesture.
+  function ensureAudio(){
+    if (!state.settings?.ui?.sound) return;
+    try{
+      if (!_audioCtx){ const AC = window.AudioContext || window.webkitAudioContext; if (AC) _audioCtx = new AC(); }
+      if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
+    }catch(_){}
+  }
+  function beep(){
+    if (!state.settings?.ui?.sound) return;
+    try{
+      ensureAudio();
+      if (!_audioCtx) return;
+      const t = _audioCtx.currentTime;
+      const o = _audioCtx.createOscillator();
+      const g = _audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 880;
+      o.connect(g); g.connect(_audioCtx.destination);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+      o.start(t); o.stop(t + 0.42);
+    }catch(_){}
+  }
+
+  /* ═══ v11.0.2: MODAL ACCESSIBILITY ═══ */
+  // Tag modal containers as dialogs and wire a global Escape-to-close.
+  // Each entry maps a container element id to the close action for that modal.
+  const A11Y_DIALOGS = [
+    { id:'restModal',      close:() => closeRest(false) },
+    { id:'readinessModal', close:null },   // intentionally NOT escapable — readiness is a required gate
+    { id:'warmupModal',    close:() => { if (el.warmupSkip) el.warmupSkip.click(); } },
+    { id:'calcModal',      close:() => { if (el.btnCalcClose) el.btnCalcClose.click(); } },
+    { id:'previewModal',   close:() => closePreviewModal() },
+    { id:'confirmModal',   close:() => closeConfirm(false) },
+    { id:'onboardModal',   close:null },   // first-run gate — use the explicit Skip button
+    { id:'guideOverlay',   close:() => { if (el.guideOverlay) el.guideOverlay.classList.remove('show'); } }
+  ];
+  function setupModalA11y(){
+    A11Y_DIALOGS.forEach(({ id }) => {
+      const node = $(id);
+      if (!node) return;
+      node.setAttribute('role', 'dialog');
+      node.setAttribute('aria-modal', 'true');
+    });
+    // Escape closes the top-most visible, escapable modal.
+    // Confirm modal can stack over any other, so it's checked first.
+    const escOrder = ['confirmModal','warmupModal','calcModal','previewModal','restModal','guideOverlay'];
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      for (const id of escOrder){
+        const entry = A11Y_DIALOGS.find(d => d.id === id);
+        if (!entry || !entry.close) continue;
+        const node = $(id);
+        if (!node) continue;
+        const visible = node.classList.contains('show') || (!node.hidden && getComputedStyle(node).display !== 'none');
+        if (visible){ e.preventDefault(); entry.close(); return; }
+      }
+    });
+  }
 
   /* ═══ INDEXEDDB ═══ */
   const idb = {
@@ -3350,6 +3475,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     base.program.completion = { ...(base.program.completion||{}), ...((parsed.program||{}).completion||{}) };
     base.activeSession = parsed.activeSession || null;
     base.history = Array.isArray(parsed.history) ? parsed.history : [];
+    base.records = (parsed.records && typeof parsed.records === 'object') ? parsed.records : {}; // v11.0.2 PR ledger
     base.bodyweight = Array.isArray(parsed.bodyweight) ? parsed.bodyweight : []; // v10
     const inAcc = (parsed.accessories||{}).byLift || {};
     for (const lift of LIFTS){
@@ -4094,7 +4220,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'coachingCard','coachingText','badgeFatigue',
      'sessionCompleteOverlay','scoSummary','scoCoaching','scoCoachText','scoWeakPoint','scoWeakOpts',
      'scoAccSuggestion','scoAccText','scoAccApply','btnContinueAcc2','btnReturnDash',
-     'enableReadiness','enableRPE','enableBackoffSets','enableGuidedWarmup','anthropicKey','performanceMode',
+     'enableReadiness','enableRPE','enableBackoffSets','enableGuidedWarmup','openrouterKey','aiModel','performanceMode','uiWakeLock','uiHaptics','uiSound',
      'profAgeBracket','profExperienceYears','profBodyweight','profPedAssisted','profLifestyleStress','profMultiplierPreview',
      'equipBarbell','equipDumbbell','equipCable','equipBand','equipMachine','equipPullupBar',
      'bwInput','btnLogBW','bwRecent',
@@ -4825,13 +4951,58 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.sessionCompleteOverlay.hidden = false;
   }
 
+  /* ═══ AI (OpenRouter) HELPERS ═══ */
+  function aiKey(){
+    return (sessionApiKey || '').trim()
+      || (state.settings.ai?.openrouterKey || '').trim()
+      || String(el.openrouterKey?.value || '').trim();
+  }
+  function aiModel(){
+    return (state.settings.ai?.model || '').trim()
+      || String(el.aiModel?.value || '').trim()
+      || 'anthropic/claude-haiku-4.5';
+  }
+  function aiHeaders(key){
+    return {
+      'Content-Type':'application/json',
+      'Authorization':'Bearer ' + key,
+      // Optional attribution headers (used by OpenRouter leaderboards only)
+      'HTTP-Referer': (location.origin && location.origin !== 'null') ? location.origin : 'https://juggernaut.app',
+      'X-Title':'Juggernaut Method 2.0'
+    };
+  }
+  function aiExtractText(data){
+    try{ return String(data?.choices?.[0]?.message?.content || '').trim(); }catch(_){ return ''; }
+  }
+  // Shared OpenRouter call with a hard timeout. Returns text or throws.
+  async function aiComplete(key, prompt, maxTokens){
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000);
+    try{
+      const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method:'POST', signal:ctrl.signal,
+        headers:aiHeaders(key),
+        body:JSON.stringify({ model:aiModel(), max_tokens:maxTokens, messages:[{ role:'user', content:prompt }] })
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      return aiExtractText(data);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  let _lastCoachEntry = null;
   function fetchCoachingForOverlay(entry){
-    const key = (sessionAnthropicKey || '').trim() || (state.settings.ai?.anthropicKey || '').trim() || String(el.anthropicKey?.value || '').trim();
+    const key = aiKey();
     if (!key || !key.startsWith('sk-')) return;
     if (!el.scoCoaching || !el.scoCoachText) return;
+    _lastCoachEntry = entry;
     el.scoCoaching.hidden = false;
     el.scoCoachText.textContent = 'Analyzing session...';
     el.scoCoachText.className = 'loading';
+    removeCoachRetry();
 
     const lift = getLiftMeta(entry.liftId);
     const workingSets = entry.sets.filter(s => !s.isRamp);
@@ -4856,33 +5027,36 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       (entry.note || '') +
       ' Give 2-3 concise coaching sentences. Be specific and actionable.';
 
-    const ctrl = new AbortController();
-    fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', signal:ctrl.signal,
-      headers:{ 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:200, messages:[{role:'user', content:prompt}] })
-    }).then(r => r.json()).then(async (data) => {
-      // Check for API error response
-      if (data.error){
-        el.scoCoachText.textContent = 'API error: ' + (data.error.message || JSON.stringify(data.error));
-        el.scoCoachText.className = '';
+    aiComplete(key, prompt, 250).then(async (text) => {
+      el.scoCoachText.className = '';
+      if (!text){
+        el.scoCoachText.textContent = 'No coaching insight returned. Check your model slug in Settings.';
+        addCoachRetry();
         return;
       }
-      const text = (data.content || []).map(c => c.text || '').join('').trim();
-      el.scoCoachText.textContent = text || 'No coaching insight returned. Check your API key in Settings.';
-      el.scoCoachText.className = '';
-      // Persist to history entry
-      if (text){
-        const idx = state.history.findIndex(h => h.id === entry.id);
-        if (idx !== -1){
-          state.history[idx].coachingInsight = text;
-          await saveState();
-        }
-      }
+      el.scoCoachText.textContent = text;
+      const idx = state.history.findIndex(h => h.id === entry.id);
+      if (idx !== -1){ state.history[idx].coachingInsight = text; await saveState(); }
     }).catch(err => {
-      el.scoCoachText.textContent = 'Coaching failed: ' + (err.message || 'network error. Check connection and API key.');
       el.scoCoachText.className = '';
+      const aborted = err && err.name === 'AbortError';
+      el.scoCoachText.textContent = aborted
+        ? 'Coaching timed out. Check your connection and try again.'
+        : 'Coaching failed: ' + (err.message || 'network error. Check connection and API key.');
+      addCoachRetry();
     });
+  }
+
+  function removeCoachRetry(){ const b = el.scoCoaching?.querySelector('.coach-retry'); if (b) b.remove(); }
+  function addCoachRetry(){
+    if (!el.scoCoaching) return;
+    removeCoachRetry();
+    const b = document.createElement('button');
+    b.className = 'btn-s coach-retry';
+    b.style.cssText = 'margin-top:8px;width:100%;font-size:12px';
+    b.textContent = 'Retry coaching';
+    b.addEventListener('click', () => { if (_lastCoachEntry) fetchCoachingForOverlay(_lastCoachEntry); });
+    el.scoCoaching.appendChild(b);
   }
 
   function showWeakPointPrompt(liftId){
@@ -4915,7 +5089,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   async function fetchWeakPointWhy(liftId, accName, weakPoint){
-    const key = (sessionAnthropicKey || '').trim() || (state.settings.ai?.anthropicKey || '').trim() || String(el.anthropicKey?.value || '').trim();
+    const key = aiKey();
     if (!key || !key.startsWith('sk-')){
       toast('Add API key in Settings for AI explanations.', 'w');
       return '';
@@ -4923,20 +5097,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const lift = getLiftMeta(liftId);
     const prompt = 'You are a powerlifting coach. In 2 sentences, explain why "' + accName + '" is a good accessory exercise for someone who struggles with "' + weakPoint + '" on the ' + lift.name + '. Be specific about the muscle groups and mechanics involved. Do not use filler words.';
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-        body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:150, messages:[{ role:'user', content:prompt }] }),
-        signal: controller.signal
-      });
-      clearTimeout(timer);
-      const data = await resp.json();
-      return data.content?.map(b => b.text || '').join('') || 'No explanation available.';
+      const text = await aiComplete(key, prompt, 160);
+      return text || 'No explanation available.';
     } catch(err){
       console.error('Why API error:', err);
-      return 'Could not generate explanation — check connection.';
+      return err.name === 'AbortError'
+        ? 'Explanation timed out — check connection.'
+        : 'Could not generate explanation — check connection.';
     }
   }
 
@@ -5279,8 +5446,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (el.profPedAssisted) el.profPedAssisted.checked = !!prof.pedAssisted;
     if (el.profLifestyleStress) el.profLifestyleStress.value = String(prof.lifestyleStress ?? 3);
     updateProfileMultiplierPreview();
-    el.anthropicKey.value = sessionAnthropicKey || state.settings.ai?.anthropicKey || '';
+    el.openrouterKey.value = sessionApiKey || state.settings.ai?.openrouterKey || '';
+    if (el.aiModel) el.aiModel.value = state.settings.ai?.model || 'anthropic/claude-haiku-4.5';
     el.performanceMode.checked = state.settings.ui?.performanceMode === true;
+    if (el.uiWakeLock) el.uiWakeLock.checked = state.settings.ui?.wakeLock !== false;
+    if (el.uiHaptics) el.uiHaptics.checked = state.settings.ui?.haptics !== false;
+    if (el.uiSound) el.uiSound.checked = state.settings.ui?.sound === true;
     // Equipment toggles
     const eq = state.settings.equipment || {};
     el.equipBarbell.checked = eq.barbell !== false;
@@ -6338,27 +6509,39 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* v10: Rep-Max PRs — best weight × reps observed per lift, grouped by rep range */
-  function computeRepMaxPRs(){
-    // PRs: { liftId: { 'range': { weight, reps, date } } }
-    // Ranges: 1RM (1), 3RM (2-3), 5RM (4-5), 8RM (6-8), 12RM (9-12), 15+RM (13+)
-    const rangeFor = r => r <= 1 ? '1RM' : r <= 3 ? '3RM' : r <= 5 ? '5RM' : r <= 8 ? '8RM' : r <= 12 ? '12RM' : '15+RM';
-    const prs = {};
-    for (const h of (state.history || [])){
-      if (!h.sets) continue;
-      for (const s of h.sets){
-        if (s.isRamp) continue;
-        const reps = Math.floor(s.performedReps || 0);
-        const w = +s.weight;
-        if (!reps || !Number.isFinite(w) || w <= 0) continue;
-        const range = rangeFor(reps);
-        prs[h.liftId] = prs[h.liftId] || {};
-        const current = prs[h.liftId][range];
-        // PR = heaviest weight; if tie, more reps wins
-        if (!current || w > current.weight || (w === current.weight && reps > current.reps)){
-          prs[h.liftId][range] = { weight:w, reps, date:h.completedAt };
-        }
+  // v11.0.2: persistent PR ledger so pruning old sessions never loses a PR.
+  function rangeForReps(r){ return r <= 1 ? '1RM' : r <= 3 ? '3RM' : r <= 5 ? '5RM' : r <= 8 ? '8RM' : r <= 12 ? '12RM' : '15+RM'; }
+  function foldSetsIntoRecords(records, liftId, sets, date){
+    if (!Array.isArray(sets)) return;
+    for (const s of sets){
+      if (s.isRamp) continue;
+      const reps = Math.floor(s.performedReps || 0);
+      const w = +s.weight;
+      if (!reps || !Number.isFinite(w) || w <= 0) continue;
+      const range = rangeForReps(reps);
+      records[liftId] = records[liftId] || {};
+      const cur = records[liftId][range];
+      if (!cur || w > cur.weight || (w === cur.weight && reps > cur.reps)){
+        records[liftId][range] = { weight:w, reps, date:date || null };
       }
     }
+  }
+  function updateRecordsFromEntry(entry){
+    if (!entry || !entry.liftId) return;
+    if (!state.records || typeof state.records !== 'object') state.records = {};
+    foldSetsIntoRecords(state.records, entry.liftId, entry.sets, entry.completedAt);
+  }
+  function computeRepMaxPRs(){
+    // PRs: { liftId: { 'range': { weight, reps, date } } }
+    // Seed from the persistent ledger (captures PRs from sessions that have since been pruned),
+    // then fold live history on top so anything newer/heavier wins.
+    const prs = {};
+    const seed = state.records || {};
+    for (const lid of Object.keys(seed)){
+      prs[lid] = {};
+      for (const range of Object.keys(seed[lid])) prs[lid][range] = { ...seed[lid][range] };
+    }
+    for (const h of (state.history || [])) foldSetsIntoRecords(prs, h.liftId, h.sets, h.completedAt);
     return prs;
   }
 
@@ -6593,6 +6776,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
     state.activeSession = session;
     await saveState();
+    requestWakeLock(); // v11.0.2: keep screen awake during the workout
     toast('Session started.', 'g');
     render();
     } finally {
@@ -6632,6 +6816,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
     setSessionActiveIndexToNextOpen(session);
     await saveState();
+    haptic(30); // light confirmation buzz on set logged
     const restSec = restSecondsForSession(session);
     if (restSec > 0) openRest(restSec);
     render();
@@ -6655,6 +6840,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   /* ═══ REST TIMER — RAF-based (FIX: no setInterval throttling) ═══ */
   function openRest(seconds){
     closeRest(false);
+    ensureAudio(); // unlock audio on this user-gesture so the completion beep is allowed on iOS
     restTimer.totalSeconds = seconds;
     restTimer.endAt = Date.now() + (seconds * 1000);
     el.restModal.hidden = false;
@@ -6705,7 +6891,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       closeRest(false);
       stopRestMiniBadge();
       toast('Rest done!', 'g');
-      try{ if (navigator.vibrate) navigator.vibrate([120, 60, 120]); }catch(_){}
+      beep();
+      haptic([120, 60, 120]);
       return;
     }
     // v10: setInterval at 250ms instead of rAF — plenty smooth, saves ~98% of draw calls
@@ -6820,6 +7007,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       movementQuality:_movementQuality || 'normal'
     };
     state.history.push(entry);
+    updateRecordsFromEntry(entry); // v11.0.2: capture PRs into persistent ledger before any future pruning
     const key = session.microcycleKey;
     const comp = state.program.completion[key] || {};
     comp[session.liftId] = 'done'; state.program.completion[key] = comp;
@@ -6829,6 +7017,8 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     maybeAdvanceMicrocycle();
     await saveState();
     await enqueueSync('main-session', entry);
+    releaseWakeLock(); // v11.0.2: session over — let the screen sleep again
+    if (realizationUpdate?.reason === 'progress') haptic([60, 40, 60, 40, 120]); // celebrate a new 1RM
 
     toast(note || 'Session completed.', realizationUpdate?.reason === 'progress' ? 'g' : '');
     el.badgeFatigue.style.display = 'none';
@@ -6864,13 +7054,22 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       pullup_bar: !!el.equipPullupBar.checked
     };
     state.settings.remoteEndpoint = String(el.remoteEndpoint.value || '').trim();
-    const keyVal = String(el.anthropicKey.value || '').trim();
+    const keyVal = String(el.openrouterKey.value || '').trim();
+    const modelVal = String((el.aiModel && el.aiModel.value) || '').trim() || 'anthropic/claude-haiku-4.5';
     state.settings.ai = {
       enableReadiness:!!el.enableReadiness.checked,
       enableRPE:!!el.enableRPE.checked,
-      anthropicKey:keyVal
+      openrouterKey:keyVal,
+      model:modelVal
     };
-    sessionAnthropicKey = keyVal;
+    sessionApiKey = keyVal;
+    // v11.0.2: UI toggles (wake lock, haptics, sound)
+    if (!state.settings.ui) state.settings.ui = {};
+    if (el.uiWakeLock) state.settings.ui.wakeLock = !!el.uiWakeLock.checked;
+    if (el.uiHaptics) state.settings.ui.haptics = !!el.uiHaptics.checked;
+    if (el.uiSound) state.settings.ui.sound = !!el.uiSound.checked;
+    // Acquire/release wake lock immediately to reflect the new preference during an active session
+    if (state.activeSession && state.settings.ui.wakeLock) requestWakeLock(); else releaseWakeLock();
     // v11: backoff sets toggle + guided warmup toggle
     if (!state.settings.amrap) state.settings.amrap = {};
     state.settings.amrap.enableBackoffSets = !!(el.enableBackoffSets && el.enableBackoffSets.checked);
@@ -6970,7 +7169,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     if (!ok) return;
     state = deepClone(DEFAULT_STATE);
     try{ for (const item of await idb.getAll('outbox')) await idb.del('outbox', item.id); }catch(_){}
-    stopSessionTimer(); stopRestMiniBadge();
+    stopSessionTimer(); stopRestMiniBadge(); releaseWakeLock();
     await saveState(); toast('Reset complete.', 'g'); render();
   }
 
@@ -6979,11 +7178,12 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     const sanitized = JSON.parse(JSON.stringify(state));
     if (sanitized.settings?.ai){
       sanitized.settings.ai = { ...sanitized.settings.ai };
-      delete sanitized.settings.ai.anthropicKey;
+      delete sanitized.settings.ai.openrouterKey;
+      delete sanitized.settings.ai.anthropicKey; // legacy field cleanup
     }
     const blob = new Blob([JSON.stringify(sanitized, null, 2)], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v11.0.1-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v11.0.2-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
   }
@@ -7011,11 +7211,11 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         const ok = await showConfirm('Import Preview', summary, 'Import', 'btn-w');
         if (!ok) return;
         // Preserve current local API key if import has none (exports strip it)
-        const currentKey = state.settings?.ai?.anthropicKey || '';
+        const currentKey = state.settings?.ai?.openrouterKey || '';
         state = mergeState(parsed);
-        if (currentKey && !state.settings.ai.anthropicKey){
-          state.settings.ai.anthropicKey = currentKey;
-          sessionAnthropicKey = currentKey;
+        if (currentKey && !state.settings.ai.openrouterKey){
+          state.settings.ai.openrouterKey = currentKey;
+          sessionApiKey = currentKey;
         }
         await saveState(); toast('Imported.', 'g'); render();
       }catch(err){ console.error(err); toast('Import failed — invalid JSON.', 'b'); }
@@ -7649,6 +7849,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ writeLocalBackup(true); saveState(); }
+      else if (state.activeSession){ requestWakeLock(); } // iOS drops the lock when backgrounded — re-acquire
     });
 
     // v11: Training profile — live preview of multiplier as user tweaks
@@ -7861,8 +8062,11 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     state.history.sort((a,b) => (a.completedAt||'').localeCompare(b.completedAt||''));
     const overflow = state.history.length - MAX_SESSIONS;
     if (overflow > 0){
+      // v11.0.2: fold every session being removed into the persistent PR ledger first — pruning never loses a PR
+      if (!state.records || typeof state.records !== 'object') state.records = {};
+      for (let i = 0; i < overflow; i++){ const h = state.history[i]; if (h) foldSetsIntoRecords(state.records, h.liftId, h.sets, h.completedAt); }
       state.history.splice(0, overflow);
-      toast('Pruned ' + overflow + ' oldest sessions (kept ' + MAX_SESSIONS + ').', 'w');
+      toast('Archived ' + overflow + ' old sessions (PRs kept).', 'w');
     }
     // Also prune accessory history
     if (state.accessories.history && state.accessories.history.length > ARCHIVE_THRESHOLD){
@@ -7875,6 +8079,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
   async function boot(){
     cacheEls();
     bindEvents();
+    setupModalA11y(); // v11.0.2: dialog roles + Escape-to-close
     wireOnboarding(); // v10: attach onboarding modal handlers
     db = await idb.open();
     await loadState();
@@ -7883,7 +8088,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     registerPWA();
     // Restore API key from saved settings
     try{
-      if (state.settings?.ai?.anthropicKey) sessionAnthropicKey = state.settings.ai.anthropicKey;
+      if (state.settings?.ai?.openrouterKey) sessionApiKey = state.settings.ai.openrouterKey;
     }catch(_){}
     // Unfinished session resume flow
     try{
@@ -7897,7 +8102,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
           '\nLift: ' + lm.name + '\nSet: ' + (doneCount+1) + '/' + totalSets + '\nReadiness: ' + rVal + '\n\nResume?';
         const ok = await showConfirm('Resume Session', msg, 'Resume', 'btn-p');
         if (!ok){ state.activeSession = null; await saveState(); }
-        else if (as.readiness){ _sessionReadiness = { ...as.readiness }; }
+        else { if (as.readiness){ _sessionReadiness = { ...as.readiness }; } requestWakeLock(); }
       }
     }catch(_){}
     render();
