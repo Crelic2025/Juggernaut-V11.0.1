@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v11.0.2</title>
+<title>Juggernaut Method 2.0 — v12.0.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -575,7 +575,7 @@ button:disabled{opacity:.35;pointer-events:none}
 /* ─── BOTTOM NAV ─── */
 .bottom-nav{
   position:fixed;left:0;right:0;bottom:0;
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(5,1fr);
   gap:4px;
   padding:6px 10px calc(6px + var(--safe-b));
   background:rgba(0,0,0,.96);
@@ -601,6 +601,30 @@ button:disabled{opacity:.35;pointer-events:none}
   color:var(--accent);
   background:var(--accent-dim);
 }
+
+/* ─── v12: COACH CHAT ─── */
+.coach-wrap{display:flex;flex-direction:column;gap:10px}
+.coach-messages{
+  display:flex;flex-direction:column;gap:10px;
+  height:calc(100dvh - 232px);min-height:240px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:4px;
+}
+.coach-msg{
+  max-width:88%;padding:10px 12px;border-radius:14px;
+  font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word;
+}
+.coach-msg.user{align-self:flex-end;background:var(--accent-dim);color:var(--text);border:1px solid var(--accent-mid)}
+.coach-msg.assistant{align-self:flex-start;background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
+.coach-msg.error{align-self:flex-start;background:rgba(245,101,101,.08);border:1px solid rgba(245,101,101,.3);color:var(--text)}
+.coach-empty{margin:auto;text-align:center;color:var(--muted);font-size:13px;line-height:1.5;padding:0 12px}
+.coach-suggest{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.coach-suggest button{font-size:12px;padding:8px 12px;min-height:auto}
+.coach-typing{align-self:flex-start;color:var(--muted);font-size:13px;font-style:italic;padding:4px 8px}
+.coach-input-row{display:flex;gap:8px;align-items:flex-end}
+.coach-input-row textarea{flex:1;min-height:44px;max-height:120px;resize:none;font-size:16px}
+.coach-input-row button{flex:0 0 auto}
+.coach-actions{display:flex;justify-content:flex-end}
 
 /* ─── TOAST ─── */
 .toast{
@@ -1462,7 +1486,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v11.0.2 — Inverted Hybrid</div>
+        <div class="hdr-sub">v12.0.0 — Inverted Hybrid</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -1779,6 +1803,20 @@ body.performance-mode *{animation:none!important;transition:none!important}
     </section>
 
     <!-- ═══ SETTINGS VIEW ═══ -->
+    <!-- ═══ COACH VIEW (v12) ═══ -->
+    <section id="viewCoach" class="view">
+      <div class="coach-wrap">
+        <div id="coachMessages" class="coach-messages" aria-live="polite" aria-label="Coach conversation"></div>
+        <div class="coach-input-row">
+          <textarea id="coachInput" rows="1" placeholder="Ask your coach…" autocomplete="off" aria-label="Message your coach"></textarea>
+          <button id="coachSend" class="btn-p">Send</button>
+        </div>
+        <div class="coach-actions">
+          <button id="coachClear" class="btn-s xs">Clear chat</button>
+        </div>
+      </div>
+    </section>
+
     <section id="viewSettings" class="view">
       <!-- GROUP 1: Program -->
       <div class="settings-group open" data-sg="program">
@@ -2220,7 +2258,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <p><strong>Lifts &amp; Maxes:</strong> Enter your true 1RM for each lift. The app calculates your Training Max (TM) at 90% automatically.</p>
     <p><strong>Barbell Profiles:</strong> Below the 1RM editor, set <strong>per-lift bar weight, collar weight, rounding, and plate inventory</strong>. Useful if you use different bars (e.g. 55 lb squat bar vs 45 lb bench bar). The app uses these for exact plate breakdowns and snaps weights to what you can actually load.</p>
     <p><strong>Rest Timers:</strong> A wave×phase grid. 10s wave uses short rest (60s). Heavier waves get 2.5 min. "0" = no auto-timer. All overridable.</p>
-    <p><strong>AI &amp; Readiness:</strong> Toggle Daily Readiness check and RPE logging on/off. Paste your Anthropic API key for AI coaching. Optional — the app works fully without it.</p>
+    <p><strong>AI &amp; Readiness:</strong> Toggle Daily Readiness check and RPE logging on/off. Paste your OpenRouter API key for AI coaching, and optionally set the model. Optional — the app works fully without it.</p>
     <p><strong>UI &amp; Performance:</strong> Enable <strong>Performance Mode</strong> to disable blur effects and animations. Useful on older phones. Switches to system fonts for faster rendering.</p>
     <p><strong>Gym Equipment:</strong> Six toggles for the equipment you have access to — Barbell, Dumbbells, Cables, Bands, Machines, and Pull-up Bar. All are on by default. Toggle off anything you don't have and the <strong>swap chip lists</strong> in the exercise help modal will only show alternatives you can actually do. Your default accessories stay unchanged so you don't lose progress tracking — but if an exercise needs equipment you've toggled off, an amber warning appears on the card suggesting you swap. Bodyweight exercises are always available regardless of toggles.</p>
   </div>
@@ -2323,7 +2361,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 
   <h2 id="guide-coaching">AI Coaching</h2>
   <div class="section">
-    <p>With an Anthropic API key in Settings, <strong>Claude Sonnet</strong> analyzes your session data — sets, RPE, readiness, warmup feedback, movement quality, volume trends — and returns 2–3 sentences of personalized coaching in a purple card.</p>
+    <p>With an OpenRouter API key in Settings, your chosen model (default <strong>Claude Haiku 4.5</strong>) analyzes your session data — sets, RPE, readiness, warmup feedback, movement quality, volume trends — alongside your recent training history, and returns 3–4 sentences of personalized coaching. The new <strong>Coach</strong> tab lets you ask follow-up questions with that same context.</p>
   </div>
 
   <h2 id="guide-philosophy">System Philosophy</h2>
@@ -2412,7 +2450,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <p>The <strong>Session Complete overlay</strong> appears with:</p>
     <p><strong>Summary card</strong> — lift name, wave/phase, tonnage, session duration, AMRAP estimated 1RM, readiness score, sets completed. If it was a realization day and you earned a new 1RM, it's highlighted in green with the increase amount.</p>
     <p><strong>Session notes</strong> — a text area to record anything notable ("hip felt tight on set 3", "new belt felt great", "grip slipped on set 5"). Saved to your history.</p>
-    <p><strong>AI Coaching Insight</strong> — if you have an Anthropic API key in Settings, a purple card loads with 2–3 sentences of personalized coaching based on your sets, RPE, readiness, movement quality, and volume trends. This takes a few seconds to generate.</p>
+    <p><strong>AI Coaching Insight</strong> — if you have an OpenRouter API key in Settings, a card loads with 3–4 sentences of personalized coaching based on your sets, RPE, readiness, movement quality, and recent volume/e1RM trends. This takes a few seconds to generate.</p>
     <p><strong>"Where did you struggle?"</strong> — tap your sticking point: Out of the hole, Midrange, Lockout, Off the chest, Off the floor, or No issues. This selection does two things: it highlights matching accessories with a purple star badge, and it may trigger an <strong>accessory swap suggestion</strong> in a purple card below.</p>
     <p><strong>Accessory swap suggestion</strong> — if your current T1 accessory doesn't target the weakness you just selected, and a better option exists in the library, the app suggests the swap: "Consider swapping Pause Squat → Close-Grip Bench to target your lockout weakness." One tap on <strong>Apply Swap</strong> executes it. If you've reported the same sticking point 2+ sessions in a row, the suggestion is emphasized.</p>
 
@@ -2533,6 +2571,10 @@ body.performance-mode *{animation:none!important;transition:none!important}
   <button class="tab" data-tab="History">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     History
+  </button>
+  <button class="tab" data-tab="Coach">
+    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    Coach
   </button>
   <button class="tab" data-tab="Settings">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -2706,8 +2748,12 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '11.0.2';
-  // Session-only storage for Anthropic API key
+  const APP_VERSION = '12.0.0';
+  // v12: longitudinal coaching tunables
+  const COACH_WINDOW = 8;     // sessions per lift fed to the model
+  const COACH_CHAT_MAX = 24;  // chat turns persisted
+  const COACH_CHAT_SEND = 16; // chat turns sent to the model per request
+  // Session-only storage for the OpenRouter API key
   let sessionApiKey = '';
   let _audioCtx = null;
   const DB_NAME = 'JuggernautTrackerDB';
@@ -3298,6 +3344,7 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     activeSession:null,
     history:[],
     records:{}, // v11.0.2: persistent lifetime PR ledger — survives history pruning
+    coachChat:{ messages:[] }, // v12: longitudinal coach conversation
     bodyweight:[], // v10: array of { date:ISO, weight:number }
     accessories:{
       byLift:{
@@ -3476,6 +3523,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     base.activeSession = parsed.activeSession || null;
     base.history = Array.isArray(parsed.history) ? parsed.history : [];
     base.records = (parsed.records && typeof parsed.records === 'object') ? parsed.records : {}; // v11.0.2 PR ledger
+    base.coachChat = (parsed.coachChat && Array.isArray(parsed.coachChat.messages)) // v12 coach chat
+      ? { messages: parsed.coachChat.messages.slice(-COACH_CHAT_MAX) }
+      : { messages: [] };
     base.bodyweight = Array.isArray(parsed.bodyweight) ? parsed.bodyweight : []; // v10
     const inAcc = (parsed.accessories||{}).byLift || {};
     for (const lift of LIFTS){
@@ -4221,6 +4271,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'sessionCompleteOverlay','scoSummary','scoCoaching','scoCoachText','scoWeakPoint','scoWeakOpts',
      'scoAccSuggestion','scoAccText','scoAccApply','btnContinueAcc2','btnReturnDash',
      'enableReadiness','enableRPE','enableBackoffSets','enableGuidedWarmup','openrouterKey','aiModel','performanceMode','uiWakeLock','uiHaptics','uiSound',
+     'coachMessages','coachInput','coachSend','coachClear',
      'profAgeBracket','profExperienceYears','profBodyweight','profPedAssisted','profLifestyleStress','profMultiplierPreview',
      'equipBarbell','equipDumbbell','equipCable','equipBand','equipMachine','equipPullupBar',
      'bwInput','btnLogBW','bwRecent',
@@ -4228,7 +4279,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'onboardNext1','onboardBack2','onboardNext2','onboardBack3','onboardDone','onboardSkip',
      'toast','restModal','restDisplay','timerArc','btnRestMinus10','btnRestPlus10','btnRestClose',
      'confirmModal','confirmTitle','confirmMsg','confirmCancel','confirmOk',
-     'viewWorkout','viewAccessories','viewHistory','viewSettings'
+     'viewWorkout','viewAccessories','viewHistory','viewCoach','viewSettings'
     ].forEach(id => el[id] = $(id));
   }
 
@@ -4974,15 +5025,20 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function aiExtractText(data){
     try{ return String(data?.choices?.[0]?.message?.content || '').trim(); }catch(_){ return ''; }
   }
-  // Shared OpenRouter call with a hard timeout. Returns text or throws.
-  async function aiComplete(key, prompt, maxTokens){
+  // Multi-turn OpenRouter call with a hard timeout and optional system message. Returns text or throws.
+  async function aiChat(key, messages, opts = {}){
+    const { maxTokens = 400, system = null, timeoutMs = 30000 } = opts;
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 20000);
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     try{
       const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method:'POST', signal:ctrl.signal,
         headers:aiHeaders(key),
-        body:JSON.stringify({ model:aiModel(), max_tokens:maxTokens, messages:[{ role:'user', content:prompt }] })
+        body:JSON.stringify({
+          model:aiModel(),
+          max_tokens:maxTokens,
+          messages: system ? [{ role:'system', content:system }, ...messages] : messages
+        })
       });
       const data = await resp.json().catch(() => ({}));
       if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
@@ -4991,6 +5047,51 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     } finally {
       clearTimeout(timer);
     }
+  }
+  // Backward-compatible single-prompt wrapper (used by the weak-point "Why?" call).
+  async function aiComplete(key, prompt, maxTokens){
+    return aiChat(key, [{ role:'user', content:prompt }], { maxTokens, timeoutMs:20000 });
+  }
+
+  /* ═══ v12: LONGITUDINAL COACHING PROMPTS ═══ */
+  const COACH_SYSTEM_REVIEW =
+    "You are an elite powerlifting coach reviewing a lifter on the Juggernaut Method 2.0 " +
+    "(block periodization: 10s -> 8s -> 5s -> 3s waves, AMRAP-driven training-max autoregulation, scheduled deloads). " +
+    "You are given a JSON digest of the lifter's recent training plus the session they just finished. " +
+    "Ground EVERY statement in the digest's numbers and the pre-computed `flags` -- never invent data or cite a number not in the digest. " +
+    "All weights are in the unit given by digest.units; always label numbers with that unit. " +
+    "If a stall or downtrend flag is present, address it and state whether it reads as a PROGRAMMING issue or a RECOVERY/fatigue issue, " +
+    "using `readinessTrend` to decide (flat/up readiness + flat e1rm = programming; down readiness = recovery). " +
+    "You are advisory only: suggest, never command changes to training maxes, deloads, phases, or progression. " +
+    "Be specific and actionable. 3-4 sentences. No preamble, no filler, no bullet lists.";
+
+  const COACH_SYSTEM_CHAT =
+    "You are an elite powerlifting coach for a lifter on the Juggernaut Method 2.0 " +
+    "(block periodization: 10s -> 8s -> 5s -> 3s waves, AMRAP-driven training-max autoregulation, scheduled deloads). " +
+    "Answer their questions about programming, recovery, technique, and progression. " +
+    "A JSON digest of their recent training is provided below -- ground all numeric claims in it and never invent numbers. " +
+    "All weights are in the unit given by digest.units; always label numbers with that unit. " +
+    "You are advisory only: suggest, never command. If the digest can't answer something, say so briefly and give general best-practice guidance. " +
+    "Keep answers tight and practical.\n\nDIGEST:\n";
+
+  // One-line summary of a just-completed session for the post-session coaching prompt.
+  // Note is truncated to keep the prompt small and avoid dumping free text.
+  function oneLineSession(entry){
+    const a = _sessionAmrap(entry);
+    const r = entry.readiness ? Math.round(readinessScoreNormalized(entry.readiness)) : null;
+    const note = entry.note ? String(entry.note).slice(0, 140) : null;
+    return [
+      entry.wave + ' ' + entry.phase,
+      a ? ('AMRAP ' + a.reps + '/' + a.target + ' @ ' + formatWeight(a.w) + (a.grind ? ' (grind)' : '')) : null,
+      'e1RM ' + (_sessionE1rm(entry) || '?'),
+      'tonnage ' + _sessionTonnage(entry),
+      r !== null ? ('readiness ' + r + '/30') : null,
+      entry.sessionDifficulty ? ('difficulty ' + entry.sessionDifficulty + '/10') : null,
+      'quality ' + (entry.movementQuality || 'normal'),
+      entry.readiness?.fireDay ? 'fire day extended' : null,
+      entry.readiness?.fatigueManaged ? 'volume auto-reduced' : null,
+      note ? ('note: ' + note) : null
+    ].filter(Boolean).join(', ');
   }
 
   let _lastCoachEntry = null;
@@ -5004,30 +5105,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.scoCoachText.className = 'loading';
     removeCoachRetry();
 
-    const lift = getLiftMeta(entry.liftId);
-    const workingSets = entry.sets.filter(s => !s.isRamp);
-    const tonnage = workingSets.reduce((sum, s) => sum + s.weight * s.performedReps, 0);
-    const amrapSet = workingSets.find(s => s.isAMRAP);
-    // v10: latest bodyweight context for coaching
-    const latestBW = (state.bodyweight && state.bodyweight.length) ? state.bodyweight[state.bodyweight.length - 1] : null;
-    const bwStr = latestBW ? 'Bodyweight: ' + formatWeight(latestBW.weight) + '. ' : '';
-    // v11: session difficulty feeds coaching context
-    const diffStr = entry.sessionDifficulty ? 'Session difficulty: ' + entry.sessionDifficulty + '/10. ' : '';
-    // v11: fire day signal
-    const fireStr = entry.readiness?.fireDay ? 'Fire day — user opted to extend volume. ' : '';
-    const prompt = 'You are a powerlifting coach reviewing a session. Lift: ' + lift.name + '. Phase: ' + entry.wave + ' ' + entry.phase + '. ' +
-      'Sets completed: ' + workingSets.length + '. Tonnage: ' + formatWeight(tonnage) + '. ' +
-      (amrapSet ? 'AMRAP: ' + amrapSet.performedReps + '/' + amrapSet.targetReps + ' reps at ' + formatWeight(amrapSet.weight) + (amrapSet.missedLastRep ? ' (last rep was a grind/missed lockout)' : '') + '. ' : '') +
-      bwStr +
-      diffStr +
-      fireStr +
-      (entry.readiness ? 'Readiness: ' + readinessScoreNormalized(entry.readiness).toFixed(0) + '/30. ' : '') +
-      (entry.readiness?.fatigueManaged ? 'Volume was auto-reduced due to fatigue. ' : '') +
-      'Movement quality: ' + (entry.movementQuality || 'normal') + '. ' +
-      (entry.note || '') +
-      ' Give 2-3 concise coaching sentences. Be specific and actionable.';
+    // v12: longitudinal context — recent history digest + the just-completed session
+    const digest = buildCoachingDigest();
+    const userMsg =
+      'DIGEST:\n```json\n' + JSON.stringify(digest) + '\n```\n' +
+      'JUST COMPLETED (' + getLiftMeta(entry.liftId).name + '): ' + oneLineSession(entry) + '\n\n' +
+      'Give your read on this session in the context of the recent trend.';
 
-    aiComplete(key, prompt, 250).then(async (text) => {
+    aiChat(key, [{ role:'user', content:userMsg }], { system:COACH_SYSTEM_REVIEW, maxTokens:320 }).then(async (text) => {
       el.scoCoachText.className = '';
       if (!text){
         el.scoCoachText.textContent = 'No coaching insight returned. Check your model slug in Settings.';
@@ -5057,6 +5142,77 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     b.textContent = 'Retry coaching';
     b.addEventListener('click', () => { if (_lastCoachEntry) fetchCoachingForOverlay(_lastCoachEntry); });
     el.scoCoaching.appendChild(b);
+  }
+
+  /* ═══ v12: COACH CHAT VIEW ═══ */
+  function renderCoachChat(){
+    const box = el.coachMessages;
+    if (!box) return;
+    const msgs = (state.coachChat && state.coachChat.messages) || [];
+    if (!msgs.length){
+      box.innerHTML =
+        '<div class="coach-empty">Ask about your training. I can see your recent sessions, e1RM trends, AMRAP performance, and readiness.' +
+        '<div class="coach-suggest">' +
+          '<button class="btn-s" data-coach-q="How is my training trending overall?">Trend check</button>' +
+          '<button class="btn-s" data-coach-q="Has any lift stalled, and is it programming or recovery?">Stall check</button>' +
+          '<button class="btn-s" data-coach-q="Based on my readiness lately, should I deload soon?">Deload?</button>' +
+        '</div></div>';
+      return;
+    }
+    box.innerHTML = msgs.map(m =>
+      '<div class="coach-msg ' + (m.role === 'user' ? 'user' : (m.error ? 'error' : 'assistant')) + '">' +
+      escapeHtml(m.content) + '</div>'
+    ).join('');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function sendCoachMessage(text){
+    text = (text || '').trim();
+    if (!text) return;
+    const key = aiKey();
+    if (!key || !key.startsWith('sk-')){ toast('Add your OpenRouter key in Settings to use the coach.', 'w'); return; }
+    if (!navigator.onLine){ toast('Coach needs a connection.', 'w'); return; }
+    if (!state.coachChat || !Array.isArray(state.coachChat.messages)) state.coachChat = { messages: [] };
+
+    state.coachChat.messages.push({ role:'user', content:text, t:nowISO() });
+    state.coachChat.messages = state.coachChat.messages.slice(-COACH_CHAT_MAX);
+    renderCoachChat();
+    await saveState();
+
+    const box = el.coachMessages;
+    const typing = document.createElement('div');
+    typing.className = 'coach-typing'; typing.textContent = 'Coach is thinking…';
+    if (box){ box.appendChild(typing); box.scrollTop = box.scrollHeight; }
+    if (el.coachSend) el.coachSend.disabled = true;
+
+    const system = COACH_SYSTEM_CHAT + JSON.stringify(buildCoachingDigest());
+    const convo = state.coachChat.messages
+      .filter(m => !m.error)
+      .slice(-COACH_CHAT_SEND)
+      .map(m => ({ role:m.role, content:m.content }));
+
+    try{
+      const reply = await aiChat(key, convo, { system, maxTokens:500 });
+      state.coachChat.messages.push({ role:'assistant', content:reply || '(no response)', t:nowISO() });
+    }catch(err){
+      const aborted = err && err.name === 'AbortError';
+      state.coachChat.messages.push({
+        role:'assistant', error:true, t:nowISO(),
+        content: aborted ? 'Timed out — try again.' : 'Coach error: ' + (err.message || 'network')
+      });
+    }finally{
+      state.coachChat.messages = state.coachChat.messages.slice(-COACH_CHAT_MAX);
+      if (el.coachSend) el.coachSend.disabled = false;
+      renderCoachChat();
+      await saveState();
+    }
+  }
+
+  function autoGrowCoachInput(){
+    const t = el.coachInput;
+    if (!t) return;
+    t.style.height = 'auto';
+    t.style.height = Math.min(t.scrollHeight, 120) + 'px';
   }
 
   function showWeakPointPrompt(liftId){
@@ -5406,6 +5562,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     el['view' + name].classList.add('active');
     document.querySelector('.tab[data-tab="' + name + '"]').classList.add('active');
+    if (name === 'Coach') renderCoachChat(); // v12
   }
 
   /* ═══ RENDER: Lift selects ═══ */
@@ -6531,6 +6688,146 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (!state.records || typeof state.records !== 'object') state.records = {};
     foldSetsIntoRecords(state.records, entry.liftId, entry.sets, entry.completedAt);
   }
+
+  /* ═══ v12: LONGITUDINAL COACHING DIGEST ═══ */
+  // The model receives facts + pre-computed signals; it never derives trends from raw arrays.
+  // Field names are unit-neutral (digest.units carries lb/kg); never imply pounds.
+  function _sessionAmrap(entry){
+    const a = (entry.sets || []).find(s => s.isAMRAP && !s.isRamp);
+    return a ? { reps:a.performedReps, target:a.targetReps, w:a.weight, rpe:a.rpe, grind:!!a.missedLastRep } : null;
+  }
+  function _sessionE1rm(entry){
+    const work = (entry.sets || []).filter(s => !s.isRamp && s.performedReps > 0 && s.weight > 0);
+    if (!work.length) return null;
+    const a = _sessionAmrap(entry);
+    if (a && a.w > 0 && a.reps > 0){ const v = estimated1RM(a.w, a.reps, a.rpe); return Number.isFinite(v) ? Math.round(v) : null; }
+    const best = Math.max(...work.map(s => estimated1RM(s.weight, s.performedReps, s.rpe)).filter(Number.isFinite));
+    return Number.isFinite(best) ? Math.round(best) : null;
+  }
+  function _sessionTonnage(entry){
+    return Math.round((entry.sets || []).filter(s => !s.isRamp)
+      .reduce((t, s) => t + (s.weight || 0) * (s.performedReps || 0), 0));
+  }
+  // Least-squares slope of y vs time, expressed per week.
+  function _linregSlopePerWeek(points){
+    const pts = points.filter(p => Number.isFinite(p.y) && Number.isFinite(p.t));
+    if (pts.length < 2) return 0;
+    const xs = pts.map(p => p.t / (7 * 24 * 3600 * 1000));
+    const ys = pts.map(p => p.y);
+    const n = xs.length;
+    const mx = xs.reduce((a, b) => a + b, 0) / n;
+    const my = ys.reduce((a, b) => a + b, 0) / n;
+    let num = 0, den = 0;
+    for (let i = 0; i < n; i++){ num += (xs[i] - mx) * (ys[i] - my); den += (xs[i] - mx) ** 2; }
+    if (den === 0) return 0;
+    const slope = num / den;
+    return Number.isFinite(slope) ? Math.round(slope * 10) / 10 : 0;
+  }
+  // 'up' | 'flat' | 'down' from first-half vs second-half average, with a 4% deadband.
+  function _trendLabel(vals){
+    const v = vals.filter(Number.isFinite);
+    if (v.length < 4) return 'flat';
+    const half = Math.floor(v.length / 2);
+    const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+    const early = avg(v.slice(0, half)), late = avg(v.slice(-half));
+    const thr = Math.max(1, early * 0.04);
+    return late - early > thr ? 'up' : late - early < -thr ? 'down' : 'flat';
+  }
+  function _bestByRange(liftId){
+    const all = (computeRepMaxPRs()[liftId]) || {};
+    const out = {};
+    for (const k of Object.keys(all)) out[k] = { w:all[k].weight, reps:all[k].reps };
+    return out;
+  }
+  function _bodyweightDigest(){
+    const bw = state.bodyweight || [];
+    if (!bw.length) return null;
+    const latest = bw[bw.length - 1];
+    const current = latest?.weight ?? null;
+    if (current == null) return null;
+    // Simple 4-week delta + trend if dates are present; otherwise just the latest value.
+    const pts = bw.filter(b => Number.isFinite(b.weight)).map(b => ({ t:new Date(b.date || b.ts || latest.date || Date.now()).getTime(), y:b.weight }));
+    let deltaLast4Weeks = null, trend = 'flat';
+    if (pts.length >= 2){
+      const cutoff = Date.now() - 28 * 24 * 3600 * 1000;
+      const recent = pts.filter(p => Number.isFinite(p.t) && p.t >= cutoff);
+      if (recent.length >= 2){
+        deltaLast4Weeks = Math.round((recent[recent.length - 1].y - recent[0].y) * 10) / 10;
+        trend = deltaLast4Weeks > 0.5 ? 'up' : deltaLast4Weeks < -0.5 ? 'down' : 'flat';
+      }
+    }
+    return { current, trend, deltaLast4Weeks };
+  }
+
+  function buildLiftDigest(liftId){
+    const hist = (state.history || [])
+      .filter(h => h.liftId === liftId)
+      .sort((a, b) => (a.completedAt || '').localeCompare(b.completedAt || ''))
+      .slice(-COACH_WINDOW);
+    if (!hist.length) return null;
+
+    const sessions = hist.map(h => {
+      const a = _sessionAmrap(h);
+      return {
+        date:(h.completedAt || '').slice(0, 10),
+        wave:h.wave || null,
+        amrap:a ? { reps:a.reps, target:a.target, w:a.w, grind:a.grind } : null,
+        e1rm:_sessionE1rm(h),
+        tonnage:_sessionTonnage(h),
+        readiness:h.readiness ? Math.round(readinessScoreNormalized(h.readiness)) : null,
+        difficulty:h.sessionDifficulty || null,
+        quality:h.movementQuality || 'normal'
+      };
+    });
+
+    const e1Pts = hist.map(h => ({ t:new Date(h.completedAt || Date.now()).getTime(), y:_sessionE1rm(h) }));
+    const amrapDeltas = sessions.map(s => s.amrap ? (s.amrap.reps - s.amrap.target) : null).filter(Number.isFinite);
+
+    return {
+      name:getLiftMeta(liftId).name,
+      currentE1rm:sessions[sessions.length - 1].e1rm,
+      best:_bestByRange(liftId),
+      e1rmSlopePerWk:_linregSlopePerWeek(e1Pts),
+      amrapVsTargetAvg:amrapDeltas.length ? Math.round((amrapDeltas.reduce((a, b) => a + b, 0) / amrapDeltas.length) * 10) / 10 : null,
+      readinessTrend:_trendLabel(sessions.map(s => s.readiness)),
+      sessions
+    };
+  }
+
+  function detectCoachFlags(lifts){
+    const flags = [];
+    for (const [lid, d] of Object.entries(lifts)){
+      if (!d || d.sessions.length < 3) continue;
+      if (d.e1rmSlopePerWk <= 0.2 && d.readinessTrend !== 'down') flags.push(lid + '_e1rm_stalled');
+      if (d.readinessTrend === 'down') flags.push(lid + '_readiness_downtrend');
+      if (d.amrapVsTargetAvg !== null && d.amrapVsTargetAvg < -0.5) flags.push(lid + '_amrap_below_target');
+    }
+    return flags;
+  }
+
+  function buildCoachingDigest(){
+    const micro = (typeof currentMicrocycle === 'function') ? currentMicrocycle() : {};
+    const lifts = {};
+    for (const lid of (state.settings.activeLiftIds || ['squat', 'bench', 'deadlift', 'ohp'])){
+      const d = buildLiftDigest(lid);
+      if (d) lifts[lid] = d;
+    }
+    const digest = {
+      generatedAt:nowISO(),
+      units:state.settings.units || 'lb',
+      program:{
+        wave:micro.wave || null,
+        phase:micro.phase || null,
+        microcycleIndex:(micro.index !== undefined ? micro.index : state.program.index),
+        deload:/deload/i.test(micro.phase || '') || micro.wave === 'deload'
+      },
+      bodyweight:_bodyweightDigest(),
+      lifts
+    };
+    digest.flags = detectCoachFlags(lifts);
+    return digest;
+  }
+
   function computeRepMaxPRs(){
     // PRs: { liftId: { 'range': { weight, reps, date } } }
     // Seed from the persistent ledger (captures PRs from sessions that have since been pruned),
@@ -7183,7 +7480,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     }
     const blob = new Blob([JSON.stringify(sanitized, null, 2)], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v11.0.2-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v12.0.0-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
   }
@@ -7395,6 +7692,44 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     document.querySelectorAll('.tab').forEach(btn => {
       btn.addEventListener('click', () => setView(btn.getAttribute('data-tab')));
     });
+
+    // v12: Coach chat
+    if (el.coachSend){
+      el.coachSend.addEventListener('click', () => {
+        const v = el.coachInput.value;
+        el.coachInput.value = '';
+        autoGrowCoachInput();
+        sendCoachMessage(v);
+      });
+    }
+    if (el.coachInput){
+      el.coachInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey){
+          e.preventDefault();
+          const v = el.coachInput.value;
+          el.coachInput.value = '';
+          autoGrowCoachInput();
+          sendCoachMessage(v);
+        }
+      });
+      el.coachInput.addEventListener('input', autoGrowCoachInput);
+    }
+    if (el.coachClear){
+      el.coachClear.addEventListener('click', async () => {
+        if (!(state.coachChat?.messages || []).length) return;
+        const ok = await showConfirm('Clear chat', 'Delete this coach conversation? This cannot be undone.', 'Clear', 'btn-w');
+        if (!ok) return;
+        state.coachChat = { messages: [] };
+        await saveState();
+        renderCoachChat();
+      });
+    }
+    if (el.coachMessages){
+      el.coachMessages.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-coach-q]');
+        if (b) sendCoachMessage(b.getAttribute('data-coach-q'));
+      });
+    }
 
     el.liftSelect.addEventListener('change', () => { renderDashboard(); render(); });
     el.accLiftSelect.addEventListener('change', () => renderAccessories());
@@ -8108,6 +8443,49 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     render();
     // v10: show onboarding for first-time users after initial render
     if (shouldShowOnboarding()) showOnboarding();
+    // v12: optional self-test via ?selftest
+    try{ if (/[?&]selftest\b/.test(location.search)) runCoachSelftest(); }catch(_){}
+  }
+
+  // v12: non-UI debug hook + lightweight assertions for the coaching math.
+  window.juggernautBuildCoachingDigest = buildCoachingDigest;
+  function runCoachSelftest(){
+    const results = [];
+    const assert = (name, cond) => results.push({ name, pass: !!cond });
+
+    // _linregSlopePerWeek: +10/week over 2 weeks
+    const wk = 7 * 24 * 3600 * 1000;
+    const slope = _linregSlopePerWeek([{ t:0, y:100 }, { t:wk, y:110 }, { t:2*wk, y:120 }]);
+    assert('_linregSlopePerWeek ~+10/wk', Math.abs(slope - 10) < 0.5);
+    assert('_linregSlopePerWeek single point = 0', _linregSlopePerWeek([{ t:0, y:5 }]) === 0);
+
+    // _trendLabel
+    assert('_trendLabel up', _trendLabel([100,101,108,112]) === 'up');
+    assert('_trendLabel down', _trendLabel([112,108,101,100]) === 'down');
+    assert('_trendLabel flat', _trendLabel([100,100,100,100]) === 'flat');
+    assert('_trendLabel <4 = flat', _trendLabel([100,200]) === 'flat');
+
+    // detectCoachFlags
+    const stalled = { test: { sessions:[1,2,3,4], e1rmSlopePerWk:0.1, readinessTrend:'flat', amrapVsTargetAvg:0 } };
+    assert('flag e1rm_stalled', detectCoachFlags(stalled).includes('test_e1rm_stalled'));
+    const downR = { test: { sessions:[1,2,3,4], e1rmSlopePerWk:5, readinessTrend:'down', amrapVsTargetAvg:0 } };
+    assert('flag readiness_downtrend', detectCoachFlags(downR).includes('test_readiness_downtrend'));
+    const belowA = { test: { sessions:[1,2,3,4], e1rmSlopePerWk:5, readinessTrend:'up', amrapVsTargetAvg:-1 } };
+    assert('flag amrap_below_target', detectCoachFlags(belowA).includes('test_amrap_below_target'));
+    assert('no flags <3 sessions', detectCoachFlags({ t:{ sessions:[1,2], e1rmSlopePerWk:0, readinessTrend:'down', amrapVsTargetAvg:-2 } }).length === 0);
+
+    // buildCoachingDigest: valid JSON, no NaN/undefined tokens
+    const dj = JSON.stringify(buildCoachingDigest());
+    assert('digest serializes', typeof dj === 'string' && dj.length > 2);
+    assert('digest has no NaN', !/:\s*NaN/.test(dj) && !/NaN/.test(dj));
+    assert('digest has units', JSON.parse(dj).units != null);
+
+    const failed = results.filter(r => !r.pass);
+    console.log('%c[Juggernaut v12 selftest] ' + (results.length - failed.length) + '/' + results.length + ' passed',
+      'font-weight:bold;color:' + (failed.length ? '#f56565' : '#56d4a5'));
+    results.forEach(r => console.log((r.pass ? '✓ ' : '✗ ') + r.name));
+    if (failed.length) console.warn('FAILED:', failed.map(f => f.name));
+    return { total: results.length, passed: results.length - failed.length, failed: failed.map(f => f.name) };
   }
 
   boot().catch(err => { console.error(err); alert('Boot failed — check console.'); });
