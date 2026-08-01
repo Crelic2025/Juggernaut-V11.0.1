@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.2</title>
+<title>Juggernaut Method 2.0 — v13.0.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -1524,7 +1524,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.2 — Act on the Signal</div>
+        <div class="hdr-sub">v13.0.3 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -2839,7 +2839,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.2';
+  const APP_VERSION = '13.0.3';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -7742,6 +7742,22 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     } else {
       if (el.sessionCompleteOverlay) el.sessionCompleteOverlay.hidden = true;
     }
+    // v13.0.3: the accessories phase must survive re-renders. Every accessory write
+    // path (log / progress / deload / swap) ends in render(); with activeSession
+    // already null at that point, renderSession() hid sessionSection (accessories
+    // live inside it) and renderDashboard() restored the main screen — dumping the
+    // lifter to the dashboard the instant a single accessory was logged. This branch
+    // re-asserts the accessories UI the same way _sessionPhase === 'complete'
+    // asserts the overlay. Runs last so it wins over the phase-blind renderers.
+    if (_sessionPhase === 'accessories'){
+      if (el.sessionSection) el.sessionSection.hidden = false;
+      if (el.inlineAccSection) el.inlineAccSection.hidden = false;
+      if (el.btnFinishFull) el.btnFinishFull.hidden = false;
+      if (el.dashboardCard) el.dashboardCard.style.display = 'none';
+      if (el.liftIntelCard) el.liftIntelCard.style.display = 'none';
+      if (el.weeklyPlanCard) el.weeklyPlanCard.style.display = 'none';
+      renderInlineAccessories(inlineAccLiftId());
+    }
   }
 
   function selectedLiftId(){ return el.liftSelect.value || state.settings.activeLiftIds[0] || 'squat'; }
@@ -8247,7 +8263,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.2-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.3-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -8722,15 +8738,15 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       // Save log
       const saveId = t.getAttribute('data-ias-save');
       if (saveId){
-        await saveAccessoryLog(saveId, 'inline'); // v13.0.2: inline source
-        renderInlineAccessories(inlineAccLiftId());
+        // v13.0.3: saveAccessoryLog → render() now re-renders the inline list
+        // via the accessories-phase branch; no second rebuild needed here.
+        await saveAccessoryLog(saveId, 'inline');
         return;
       }
       // Progress
       const progId = t.getAttribute('data-ias-progress');
       if (progId){
-        await applyAccessoryProgression(progId, 'inline'); // v13.0.2
-        renderInlineAccessories(inlineAccLiftId());
+        await applyAccessoryProgression(progId, 'inline'); // render() handles refresh
         return;
       }
       // Exercise help

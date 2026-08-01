@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.2
+# Juggernaut Method 2.0 — v13.0.3
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,11 +9,30 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.2**
+- Current canonical build: **v13.0.3**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `cd10b96f66986a9194e46f29dcbd153a8365342c7b34da2af07f1faca8b8875c`
+- Final HTML SHA256: `f7bb46e6bce861bb7407c504d9f9f3742751a1cd5d27a2acf1663fa23ccaab1e`
 
-## v13.0.2 — In-Session Accessory Logging + Rest Readout
+## v13.0.3 — Accessories Phase Survives Render
+
+v13.0.2 made the in-session accessory "Log" button actually log — which exposed the next
+layer: every accessory write path (log / progress / deload / swap) ends in a global
+`render()`, and the render pipeline was blind to the accessories phase. With
+`state.activeSession` already null at that point, `renderSession()` hid `sessionSection`
+(the accessories UI lives inside it) and `renderDashboard()` restored the main screen —
+dumping the lifter to the dashboard the instant a single accessory was logged. The log
+itself persisted; the UI teardown made it look like the session had force-completed.
+
+Fix: `render()` now has an `_sessionPhase === 'accessories'` branch, parallel to the
+existing `'complete'` branch, that runs last and re-asserts the accessories UI
+(sessionSection + inlineAccSection + Finish button visible, dashboard cards hidden) and
+re-renders the inline list so ✓ Logged badges appear immediately. Redundant list rebuilds
+in the click handler were removed — `render()` owns the refresh.
+
+Result: tap Log → card locks to ✓ Logged / Re-log, counter ticks, you stay in the
+accessories flow. The only exits are **Finish Full Session** or starting a new session.
+
+## v13.0.2 — In-Session Accessory Logging + Rest Readout (previous)
 
 ### 1. Fixed: in-session accessory "Log" button was a silent no-op
 
