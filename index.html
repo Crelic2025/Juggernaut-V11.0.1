@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.3</title>
+<title>Juggernaut Method 2.0 — v13.0.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -1524,7 +1524,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.3 — Act on the Signal</div>
+        <div class="hdr-sub">v13.0.4 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -2839,7 +2839,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.3';
+  const APP_VERSION = '13.0.4';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -6052,9 +6052,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       el.programTimeline.appendChild(pill);
     });
 
-    // Scroll active/preview week into view — guarded for environments without scrollIntoView
+    // Scroll active/preview week into view — guarded for environments without scrollIntoView.
+    // v13.0.4: offsetParent check — never auto-scroll a chip inside a hidden card
+    // (accessories/complete phases); a queued smooth scroll keeps animating after
+    // render() returns and would drag the page even after scroll restoration.
     const scrollTarget = el.programTimeline.querySelector('.tl-week.preview') || el.programTimeline.querySelector('.tl-week.active');
-    if (scrollTarget && typeof scrollTarget.scrollIntoView === 'function'){
+    if (scrollTarget && scrollTarget.offsetParent !== null && typeof scrollTarget.scrollIntoView === 'function'){
       try { scrollTarget.scrollIntoView({ inline:'center', block:'nearest', behavior:'smooth' }); } catch(_){}
     }
   }
@@ -6188,8 +6191,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function renderDashboard(){
     if (!el.dashboardCard) return;
-    // Hide dashboard when session active
-    el.dashboardCard.style.display = state.activeSession ? 'none' : '';
+    // Hide dashboard when session active.
+    // v13.0.4: also stay hidden during the accessories phase — previously it flashed
+    // visible mid-render (the late phase branch re-hid it only afterwards), growing
+    // the page above the lifter and letting the timeline auto-scroll yank the
+    // viewport to the top. display:none also removes the layout box, so the chip
+    // scrollIntoView below becomes a natural no-op.
+    el.dashboardCard.style.display = (state.activeSession || _sessionPhase === 'accessories') ? 'none' : '';
     // v13: deload banner + backup nudge + insight cards
     renderDeloadBanner();
     renderBackupNudge();
@@ -6395,7 +6403,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   /* ═══ RENDER: Session ═══ */
   function renderSession(){
     const session = state.activeSession;
-    if (!session){ el.sessionSection.hidden = true; return; }
+    if (!session){
+      // v13.0.4: the accessories phase deliberately has no activeSession, but the
+      // accessories UI lives inside sessionSection. Hiding it mid-render collapsed
+      // the page under the lifter and let the browser clamp scroll to the top.
+      el.sessionSection.hidden = (_sessionPhase !== 'accessories');
+      return;
+    }
     const def = getPhaseDef(session.wave, session.phase);
     const set = currentSet(session);
     const lift = state.lifts[session.liftId];
@@ -7725,6 +7739,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   /* ═══ MASTER RENDER ═══ */
   function render(){
+    // v13.0.4: renders during the accessories phase must not move the page. Interim
+    // renderers (lift-intel, weekly-plan) still momentarily change layout above the
+    // lifter's position; snapshot scroll here and restore at the end of this same
+    // synchronous pass — the restore lands before the next paint, so tapping Log
+    // produces zero visible movement.
+    const _keepY = (_sessionPhase === 'accessories') ? window.scrollY : null;
     // v13 A2: storage-degraded banner (page-load dismiss only)
     if (el.storageBanner) el.storageBanner.hidden = !(storageDegraded && !_storageBannerDismissed);
     renderLiftSelects(); renderSettings(); renderProgramSummary(); renderProgramChart(); renderDashboard();
@@ -7758,6 +7778,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (el.weeklyPlanCard) el.weeklyPlanCard.style.display = 'none';
       renderInlineAccessories(inlineAccLiftId());
     }
+    // v13.0.4: restore the lifter's position — must be the last statement so it
+    // wins over every layout change this pass made.
+    if (_keepY !== null) window.scrollTo(0, _keepY);
   }
 
   function selectedLiftId(){ return el.liftSelect.value || state.settings.activeLiftIds[0] || 'squat'; }
@@ -8263,7 +8286,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.3-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.4-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();

@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.3
+# Juggernaut Method 2.0 — v13.0.4
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,11 +9,33 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.3**
+- Current canonical build: **v13.0.4**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `f7bb46e6bce861bb7407c504d9f9f3742751a1cd5d27a2acf1663fa23ccaab1e`
+- Final HTML SHA256: `0eb52a88c84bf8c36804d2bf7c9c83e17e49707a6e664f221f9542364554c6fc`
 
-## v13.0.3 — Accessories Phase Survives Render
+## v13.0.4 — Log Stays Put (scroll-jump fix)
+
+v13.0.3 kept the accessories UI alive across renders, but its phase branch runs *last* —
+everything before it still thrashed layout mid-pass. With `state.activeSession` null,
+four scroll vectors fired inside a single `render()` while the lifter was scrolled deep
+in the accessories list: (1) `renderDashboard()` flashed the dashboard visible above
+them, (2) its week-chip auto-scroll (`scrollIntoView`, `behavior:'smooth'`) queued an
+animation that kept dragging the page toward the top even after render returned,
+(3) lift-intel / weekly-plan cards flashed visible adding height churn, and
+(4) `renderSession()` hid `sessionSection` entirely, collapsing the page and letting the
+browser clamp scrollTop. Net effect: tapping Log shot the viewport to the top.
+
+Fixes, at the source plus a guarantee:
+- `renderSession()` no longer hides `sessionSection` during the accessories phase.
+- `renderDashboard()` keeps the dashboard `display:none` during the accessories phase,
+  which also removes the chip's layout box so its auto-scroll is naturally inert.
+- The chip auto-scroll gained an `offsetParent !== null` guard — never smooth-scroll an
+  element inside a hidden card (covers the completion phase too).
+- `render()` snapshots `window.scrollY` on entry during the accessories phase and
+  restores it as its final statement — same synchronous task, so the restore lands
+  before the next paint and no movement is ever visible.
+
+## v13.0.3 — Accessories Phase Survives Render (previous)
 
 v13.0.2 made the in-session accessory "Log" button actually log — which exposed the next
 layer: every accessory write path (log / progress / deload / swap) ends in a global
