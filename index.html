@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.1</title>
+<title>Juggernaut Method 2.0 — v13.0.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -396,6 +396,18 @@ button:disabled{opacity:.35;pointer-events:none}
 .rest-next-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
 .rest-next-weight{font-family:var(--mono);font-size:24px;font-weight:800;margin-bottom:2px}
 .rest-next-detail{font-size:12px;color:var(--muted)}
+/* v13.0.2: glanceable sets-remaining readout — readable from the floor */
+.rest-sets-left{
+  text-align:center;margin:-2px 0 12px;
+  font-size:26px;font-weight:900;letter-spacing:-.5px;
+  color:var(--accent);line-height:1.1;
+}
+.rest-sets-left .rsl-sub{
+  display:block;margin-top:3px;
+  font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--muted);
+}
+.rest-sets-left.rsl-last{color:var(--warn)}
 .pill{
   display:inline-flex;align-items:center;gap:4px;
   margin-left:6px;
@@ -832,6 +844,20 @@ button:disabled{opacity:.35;pointer-events:none}
   transition:border-color .2s;
 }
 .inline-acc-card.has-progress{border-color:var(--accent-mid)}
+/* v13.0.2: accessory logged for this session */
+.inline-acc-card.acc-logged{border-color:var(--accent);background:var(--accent-dim)}
+.inline-acc-card.acc-logged .inline-acc-set{opacity:.72}
+.acc-logged-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-mid);
+  border-radius:999px;padding:2px 8px;white-space:nowrap;
+}
+.inline-acc-progress{
+  font-size:11px;font-weight:700;color:var(--muted);
+  margin:2px 0 8px;letter-spacing:.2px;
+}
+.inline-acc-progress.all-done{color:var(--accent)}
 .inline-acc-top{
   display:flex;justify-content:space-between;align-items:center;gap:8px;
 }
@@ -1498,7 +1524,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.1 — Act on the Signal</div>
+        <div class="hdr-sub">v13.0.2 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -2661,6 +2687,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
       </svg>
       <div id="restDisplay" class="timer-text">0:00</div>
     </div>
+    <div id="restSetsLeft" class="rest-sets-left" aria-live="polite" hidden>—</div>
     <div class="row" style="justify-content:center;gap:8px">
       <div class="tight"><button id="btnRestMinus10" class="btn-s">−10s</button></div>
       <div class="tight"><button id="btnRestPlus10" class="btn-s">+10s</button></div>
@@ -2812,7 +2839,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.1';
+  const APP_VERSION = '13.0.2';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -4440,7 +4467,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'bwInput','btnLogBW','bwRecent',
      'onboardModal','onboardStep1','onboardStep2','onboardStep3','onboardLifts',
      'onboardNext1','onboardBack2','onboardNext2','onboardBack3','onboardDone','onboardSkip',
-     'toast','restModal','restDisplay','timerArc','btnRestMinus10','btnRestPlus10','btnRestClose',
+     'toast','restModal','restDisplay','restSetsLeft','timerArc','btnRestMinus10','btnRestPlus10','btnRestClose',
      'confirmModal','confirmTitle','confirmMsg','confirmCancel','confirmOk',
      'viewWorkout','viewAccessories','viewHistory','viewCoach','viewSettings'
     ].forEach(id => el[id] = $(id));
@@ -4897,10 +4924,17 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* ═══ REST MODAL: Next Set Preview ═══ */
+  // v13.0.2: renders both the "Up Next" block and the glanceable sets-remaining line.
   function renderRestPreview(){
     const session = state.activeSession;
-    if (!session || !el.restNextPreview) return;
+    if (!session){
+      if (el.restSetsLeft) el.restSetsLeft.hidden = true;
+      if (el.restNextPreview) el.restNextPreview.hidden = true;
+      return;
+    }
     const nextSet = session.sets.find(s => !s.done);
+    renderRestSetsLeft(session, nextSet);
+    if (!el.restNextPreview) return;
     if (!nextSet){
       el.restNextPreview.hidden = true;
       return;
@@ -4917,6 +4951,49 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const pm = calculatePlates(nextSet.weight, session.liftId);
       el.restNextDetail.textContent += ' · ' + (pm.perSide.length ? pm.perSide.join('+') + '/side' : 'Bar only');
     }
+  }
+
+  /* ═══ v13.0.2: REST TIMER — SETS REMAINING ═══
+     Big, high-contrast count so the lifter can read it from the floor mid-rest.
+     Warmup ramps and work sets are counted separately because they are not
+     psychologically equivalent — "2 sets left" must never include ramps. */
+  function renderRestSetsLeft(session, nextSet){
+    if (!el.restSetsLeft) return;
+    if (!session || !Array.isArray(session.sets) || !session.sets.length){
+      el.restSetsLeft.hidden = true;
+      return;
+    }
+    const total = session.sets.length;
+    const remaining = session.sets.filter(s => !s.done);
+    const doneCount = total - remaining.length;
+
+    if (!remaining.length){
+      el.restSetsLeft.hidden = false;
+      el.restSetsLeft.classList.remove('rsl-last');
+      el.restSetsLeft.innerHTML = 'All sets done'
+        + '<span class="rsl-sub">' + total + ' of ' + total + ' complete</span>';
+      return;
+    }
+
+    const rampsLeft = remaining.filter(s => s.isRamp).length;
+    const workLeft = remaining.length - rampsLeft;
+    const amrapLeft = remaining.some(s => s.isAMRAP);
+
+    let headline;
+    if (rampsLeft && workLeft){
+      headline = rampsLeft + ' warmup · ' + workLeft + ' work left';
+    } else if (rampsLeft){
+      headline = rampsLeft + (rampsLeft === 1 ? ' warmup set left' : ' warmup sets left');
+    } else {
+      headline = workLeft + (workLeft === 1 ? ' set left' : ' sets left');
+    }
+
+    let sub = doneCount + ' of ' + total + ' done';
+    if (!rampsLeft && amrapLeft) sub += ' · AMRAP ahead';
+
+    el.restSetsLeft.hidden = false;
+    el.restSetsLeft.classList.toggle('rsl-last', !rampsLeft && workLeft === 1);
+    el.restSetsLeft.innerHTML = escapeHtml(headline) + '<span class="rsl-sub">' + escapeHtml(sub) + '</span>';
   }
 
   /* ═══ READINESS MINI-BAR ═══ */
@@ -5480,10 +5557,22 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       return;
     }
 
+    // v13.0.2: session completion counter above the list
+    const doneCount = data.templates.filter(t => accessoryDoneThisSession(t.id)).length;
+    const progEl = document.createElement('div');
+    progEl.className = 'inline-acc-progress' + (doneCount === data.templates.length ? ' all-done' : '');
+    progEl.textContent = doneCount === data.templates.length
+      ? '\u2713 All ' + data.templates.length + ' accessories logged'
+      : doneCount + ' of ' + data.templates.length + ' logged this session';
+    el.inlineAccList.appendChild(progEl);
+
     data.templates.forEach(item => {
       const effectiveSets = getEffectiveAccSets(item);
-      const lastSets = Array.isArray(item.lastLoggedSets) && item.lastLoggedSets.length
-        ? item.lastLoggedSets : Array(effectiveSets).fill(item.repMin||10);
+      const doneLog = accessoryDoneThisSession(item.id); // v13.0.2
+      const lastSets = (doneLog && Array.isArray(doneLog.reps) && doneLog.reps.length)
+        ? doneLog.reps
+        : (Array.isArray(item.lastLoggedSets) && item.lastLoggedSets.length
+            ? item.lastLoggedSets : Array(effectiveSets).fill(item.repMin||10));
       const tierCon = TIER_CONSTRAINTS[item.tier] || TIER_CONSTRAINTS.tier2;
       const hasProg = item.pendingProgression && Number.isFinite(item.suggestedWeight);
       const weightStr = item.weight > 0 ? formatWeight(item.weight) : 'BW';
@@ -5491,7 +5580,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const card = document.createElement('div');
       const weakPoint = _sessionWeakPoint || getWeakPointForLift(liftId);
       const isWeakMatch = accessoryMatchesWeakPoint(item, weakPoint);
-      card.className = 'inline-acc-card' + (hasProg ? ' has-progress' : '') + (isWeakMatch ? ' acc-weak-match' : '');
+      card.className = 'inline-acc-card' + (hasProg ? ' has-progress' : '') + (isWeakMatch ? ' acc-weak-match' : '') + (doneLog ? ' acc-logged' : '');
 
       // Build compact set steppers
       let setsHTML = '';
@@ -5509,17 +5598,25 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const helpId = 'help_' + item.id;
       const weakBadge = isWeakMatch ? '<span class="acc-weak-badge">\u2605 Targets weak point</span><button class="acc-why-btn" data-why-acc="' + escapeHtml(item.name) + '" data-why-lift="' + escapeHtml(liftId) + '">Why?</button>' : '';
 
+      // v13.0.2: completed-this-session affordances
+      const loggedBadge = doneLog
+        ? '<span class="acc-logged-badge">\u2713 Logged ' + escapeHtml(doneLog.reps.join('/')) + '</span>' : '';
+      const logBtn = doneLog
+        ? '<button class="btn-s" data-ias-save="' + item.id + '">Re-log</button>'
+        : '<button class="btn-p" data-ias-save="' + item.id + '">Log</button>';
+
       card.innerHTML = '<div class="inline-acc-top">' +
         '<div style="min-width:0;flex:1">' +
           '<h3>' + escapeHtml(item.name) + ' <button class="btn-s" data-ex-help="' + item.id + '" style="font-size:9px;min-height:24px;min-width:24px;padding:0 6px;border-radius:6px;vertical-align:middle">?</button>' + weakBadge + '</h3>' +
           '<div class="inline-acc-meta"><span style="color:var(--blue);font-weight:700">' + escapeHtml(tierCon.label) + '</span> · ' + escapeHtml(weightStr) + ' · ' + item.repMin + '-' + item.repMax + ' reps</div>' +
         '</div>' +
+        loggedBadge +
         (hasProg ? '<span class="pill g" style="margin:0;font-size:9px">\u2191 ' + escapeHtml(formatWeight(item.suggestedWeight)) + '</span>' : '') +
       '</div>' +
       '<div class="inline-acc-sets">' + setsHTML + '</div>' +
       '<div id="' + helpId + '" class="ex-help" hidden></div>' +
       '<div class="inline-acc-actions">' +
-        '<button class="btn-p" data-ias-save="' + item.id + '">Log</button>' +
+        logBtn +
         (hasProg ? '<button class="btn-s" data-ias-progress="' + item.id + '">Apply \u2191</button>' : '') +
       '</div>';
 
@@ -6290,6 +6387,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     } else if (!restTimer.endAt){
       stopRestMiniBadge();
     }
+    // v13.0.2: if the rest sheet is open, keep its sets-remaining readout in sync
+    // with state changes made behind it (undo, fire-day extension, ramp auto-log).
+    if (el.restModal && !el.restModal.hidden) renderRestPreview();
   }
 
   /* ═══ RENDER: Session ═══ */
@@ -8147,7 +8247,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.1-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.2-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -8231,21 +8331,63 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
 
   function findAccessory(liftId, id){ return accessoryLiftState(liftId).templates.find(x => x.id === id); }
 
-  async function saveAccessoryLog(id){
-    const liftId = el.accLiftSelect.value || 'squat';
-    const item = findAccessory(liftId, id); if (!item) return;
-    item.name = String(document.querySelector('[data-acc-name="'+id+'"]')?.value||'').trim()||'Accessory';
-    item.category = String(document.querySelector('[data-acc-category="'+id+'"]')?.value||'').trim()||'Accessory';
-    item.weight = Math.max(0, n(document.querySelector('[data-acc-weight="'+id+'"]')?.value)||0);
-    item.increment = Math.max(0.5, n(document.querySelector('[data-acc-increment="'+id+'"]')?.value)||state.settings.rounding);
-    // Read reps from inline stepper spans
-    const repSpans = [...document.querySelectorAll('[data-acc-val="'+id+'"]')];
-    const reps = repSpans.map(span => Math.max(0, Math.floor(n(span.textContent)||0)));
-    if (!reps.length){
-      // Fallback to old input method
+  /* v13.0.2: the lift the inline session accessories belong to. Deliberately independent
+     of el.accLiftSelect (the Accessories tab dropdown), which desyncs the moment the
+     lifter browses another lift's accessories. */
+  function inlineAccLiftId(){
+    return state.activeSession?.liftId
+      || (state.history.length ? state.history[state.history.length - 1].liftId : null)
+      || state.settings.activeLiftIds[0] || 'squat';
+  }
+
+  /* v13.0.2: session anchor for "completed this session". Derived, not stored — no new
+     persisted field, no migration, and it survives a mid-session reload. */
+  function currentSessionAnchorISO(){
+    if (state.activeSession?.createdAt) return state.activeSession.createdAt;
+    const last = state.history.length ? state.history[state.history.length - 1] : null;
+    return last?.completedAt || null;
+  }
+
+  function accessoryDoneThisSession(accId){
+    const anchor = currentSessionAnchorISO();
+    if (!anchor) return null;
+    const logs = (state.accessories.history || [])
+      .filter(h => h.accessoryId === accId && (h.completedAt || '') >= anchor);
+    return logs.length ? logs[logs.length - 1] : null;
+  }
+
+  /* v13.0.2 FIX — the in-session "Log" button was a silent no-op.
+     This function was hard-wired to the Accessories *tab*: it resolved the lift from
+     el.accLiftSelect and read every field from that tab's [data-acc-*] DOM nodes.
+     Called from the inline session card it either (a) bailed at `if (!item) return`
+     whenever the tab was parked on a different lift, or (b) logged the tab's reps and
+     zeroed the accessory's weight, because [data-acc-weight] resolved to nothing.
+     `source` now selects the correct lift and the correct rep surface. */
+  async function saveAccessoryLog(id, source){
+    const inline = source === 'inline';
+    const liftId = inline ? inlineAccLiftId() : (el.accLiftSelect.value || 'squat');
+    const item = findAccessory(liftId, id);
+    if (!item){ toast('Accessory not found.', 'b'); return; }
+
+    // Only the Accessories tab exposes the edit form. The inline card must never
+    // write these fields — absent inputs would blank the name and zero the weight.
+    if (!inline){
+      item.name = String(document.querySelector('[data-acc-name="'+id+'"]')?.value||'').trim()||'Accessory';
+      item.category = String(document.querySelector('[data-acc-category="'+id+'"]')?.value||'').trim()||'Accessory';
+      item.weight = Math.max(0, n(document.querySelector('[data-acc-weight="'+id+'"]')?.value)||0);
+      item.increment = Math.max(0.5, n(document.querySelector('[data-acc-increment="'+id+'"]')?.value)||state.settings.rounding);
+    }
+
+    // Read reps from whichever surface the lifter actually tapped
+    const valSel = inline ? '[data-ias-val="'+id+'"]' : '[data-acc-val="'+id+'"]';
+    const reps = [...document.querySelectorAll(valSel)]
+      .map(span => Math.max(0, Math.floor(n(span.textContent)||0)));
+    if (!reps.length && !inline){
+      // Fallback to old input method (legacy tab markup)
       const repInputs = [...document.querySelectorAll('[data-acc-set="'+id+'"]')];
       reps.push(...repInputs.map(i => Math.max(0, Math.floor(n(i.value)||0))));
     }
+    if (!reps.length){ toast('No sets to log.', 'w'); return; }
     item.lastLoggedSets = reps; item.lastCompletedAt = nowISO();
     // Determine whether this log was done on reduced volume (fatigue management for T2/T3)
     const fatigueAdjusted = !!(_sessionReadiness?.fatigueManaged && (item.tier === 'tier2' || item.tier === 'tier3'));
@@ -8278,9 +8420,12 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     toast('Logged.', 'g'); render();
   }
 
-  async function applyAccessoryProgression(id){
-    const liftId = el.accLiftSelect.value || 'squat';
-    const item = findAccessory(liftId, id); if (!item) return;
+  // v13.0.2: same lift-resolution fix as saveAccessoryLog — "Apply ↑" on the inline
+  // card was equally dependent on the Accessories tab dropdown.
+  async function applyAccessoryProgression(id, source){
+    const liftId = source === 'inline' ? inlineAccLiftId() : (el.accLiftSelect.value || 'squat');
+    const item = findAccessory(liftId, id);
+    if (!item){ toast('Accessory not found.', 'b'); return; }
     if (!item.pendingProgression || !Number.isFinite(item.suggestedWeight)){ toast('No progression pending.', 'w'); return; }
     item.weight = item.suggestedWeight; item.pendingProgression = false; item.suggestedWeight = null;
     item.lastOutcome = 'Progressed — build through range.';
@@ -8544,11 +8689,14 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
 
     // Finish full session
     el.btnFinishFull.addEventListener('click', () => {
+      // v13.0.2: report what actually got filed away this session
+      const tpls = accessoryLiftState(inlineAccLiftId()).templates;
+      const logged = tpls.filter(t => accessoryDoneThisSession(t.id)).length;
       _sessionPhase = 'idle';
       _sessionReadiness = null;
       el.inlineAccSection.hidden = true;
       el.btnFinishFull.hidden = true;
-      toast('Full session complete.', 'g');
+      toast('Full session complete — ' + logged + ' of ' + tpls.length + ' accessories logged.', 'g');
       render();
     });
 
@@ -8566,8 +8714,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
           let val = Math.floor(parseInt(span.textContent) || 0);
           val = plusId ? val + 1 : Math.max(0, val - 1);
           span.textContent = String(val);
-          const liftId = state.history.length ? state.history[state.history.length - 1].liftId : 'squat';
-          const item = findAccessory(liftId, accId);
+          const item = findAccessory(inlineAccLiftId(), accId); // v13.0.2
           if (item && Array.isArray(item.lastLoggedSets)) item.lastLoggedSets[parseInt(si)] = val;
         }
         return;
@@ -8575,17 +8722,15 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       // Save log
       const saveId = t.getAttribute('data-ias-save');
       if (saveId){
-        const liftId = state.history.length ? state.history[state.history.length - 1].liftId : 'squat';
-        await saveAccessoryLog(saveId);
-        renderInlineAccessories(liftId);
+        await saveAccessoryLog(saveId, 'inline'); // v13.0.2: inline source
+        renderInlineAccessories(inlineAccLiftId());
         return;
       }
       // Progress
       const progId = t.getAttribute('data-ias-progress');
       if (progId){
-        const liftId = state.history.length ? state.history[state.history.length - 1].liftId : 'squat';
-        await applyAccessoryProgression(progId);
-        renderInlineAccessories(liftId);
+        await applyAccessoryProgression(progId, 'inline'); // v13.0.2
+        renderInlineAccessories(inlineAccLiftId());
         return;
       }
       // Exercise help
@@ -8863,6 +9008,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         const remaining = (restTimer.endAt - Date.now()) / 1000;
         el.restModal.hidden = false;
         requestAnimationFrame(() => el.restModal.classList.add('show'));
+        renderRestPreview(); // v13.0.2: repopulate sets-left + up-next on reopen
         tickRest();
         stopRestMiniBadge();
       }

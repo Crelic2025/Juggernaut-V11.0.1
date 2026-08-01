@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.1
+# Juggernaut Method 2.0 — v13.0.2
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,44 +9,55 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.1**
-- Promoted: 2026-06-10
+- Current canonical build: **v13.0.2**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Source artifact: `/Users/Crelic/.hermes/cache/documents/doc_3d66ac454031_files.zip`
-- Local served copy: `/Users/Crelic/Desktop/apps-server/juggernaut.html`
-- Final HTML SHA256: `e14c871740ba118eead5d43f188af53e66264c101a004861bd1632ddcf61636d`
+- Final HTML SHA256: `cd10b96f66986a9194e46f29dcbd153a8365342c7b34da2af07f1faca8b8875c`
 
-## v13.0.1 — Act on the Signal
+## v13.0.2 — In-Session Accessory Logging + Rest Readout
 
-v13 adds actionable coaching infrastructure on top of the v12 longitudinal coaching build:
+### 1. Fixed: in-session accessory "Log" button was a silent no-op
 
-- Fatigue/deload signal engine with watch/caution/deload severity bands.
-- Actionable deload/TM-reduction recommendations with revertable coach action log.
-- Goal tracking and trend-based ETA cards.
-- Block summaries across completed waves.
-- Backup nudge and export metadata improvements.
-- Optional File System Access auto-backup where supported.
-- Hermes digest bridge for sending training/coaching digests without API keys or free-text notes.
-- Service-worker cache identity bumped to `juggernaut-v13.0.1` to avoid serving the pre-patch v13.0.0 candidate.
+`saveAccessoryLog()` was hard-wired to the Accessories **tab**. It resolved the lift from
+`el.accLiftSelect` and read every field from that tab's `[data-acc-*]` DOM nodes. Because all
+views render simultaneously (tabs only toggle a CSS class), calling it from the inline
+session card produced one of two wrong outcomes:
 
-## v13.0.1 audited fixes
+- **Lift mismatch (common):** `findAccessory()` returned `undefined` and the function hit a
+  bare `return`. No toast, no state write, no error. The button appeared dead.
+- **Lift match:** it logged reps from the Accessories tab steppers instead of the inline ones,
+  and silently **zeroed `item.weight`** and reset `item.increment`, because `[data-acc-weight]`
+  resolved to nothing and `n(undefined) || 0` evaluates to `0`.
 
-The final promoted build includes audited fixes for two v13.0.0 blocker paths:
+Fix: `saveAccessoryLog(id, source)` and `applyAccessoryProgression(id, source)` now take a
+source discriminator.
 
-1. **Degraded IndexedDB persistence**
-   - Runtime IDB write failure now flips `idbAvailable = false`, sets `storageDegraded = true`, immediately writes current state to `localStorage`, and only shows the severe storage toast if both persistence layers fail.
+- `'inline'` → lift from `inlineAccLiftId()`, reps from `[data-ias-val]`, edit-form fields untouched.
+- default (tab) → prior behavior preserved exactly.
 
-2. **Best-effort sync enqueue**
-   - `enqueueSync()` now returns in degraded/no-DB mode and catches `idb.add()` failures, so outbox/sync enqueue cannot make an already-completed session show a false “Error completing session” toast.
+Failure paths now toast instead of returning silently.
+
+### 2. Added: accessories file away as "completed this session"
+
+- New derived helpers `currentSessionAnchorISO()` and `accessoryDoneThisSession(accId)`.
+  Completion is computed from existing `state.accessories.history` timestamps against the
+  session anchor — **no new persisted field and no migration**, and it survives a mid-session reload.
+- Logged cards get an `.acc-logged` treatment: accent border, `✓ Logged 12/10/10` badge,
+  steppers showing the reps actually logged, and the button switching to **Re-log**.
+- Counter above the list: `2 of 5 logged this session` → `✓ All 5 accessories logged`.
+- **Finish Full Session** toast now reports the count.
+
+### 3. Added: sets remaining on the rest timer
+
+- New `#restSetsLeft` readout under the timer ring — 26px/900 weight, accent colored,
+  turns warning-orange on the final work set.
+- Warmup ramps counted separately from work sets, so "2 sets left" never includes ramps.
+- Flags `AMRAP ahead` when an AMRAP set is still pending.
+- Stays in sync on undo, fire-day extension, ramp auto-log, and mini-badge reopen.
 
 ## Version metadata
 
-Bumped in all release/cache identity locations:
-
-- `<title>` tag
-- header subtitle
-- `APP_VERSION = '13.0.1'`
-- export filename `juggernaut-v13.0.1-export.json`
+Bumped in all release/cache identity locations: `<title>`, header subtitle, `APP_VERSION`,
+export filename. Service-worker cache identity derives from `APP_VERSION` and becomes `juggernaut-v13.0.2`.
 
 ## Hard constraints
 
@@ -59,8 +70,9 @@ Bumped in all release/cache identity locations:
 
 ## Previous versions
 
+- **v13.0.1** — Act on the Signal; degraded-IDB and sync-enqueue blocker fixes; deployed 2026-06-10.
 - **v12.0.0** — Longitudinal AI coaching build; deployed 2026-06-08.
 - **v11.0.2** — Visible-version / PWA URL stability build; deployed 2026-05-30.
 - **v11.0.1** — Hotfix build with data-integrity and XSS fixes.
-- **v11.0** — Inverted Juggernaut Method 2.0 ship: AMRAP-first waves, backoff sets, readiness system, fatigue management, fire-day extensions, guided warmup, weak-point-aware accessories, AI coaching overlay.
+- **v11.0** — Inverted Juggernaut Method 2.0 ship.
 - **v10 and earlier** — Legacy hybrid builds.
