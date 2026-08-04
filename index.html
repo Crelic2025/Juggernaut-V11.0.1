@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.4</title>
+<title>Juggernaut Method 2.0 — v13.0.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -858,6 +858,28 @@ button:disabled{opacity:.35;pointer-events:none}
   margin:2px 0 8px;letter-spacing:.2px;
 }
 .inline-acc-progress.all-done{color:var(--accent)}
+/* v13.0.5: calibration preview + over-main guard */
+.calib-list{max-height:46vh;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:6px}
+.calib-lift-hdr{
+  font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--muted);margin:8px 0 2px;
+}
+.calib-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);
+  background:rgba(255,255,255,.03);
+}
+.calib-row.is-over{border-color:var(--warn);background:rgba(255,159,67,.08)}
+.calib-row .cr-name{flex:1;min-width:0;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calib-row .cr-basis{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-top:1px;letter-spacing:.2px}
+.calib-row .cr-move{font-family:var(--mono);font-size:13px;font-weight:700;white-space:nowrap}
+.calib-row .cr-from{color:var(--muted);text-decoration:line-through}
+.calib-row .cr-to{color:var(--accent)}
+.acc-overmain-warn{
+  margin-top:10px;padding:10px 12px;border-radius:var(--r-sm);
+  border:1px solid var(--warn);background:rgba(255,159,67,.10);
+  font-size:12px;font-weight:600;line-height:1.5;color:var(--text);
+}
 .inline-acc-top{
   display:flex;justify-content:space-between;align-items:center;gap:8px;
 }
@@ -1524,7 +1546,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.4 — Act on the Signal</div>
+        <div class="hdr-sub">v13.0.6 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -1779,6 +1801,11 @@ body.performance-mode *{animation:none!important;transition:none!important}
           <div class="tight"><button id="btnAddT2" class="btn-s">+ T2</button></div>
           <div class="tight"><button id="btnAddT3" class="btn-s">+ T3</button></div>
         </div>
+        <!-- v13.0.5 -->
+        <div class="row" style="margin-top:8px">
+          <div class="tight" style="flex:1"><button id="btnRecalibrateAcc" class="btn-p" style="width:100%">Recalibrate from Training Maxes</button></div>
+        </div>
+        <div id="accOverMainWarn" class="acc-overmain-warn" hidden></div>
         <div class="install-help">
           3-Tier: <strong>T1</strong> Supplemental (5–8 reps) · <strong>T2</strong> Hypertrophy (8–15 reps) · <strong>T3</strong> Core/Prehab (10–20 reps). Hold load until all sets hit ceiling.
         </div>
@@ -2702,6 +2729,23 @@ body.performance-mode *{animation:none!important;transition:none!important}
 </div>
 
 <!-- ─── READINESS MODAL ─── -->
+<!-- v13.0.5: accessory recalibration preview -->
+<div id="calibModal" class="modal bottom-sheet" hidden aria-label="Accessory recalibration preview">
+  <div class="modal-card" style="text-align:left">
+    <div class="sheet-handle"></div>
+    <h2 style="margin-bottom:4px">Recalibrate Accessories</h2>
+    <div id="calibSummary" class="sm" style="color:var(--muted);margin-bottom:10px">—</div>
+    <div id="calibList" class="calib-list"></div>
+    <div class="row" style="margin-top:12px;gap:8px">
+      <div class="tight" style="flex:1"><button id="btnCalibCancel" class="btn-s" style="width:100%">Cancel</button></div>
+      <div class="tight" style="flex:1"><button id="btnCalibApply" class="btn-p" style="width:100%">Apply</button></div>
+    </div>
+    <div class="install-help" style="margin-top:10px">
+      Your logged history is not touched. Tier 1 is computed from your training max; Tier 2/3 are seeded light and climb automatically as you hit the top of each rep range.
+    </div>
+  </div>
+</div>
+
 <div id="readinessModal" class="modal bottom-sheet" hidden aria-label="Daily readiness check">
   <div class="readiness-card">
     <div class="sheet-handle"></div><div class="readiness-title">Daily Readiness</div>
@@ -2839,7 +2883,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.4';
+  const APP_VERSION = '13.0.6';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -2983,6 +3027,43 @@ body.performance-mode *{animation:none!important;transition:none!important}
    * Tier 2: Hypertrophy/Bodybuilding (3-5 sets, 8-15 reps) — mass & imbalances
    * Tier 3: Core & Prehab (3-4 sets, 10-20 reps) — stability & joint health
    */
+  /* ═══ v13.0.5: ACCESSORY CALIBRATION ═══
+     The library ships hardcoded defaultWeights (Pause Squat 185, Block Pull 315…) that
+     bear no relation to the lifter's strength. On a 10s-accumulation day — main work at
+     60% TM — those constants routinely exceed the day's main working weight, inverting
+     the Juggernaut hierarchy: supplemental work must never outrank the competition lift.
+
+     Tier 1 is 100% barbell variations of a main lift, so it scales honestly:
+         weight = mainTM × variationRatio × wavePct
+     Ratios below are standard coaching estimates, NOT measured constants. They are
+     deliberately biased low; the existing rep-ceiling progression engine walks each
+     lift up from a safe start, which is the real calibrator.
+
+     Tier 2/3 are dumbbell / cable / machine work with no defensible ratio to a 1RM.
+     They are seeded intentionally light (T2_SEED / T3_SEED fraction of the library
+     default) and left to the same progression engine. */
+  const T1_VARIATION_RATIO = {
+    // vs SQUAT
+    'Pause Squat':0.80, 'SSB Squat':0.82, 'Front Squat':0.78, 'Box Squat':0.88,
+    'Good Morning':0.45, 'Pin Squat':0.82,
+    // vs BENCH
+    'Long Pause Bench':0.85, 'Close-Grip Bench':0.88, 'Spoto Press':0.85,
+    'Wide Grip Bench':0.92, 'Board Press (2-3 board)':1.02, 'Floor Press':0.90,
+    'Larsen Press':0.82,
+    // vs DEADLIFT
+    'Deficit Deadlift':0.85, 'Block Pull':1.05, 'Pause Deadlift':0.82,
+    'Snatch Grip Deadlift':0.75, 'Romanian Deadlift':0.65, 'Stiff-Leg Deadlift':0.65,
+    // vs OHP
+    'Z-Press':0.78, 'Push Press':1.15, 'Pin Press':0.90, 'Seated Barbell Press':0.92
+  };
+  // Fallback when a Tier 1 lift isn't in the table (custom / renamed entries)
+  const T1_FALLBACK_RATIO = 0.75;
+  // Supplemental must stay below the day's main working weight (JTS: supplementary work
+  // "does not take precedent over your competition lifts"). Applied after the ratio math.
+  const T1_SUBORDINATION_CAP = 0.95;
+  // Tier 2/3 seed as a fraction of the shipped library default — errs light on purpose
+  const T2_SEED = 0.65, T3_SEED = 0.65;
+
   const TIER_CONSTRAINTS = {
     tier1:{ label:'Tier 1: Supplemental', setsMin:3, setsMax:5, repMin:5, repMax:8, deloadSetsMin:2, deloadSetsMax:3 },
     tier2:{ label:'Tier 2: Hypertrophy', setsMin:3, setsMax:5, repMin:8, repMax:15, deloadSetsMin:2, deloadSetsMax:3 },
@@ -4467,6 +4548,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'bwInput','btnLogBW','bwRecent',
      'onboardModal','onboardStep1','onboardStep2','onboardStep3','onboardLifts',
      'onboardNext1','onboardBack2','onboardNext2','onboardBack3','onboardDone','onboardSkip',
+     'btnRecalibrateAcc','accOverMainWarn','calibModal','calibSummary','calibList','btnCalibCancel','btnCalibApply',
      'toast','restModal','restDisplay','restSetsLeft','timerArc','btnRestMinus10','btnRestPlus10','btnRestClose',
      'confirmModal','confirmTitle','confirmMsg','confirmCancel','confirmOk',
      'viewWorkout','viewAccessories','viewHistory','viewCoach','viewSettings'
@@ -6645,6 +6727,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     renderTemplateChips(liftId);
     el.accessoryList.innerHTML = '';
     renderAccessoryCoverage(); // v11: show weekly pattern coverage
+    renderOverMainWarning(liftId); // v13.0.5: flag anything outranking the main lift
     if (!data.templates.length){
       el.accessoryList.innerHTML = `<div class="empty-state">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
@@ -8286,7 +8369,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.4-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.6-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -8353,6 +8436,62 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     await saveState(); toast('Applied.', 'g'); render();
   }
 
+  /* v13.0.5: preview sheet */
+  let _calibPlan = null;
+
+  function openCalibrationSheet(){
+    _calibPlan = buildCalibrationPlan();
+    const { rows, wavePct } = _calibPlan;
+    const liftNames = { squat:'Squat', bench:'Bench', deadlift:'Deadlift', ohp:'Overhead Press' };
+
+    if (!rows.length){
+      el.calibSummary.textContent = 'Everything already matches your training maxes — nothing to change.';
+      el.calibList.innerHTML = '';
+      el.btnCalibApply.disabled = true;
+    } else {
+      const overCount = rows.filter(r => r.overMain).length;
+      el.calibSummary.innerHTML = escapeHtml(rows.length + ' accessor' + (rows.length===1?'y':'ies') + ' will change · wave ' + Math.round(wavePct*100) + '% TM')
+        + (overCount ? '<br><span style="color:var(--warn);font-weight:700">' + overCount + ' currently heavier than your main working weight</span>' : '');
+      el.btnCalibApply.disabled = false;
+      const byLift = {};
+      rows.forEach(r => { (byLift[r.liftId] = byLift[r.liftId] || []).push(r); });
+      el.calibList.innerHTML = Object.keys(byLift).map(liftId =>
+        '<div class="calib-lift-hdr">' + escapeHtml(liftNames[liftId] || liftId) + '</div>' +
+        byLift[liftId].map(r =>
+          '<div class="calib-row' + (r.overMain ? ' is-over' : '') + '">' +
+            '<span class="cr-name">' + (r.overMain ? '\u26A0 ' : '') + escapeHtml(r.name) +
+              '<span class="cr-basis">' + escapeHtml(r.basis) + '</span></span>' +
+            '<span class="cr-move"><span class="cr-from">' + escapeHtml(formatWeight(r.from)) + '</span> \u2192 ' +
+              '<span class="cr-to">' + escapeHtml(formatWeight(r.to)) + '</span></span>' +
+          '</div>'
+        ).join('')
+      ).join('');
+    }
+    el.calibModal.hidden = false;
+    requestAnimationFrame(() => el.calibModal.classList.add('show'));
+  }
+
+  function closeCalibrationSheet(){
+    el.calibModal.classList.remove('show');
+    setTimeout(() => { el.calibModal.hidden = true; }, 200);
+    _calibPlan = null;
+  }
+
+  // Persistent banner on the Accessories tab whenever anything outranks the main lift
+  function renderOverMainWarning(liftId){
+    if (!el.accOverMainWarn) return;
+    const over = accessoriesOverMain(liftId);
+    if (!over.length){ el.accOverMainWarn.hidden = true; return; }
+    const mainWW = over[0].mainWW;
+    el.accOverMainWarn.hidden = false;
+    el.accOverMainWarn.innerHTML =
+      '\u26A0 <strong>' + over.length + ' accessor' + (over.length===1?'y is':'ies are') +
+      ' heavier than your main working weight</strong> (' + escapeHtml(formatWeight(mainWW)) + ' this microcycle): ' +
+      escapeHtml(over.slice(0,4).map(o => o.name + ' ' + formatWeight(o.weight)).join(', ')) +
+      (over.length > 4 ? ' +' + (over.length-4) + ' more' : '') +
+      '. Supplemental work should sit below the competition lift \u2014 tap Recalibrate above.';
+  }
+
   async function addAccessory(tier='tier2'){
     const liftId = el.accLiftSelect.value || 'squat';
     const con = TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2;
@@ -8366,6 +8505,122 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       lastCompletedAt:'', pendingProgression:false, suggestedWeight:null
     });
     await saveState(); toast('Added.', 'g'); render();
+  }
+
+  /* ═══ v13.0.5: CALIBRATION ENGINE ═══ */
+
+  // Wave percentage that Tier 1 rides on. Uses the CURRENT microcycle so calibration
+  // tracks the block. Realization/deload have no sustained work %, so fall back to the
+  // wave's accumulation figure — Tier 1 shouldn't spike on a peak or deload week.
+  function calibrationWavePct(){
+    try{
+      const micro = currentMicrocycle();
+      const def = PROGRAM.defs[micro.wave];
+      if (!def) return 0.60;
+      // v13.0.6 audit fix: sustained-work phases only. Realization DOES define pctTM —
+      // but it is the peak ramp/AMRAP percentage, not a load accessories should
+      // calibrate against; deload defines none. Both resolve to accumulation's figure,
+      // so pressing Recalibrate on a peak or deload week cannot inflate Tier 1.
+      const sustained = micro.phase === 'accumulation' || micro.phase === 'intensification';
+      const phase = sustained ? def[micro.phase] : null;
+      if (phase && Number.isFinite(phase.pctTM)) return phase.pctTM;
+      return Number.isFinite(def.accumulation?.pctTM) ? def.accumulation.pctTM : 0.60;
+    } catch(_){ return 0.60; }
+  }
+
+  // The main lift's working weight for the current microcycle — the ceiling Tier 1
+  // must stay under. Returns null when it can't be resolved (missing 1RM etc).
+  function mainWorkingWeight(liftId){
+    const lift = state.lifts?.[liftId];
+    if (!lift || !Number.isFinite(lift.true1RM) || lift.true1RM <= 0) return null;
+    try { return workingWeightFromPctTM(lift, calibrationWavePct()); }
+    catch(_){ return null; }
+  }
+
+  // Build (but do not apply) the full recalibration plan across every lift.
+  function buildCalibrationPlan(){
+    const wavePct = calibrationWavePct();
+    const rows = [];
+    const liftIds = (state.settings.activeLiftIds || []).slice();
+    liftIds.forEach(liftId => {
+      const lift = state.lifts?.[liftId];
+      const tm = (lift && Number.isFinite(lift.true1RM) && lift.true1RM > 0) ? trainingMax(lift) : null;
+      const mainWW = mainWorkingWeight(liftId);
+      const data = accessoryLiftState(liftId);
+      data.templates.forEach(item => {
+        const inc = Number.isFinite(item.increment) && item.increment > 0
+          ? item.increment : (state.settings.rounding || 5);
+        let next = null, basis = '';
+        if (item.tier === 'tier1'){
+          if (tm === null){ return; } // no 1RM on file — leave untouched
+          const ratio = T1_VARIATION_RATIO[item.name] ?? T1_FALLBACK_RATIO;
+          next = roundToIncrement(tm * ratio * wavePct, inc);
+          basis = Math.round(ratio*100) + '% var × ' + Math.round(wavePct*100) + '% wave';
+        } else {
+          if (!(item.weight > 0)) return;          // bodyweight/band — nothing to scale
+          const libItem = (ACCESSORY_LIBRARY[liftId]?.[item.tier] || []).find(x => x.name === item.name);
+          // v13.0.6 audit fix: reseed ONLY factory-untouched items. A weight the lifter
+          // progressed or hand-set is earned data — recalibration must not reset it to a
+          // beginner seed. This also makes Apply idempotent: previously a custom item
+          // (no library match) reseeded from its own current weight, compounding ×0.65
+          // on every press; and once-reseeded items would reseed again from default.
+          if (!libItem || !(libItem.defaultWeight > 0)) return;  // custom item — leave alone
+          if (item.weight !== libItem.defaultWeight) return;     // touched/progressed — leave alone
+          const seed = item.tier === 'tier3' ? T3_SEED : T2_SEED;
+          next = roundToIncrement(libItem.defaultWeight * seed, inc);
+          basis = 'seeded light — engine climbs';
+        }
+        if (!Number.isFinite(next) || next <= 0) return;
+        if (item.tier === 'tier1'){
+          // Subordination cap. Overload variations (Block Pull 1.05, Push Press 1.15,
+          // Board Press 1.02) legitimately move more weight than the parent lift — but
+          // as *supplemental* work on the same day, after the main sets, they must not
+          // outrank the competition lift. Cap at 95% of the day's main working weight;
+          // ratios below the cap are untouched.
+          if (mainWW !== null){
+            // v13.0.6 audit fix: FLOOR, not nearest. Half-up rounding could land the
+            // cap exactly equal to the main working weight (e.g. main 50, inc 5 →
+            // round(47.5/5)=10 → 50). Floor guarantees strictly below main; the only
+            // remaining equality path is the empty-bar minimum below, which is a
+            // physical constraint, not a programming choice.
+            const cap = Math.floor((mainWW * T1_SUBORDINATION_CAP) / inc) * inc;
+            if (next > cap){ next = cap; basis += ' · capped'; }
+          }
+          const bar = (Number.isFinite(lift?.barWeight) ? lift.barWeight : state.settings.barWeight) || 45;
+          next = Math.max(bar, next);
+        }
+        if (next === item.weight) return;          // already correct — omit from plan
+        rows.push({
+          liftId, id:item.id, name:item.name, tier:item.tier,
+          from:item.weight, to:next, basis,
+          overMain: (mainWW !== null && item.weight > mainWW)
+        });
+      });
+    });
+    return { rows, wavePct };
+  }
+
+  async function applyCalibrationPlan(plan){
+    if (!plan || !plan.rows.length) return 0;
+    plan.rows.forEach(r => {
+      const item = findAccessory(r.liftId, r.id);
+      if (!item) return;
+      item.weight = r.to;
+      // A recalibrated load invalidates any progression staged against the old weight
+      item.pendingProgression = false; item.suggestedWeight = null;
+      item.lastOutcome = 'Recalibrated from training max — build through the rep range.';
+    });
+    await saveState();
+    return plan.rows.length;
+  }
+
+  // Guard: accessories currently loaded heavier than today's main working weight.
+  function accessoriesOverMain(liftId){
+    const mainWW = mainWorkingWeight(liftId);
+    if (mainWW === null) return [];
+    return accessoryLiftState(liftId).templates
+      .filter(t => t.weight > mainWW)
+      .map(t => ({ name:t.name, weight:t.weight, mainWW }));
   }
 
   function findAccessory(liftId, id){ return accessoryLiftState(liftId).templates.find(x => x.id === id); }
@@ -8832,6 +9087,17 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     $('btnAddT1').addEventListener('click', () => addAccessory('tier1'));
     $('btnAddT2').addEventListener('click', () => addAccessory('tier2'));
     $('btnAddT3').addEventListener('click', () => addAccessory('tier3'));
+    // v13.0.5: recalibration
+    el.btnRecalibrateAcc.addEventListener('click', openCalibrationSheet);
+    el.btnCalibCancel.addEventListener('click', closeCalibrationSheet);
+    el.btnCalibApply.addEventListener('click', async () => {
+      if (!_calibPlan || !_calibPlan.rows.length){ closeCalibrationSheet(); return; }
+      const n = await applyCalibrationPlan(_calibPlan);
+      closeCalibrationSheet();
+      toast('Recalibrated ' + n + ' accessor' + (n===1?'y':'ies') + '.', 'g');
+      render();
+    });
+    el.calibModal.addEventListener('click', (e) => { if (e.target === el.calibModal) closeCalibrationSheet(); });
 
     // Accessory delegates (toggle, stepper, actions)
     el.accessoryList.addEventListener('click', async (e) => {

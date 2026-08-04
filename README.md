@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.4
+# Juggernaut Method 2.0 — v13.0.6
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,11 +9,72 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.4**
+- Current canonical build: **v13.0.6**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `0eb52a88c84bf8c36804d2bf7c9c83e17e49707a6e664f221f9542364554c6fc`
+- Final HTML SHA256: `081976ac8ca8d1823c487071c9a1211d055c1717f071768025d97c4169fa4926`
 
-## v13.0.4 — Log Stays Put (scroll-jump fix)
+## v13.0.6 — Audit of v13.0.5 (four findings, fixed pre-deploy)
+
+Self-audit of the calibration feature before it shipped. Findings:
+
+- **P1 — Calibration sheet rendered broken.** The sheet used a `sheet-inner` wrapper
+  class that exists nowhere in the stylesheet; bottom-sheet styling only applies to
+  `.modal-card` / `.readiness-card` / `.confirm-card`. Content would have floated
+  unstyled on the backdrop. Now uses `.modal-card` with the standard sheet handle.
+- **P1 — Recalibrate was destructive and non-idempotent for Tier 2/3.** The reseed
+  fallback used the item's own current weight when no library match existed, so each
+  Apply compounded ×0.65 on custom items; and progressed items were yanked back to 65%
+  of factory default, destroying earned working weights. Fix: reseed only
+  factory-untouched items (current weight === library default); custom, progressed, and
+  hand-set weights are never modified. Verified idempotent.
+- **P2 — Realization week inflated Tier 1 calibration.** `def.realization.pctTM` is the
+  peak ramp percentage and satisfied the finite check, contradicting the intended
+  accumulation fallback. Wave percentage now resolves only from sustained phases
+  (accumulation/intensification); realization and deload both use accumulation's figure.
+- **P2 — Subordination cap could equal main working weight.** Half-up rounding produced
+  cap == main at certain weights (main 50, inc 5 → 50). Cap now floors, guaranteeing
+  strictly below main; the only equality path left is the empty-bar physical minimum.
+
+Verification: 26,496-combination sweep (1RMs 65–700 × 9 wave percentages × all Tier 1
+items) — zero over main, all 483 equalities are empty-bar floor cases. Idempotence test
+passes. Full regression sweep of v13.0.2–v13.0.5 invariants passes. JS syntax clean.
+
+## v13.0.5 — Accessory Calibration (superseded pre-deploy)
+
+`ACCESSORY_LIBRARY` shipped hardcoded `defaultWeight` constants (Pause Squat 185, Block
+Pull 315, Leg Press 270) with no relation to the lifter's strength. On a 10s-accumulation
+day the main lift runs 10x5 at 60% TM — roughly 54% of true 1RM — so those constants
+routinely exceeded the day's main working weight, inverting the JTS hierarchy:
+supplementary work "does not take precedent over your competition lifts."
+
+Any lifter with a squat TM under ~308 received a Tier 1 supplemental heavier than their
+accumulation work. Verified across the library: Tier 1 is 24 items, 100% barbell
+variations, 100% carrying a preset weight.
+
+### Calibration model
+- **Tier 1** (24 items, all barbell variations): `mainTM x variationRatio x wavePct`.
+  Ratios are standard coaching estimates, biased low, in `T1_VARIATION_RATIO`;
+  unknown/custom names fall back to `T1_FALLBACK_RATIO` (0.75).
+- **Subordination cap** (`T1_SUBORDINATION_CAP` = 0.95): overload variations legitimately
+  move more than the parent lift (Block Pull 1.05, Push Press 1.15, Board Press 1.02),
+  but as same-day supplemental work they are capped just below the main working weight.
+  Verified: 276 combinations (3 strength levels x 4 wave percentages x all Tier 1 items)
+  produce zero accessories at or above main working weight.
+- **Tier 2/3** (dumbbell / cable / machine — no defensible ratio to a 1RM): reseeded at
+  65% of the library default and left to the existing rep-ceiling progression engine,
+  which climbs them from a safe start.
+
+### UI
+- **Recalibrate from Training Maxes** button on the Accessories tab opens a preview sheet
+  grouped by lift, showing every from → to change with its basis, flagging entries
+  currently over main working weight. Nothing is written until Apply.
+- Applying clears any `pendingProgression` staged against the old load. Logged history in
+  `state.accessories.history` is never touched.
+- Persistent warning banner on the Accessories tab whenever any accessory outranks the
+  current microcycle's main working weight.
+- Lifts with no `true1RM` on file are skipped, not zeroed.
+
+## v13.0.4 — Log Stays Put (scroll-jump fix) (previous)
 
 v13.0.3 kept the accessories UI alive across renders, but its phase branch runs *last* —
 everything before it still thrashed layout mid-pass. With `state.activeSession` null,
