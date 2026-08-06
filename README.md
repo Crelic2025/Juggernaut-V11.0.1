@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.6
+# Juggernaut Method 2.0 — v13.0.8
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,9 +9,65 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.6**
+- Current canonical build: **v13.0.8**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `081976ac8ca8d1823c487071c9a1211d055c1717f071768025d97c4169fa4926`
+- Final HTML SHA256: `ec92dc36438c1db1511f8fe50f953db9b0ed21a9d045ba66f1e41d37581186b2`
+
+## v13.0.8 — Calibrated Accessory Authority
+
+- Routes initial accessory seeding, template-chip swaps, exercise swaps, and weak-point swaps through one calibrated-weight authority; raw library defaults no longer enter state through those paths.
+- Keeps default-state boot TDZ-safe by using light seeding before live state exists, then applies training-max calibration when user state is available.
+- Limits over-main warnings and calibration flags to Tier 1 supplemental variations, avoiding false warnings for unrelated Tier 2/3 movements.
+- Bumps the title, visible subtitle, `APP_VERSION`, export filename, and derived service-worker cache identity to v13.0.8.
+
+## v13.0.7 — Weak-Point Targeting Engine
+
+Replaces the single-swap suggester behind "Where did you struggle?". The old engine had
+three silent exit doors (no unowned match / no non-matching owned item / equipment
+filter), scanned Tier 1 only — leaving back-driven weak points (bar path, arch)
+structurally dead — and its Apply wrote the raw hardcoded library defaultWeight,
+bypassing v13.0.6 calibration entirely. After one successful swap, both T1s typically
+matched the weakness and the card went permanently silent: success and broken were
+indistinguishable.
+
+### New engine
+- **Never silent.** Every tap answers: up to 2 swap pairs, a "you're covered" message
+  naming the matching movements, or a no-mapping notice. "No issues" still hides.
+- **Up to 2 swaps**, Tier 1 filled first, then Tier 2 — consistent with JuggernautAI
+  behavior (multiple movements per weak point, e.g. close-grip + boards + tricep work
+  for lockout) and the 2–4-accessories-per-weak-point convention around the book.
+- **Calibrated arrivals.** Tier 1 swap-ins get TM × variation ratio × wave %, with the
+  subordination cap and bar floor; Tier 2 (and Tier 1 with no 1RM) seed at 65% of
+  library default. Raw defaultWeight is never written.
+- **Block-hold.** Applying a swap commits the lift to that weak point for the current
+  wave. Picking a different weak point mid-wave renders a Keep / Switch confirm.
+  Fail-open when wave identity is unavailable.
+- **Coaching guards.** Rows / face pulls / rear-delt work are never offered as
+  swap-outs on bench or OHP days.
+
+### Fixes surfaced by the test battery itself
+- **Matcher false positives (shipped since v13.0.1, affected star badges too):** raw
+  substring matching let 'lat' hit "iso**lat**ion" and "**Lat**eral Raise", and 'pin'
+  hit "s**pin**e" — so pec flys and lateral raises matched back-stability weak points.
+  Replaced with stem-aware token matching (exact / plural / ≥4-char stem prefix), which
+  preserves quad→Quadriceps, tricep→Triceps, glute→Glutes. Exhaustive old-vs-new diff:
+  10 removals, all confirmed false positives; 0 legitimate losses; 0 additions.
+- **Render-phase hardening:** applying swaps triggers renders while the completion
+  overlay is open, so the v13.0.4 dashboard gate and scroll snapshot now cover the
+  'complete' phase as well.
+- **Help tab** rewritten to describe the new behavior (caught by regression test).
+
+### Verification (8-test battery)
+1. Never-silent matrix — 19 lift × weak-point taps on real parsed library data: 18 pair
+   responses, 1 covered, 0 silent. 2. Matcher diff — surgical. 3. Structural invariants
+   (≤2, same-tier, no reuse, protection) — pass. 4. 28 swap-in weights all calibrated
+   and subordinate; no-TM fallback correct. 5. Reese regression scenario (post-first-
+   swap bench) now answers with a covered message. 6. Block-hold truth table (6 cases)
+   — pass. 7. Apply mutation semantics incl. double-apply no-op — pass. 8. Full v13.0.2–
+   v13.0.6 regression suite + new statics — 18/18. JS syntax clean.
+
+Known cosmetic quirk: "Chest-Supported Row" earns an off-the-chest star via the word
+"chest" in its name; harmless (it is protected from swap-out regardless).
 
 ## v13.0.6 — Audit of v13.0.5 (four findings, fixed pre-deploy)
 

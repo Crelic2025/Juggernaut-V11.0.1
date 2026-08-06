@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.6</title>
+<title>Juggernaut Method 2.0 — v13.0.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -858,6 +858,19 @@ button:disabled{opacity:.35;pointer-events:none}
   margin:2px 0 8px;letter-spacing:.2px;
 }
 .inline-acc-progress.all-done{color:var(--accent)}
+/* v13.0.7: weak-point swap rows */
+.swap-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border:1px solid rgba(167,139,250,.3);border-radius:var(--r-sm);
+  background:rgba(167,139,250,.08);
+}
+.swap-row.applied{border-color:var(--accent);background:var(--accent-dim)}
+.swap-row .sr-desc{flex:1;min-width:0;font-size:12px;font-weight:600;line-height:1.4}
+.swap-row .sr-desc .sr-out{color:var(--muted);text-decoration:line-through}
+.swap-row .sr-desc .sr-in{color:var(--purple);font-weight:800}
+.swap-row.applied .sr-desc .sr-in{color:var(--accent)}
+.swap-row .sr-wt{display:block;font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.swap-row button{min-height:36px;white-space:nowrap}
 /* v13.0.5: calibration preview + over-main guard */
 .calib-list{max-height:46vh;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:6px}
 .calib-lift-hdr{
@@ -1546,7 +1559,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.6 — Act on the Signal</div>
+        <div class="hdr-sub">v13.0.8 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -1657,8 +1670,9 @@ body.performance-mode *{animation:none!important;transition:none!important}
           <div id="scoWeakOpts" class="weak-point-options"></div>
         </div>
         <div id="scoAccSuggestion" hidden style="margin-top:12px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid rgba(167,139,250,.25);background:rgba(167,139,250,.06)">
-          <div style="font-weight:800;font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Accessory Suggestion</div>
+          <div style="font-weight:800;font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Accessory Targeting</div>
           <p id="scoAccText" style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px"></p>
+          <div id="scoAccRows" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
           <button id="scoAccApply" class="btn-s" style="width:100%">Apply Swap</button>
         </div>
         <button id="btnContinueAcc2" class="btn-p btn-continue-acc" hidden style="margin-top:12px;width:100%">Continue to Accessories →</button>
@@ -2568,8 +2582,8 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <p><strong>Summary card</strong> — lift name, wave/phase, tonnage, session duration, AMRAP estimated 1RM, readiness score, sets completed. If it was a realization day and you earned a new 1RM, it's highlighted in green with the increase amount.</p>
     <p><strong>Session notes</strong> — a text area to record anything notable ("hip felt tight on set 3", "new belt felt great", "grip slipped on set 5"). Saved to your history.</p>
     <p><strong>AI Coaching Insight</strong> — if you have an OpenRouter API key in Settings, a card loads with 3–4 sentences of personalized coaching based on your sets, RPE, readiness, movement quality, and recent volume/e1RM trends. This takes a few seconds to generate.</p>
-    <p><strong>"Where did you struggle?"</strong> — tap your sticking point: Out of the hole, Midrange, Lockout, Off the chest, Off the floor, or No issues. This selection does two things: it highlights matching accessories with a purple star badge, and it may trigger an <strong>accessory swap suggestion</strong> in a purple card below.</p>
-    <p><strong>Accessory swap suggestion</strong> — if your current T1 accessory doesn't target the weakness you just selected, and a better option exists in the library, the app suggests the swap: "Consider swapping Pause Squat → Close-Grip Bench to target your lockout weakness." One tap on <strong>Apply Swap</strong> executes it. If you've reported the same sticking point 2+ sessions in a row, the suggestion is emphasized.</p>
+    <p><strong>"Where did you struggle?"</strong> — tap your sticking point: Out of the hole, Midrange, Lockout, Off the chest, Off the floor, or No issues. Every tap gets an answer in the purple <strong>Accessory Targeting</strong> card: either up to two targeted swaps, or confirmation that your current accessories already cover that weakness (they get starred either way).</p>
+    <p><strong>Accessory Targeting</strong> — the card offers up to <strong>two swaps</strong> (Tier 1 first, then Tier 2), each showing the calibrated working weight it will arrive at. Apply them individually or hit <strong>Swap Both</strong>. Applying commits you to that weak point for the current wave — pick a different one mid-wave and the app asks you to confirm the switch, because accessories need repeated weeks to move a weak point. Rows and face pulls are never offered as swap-outs on pressing days; that work protects your shoulders and bar path. If you've reported the same sticking point 2+ sessions in a row, the card says so and sets expectations.</p>
 
     <h3>Step 9 — Continue to Accessories</h3>
     <p>Tap <strong>"Continue to Accessories →"</strong> on the completion overlay. The app transitions to inline accessory logging — no tab switch needed. Each accessory card appears with:</p>
@@ -2883,7 +2897,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.6';
+  const APP_VERSION = '13.0.8';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -3099,12 +3113,30 @@ body.performance-mode *{animation:none!important;transition:none!important}
     'Balance / stability':['core','stability','anti-rotation','pallof']
   };
 
+  // v13.0.7: token-boundary matching. The old raw-substring check produced false
+  // positives — 'lat' matched inside "isolation", so chest-isolation work matched
+  // every lat/back weak point (and earned star badges for it). Both sides are
+  // normalized (lowercase, - and / to spaces) and targets must match whole words.
+  function _wpNorm(str){
+    return String(str||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+  }
+  // v13.0.7 r2: stem-aware token matching. Pure substring produced false positives
+  // ('lat' inside "isolation"/"Lateral"); pure whole-word broke plurals and stems
+  // ('quad' vs "Quadriceps", 'tricep' vs "Triceps"). Rules: multi-word targets use
+  // padded-substring on the normalized text; single-word targets match a token
+  // exactly, as its plural, or as a stem prefix when the target is >=4 chars —
+  // long enough that prefixing is meaningful ('quad'->quadriceps) while short
+  // ambiguous stems ('lat') stay exact and can't hit "lateral" or "isolation".
   function accessoryMatchesWeakPoint(item, weakPoint){
     if (!weakPoint || weakPoint === 'No issues') return false;
     const targets = WEAK_POINT_TARGETS[weakPoint] || [];
-    const cat = (item.category || '').toLowerCase();
-    const name = (item.name || '').toLowerCase();
-    return targets.some(t => cat.includes(t) || name.includes(t));
+    const hayStr = _wpNorm((item.category || '') + ' ' + (item.name || ''));
+    const toks = hayStr.split(' ');
+    return targets.some(raw => {
+      const t = _wpNorm(raw);
+      if (t.includes(' ')) return (' ' + hayStr + ' ').includes(' ' + t + ' ');
+      return toks.some(tok => tok === t || tok === t + 's' || (t.length >= 4 && tok.startsWith(t)));
+    });
   }
 
   /* ═══ EXERCISE COACHING CUES ═══ */
@@ -3501,7 +3533,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
         templates.push({
           id:newAccessoryId(), name:item.name, category:item.category,
           tier, sets, repMin:con.repMin, repMax:con.repMax,
-          weight:item.defaultWeight || 0, increment:item.increment || 5,
+          weight:calibratedSwapWeight(liftId, item, tier), increment:item.increment || 5,  // v13.0.8
           lastLoggedSets:Array(sets).fill(con.repMin),
           lastOutcome:'Hold load until all sets hit upper range.',
           lastCompletedAt:'', pendingProgression:false, suggestedWeight:null
@@ -4536,7 +4568,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'warmupModal','warmupStepNum','warmupStepTotal','warmupWeight','warmupReps','warmupPlates','warmupHistory','warmupPoop','warmupThumb','warmupFire','warmupSkip','warmupSubtitle',
      'coachingCard','coachingText','badgeFatigue',
      'sessionCompleteOverlay','scoSummary','scoCoaching','scoCoachText','scoWeakPoint','scoWeakOpts',
-     'scoAccSuggestion','scoAccText','scoAccApply','btnContinueAcc2','btnReturnDash',
+     'scoAccSuggestion','scoAccText','scoAccApply','scoAccRows','btnContinueAcc2','btnReturnDash',
      'enableReadiness','enableRPE','enableBackoffSets','enableGuidedWarmup','openrouterKey','aiModel','performanceMode','uiWakeLock','uiHaptics','uiSound',
      'coachMessages','coachInput','coachSend','coachClear',
      'storageBanner','storageBannerExport','storageBannerDismiss','syncStatus',
@@ -5157,56 +5189,236 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.scoWeakPoint.hidden = false;
   }
 
-  function showAccSuggestion(liftId, weakPoint){
+  /* ═══ v13.0.7: WEAK-POINT TARGETING ENGINE ═══
+     Replaces the single-swap suggester, which had three silent exit doors
+     (no unowned match / no non-matching owned / equipment filter), scanned Tier 1
+     only (making back-driven weak points structurally dead), and wrote hardcoded
+     library defaultWeights on apply — bypassing v13.0.6 calibration entirely.
+     Design contract: every tap gets a visible answer. */
+
+  let _swapPlan = null;
+
+  function currentWaveId(){
+    try { return currentMicrocycle()?.wave || null; } catch(_){ return null; }
+  }
+
+  // v13.0.8: THE single authority for putting a library exercise into state. Tier 1
+  // rides the v13.0.6 formula + subordination cap; Tier 2/3 (and Tier 1 with no 1RM
+  // on file) seed light and let the progression engine climb. Never returns a raw
+  // library defaultWeight. Every write path routes through this — initial seeding,
+  // template-chip swaps, exercise swaps, and weak-point swaps — so a hardcoded 185
+  // can no longer reach state by any route.
+  function calibratedSwapWeight(liftId, libItem, tier){
+    // v13.0.8 fix: DEFAULT_STATE calls buildDefaultAccessoriesForLift() at module-init
+    // time, BEFORE `state` is initialized. `state` is a let/const binding, so touching
+    // it there is a TDZ ReferenceError that kills boot outright — and `typeof` does not
+    // help, since typeof also throws inside the TDZ. Probe through try/catch and fall
+    // back to light seeding when state isn't available yet. There are no user 1RMs at
+    // that moment anyway, so light seeding is the correct answer, not a degradation.
+    let S = null;
+    try { S = state; } catch(_){ S = null; }
+    const inc = (Number.isFinite(libItem.increment) && libItem.increment > 0)
+      ? libItem.increment : (S?.settings?.rounding || 5);
+    const lightSeed = () => (libItem.defaultWeight > 0)
+      ? roundToIncrement(libItem.defaultWeight * T2_SEED, inc)
+      : 0; // bodyweight / band
+    if (!S) return lightSeed();
+    const lift = S.lifts?.[liftId];
+    if (tier === 'tier1' && lift && Number.isFinite(lift.true1RM) && lift.true1RM > 0){
+      try {
+        const tm = trainingMax(lift);
+        const ratio = T1_VARIATION_RATIO[libItem.name] ?? T1_FALLBACK_RATIO;
+        let w = roundToIncrement(tm * ratio * calibrationWavePct(), inc);
+        const mainWW = mainWorkingWeight(liftId);
+        if (mainWW !== null){
+          const cap = Math.floor((mainWW * T1_SUBORDINATION_CAP) / inc) * inc;
+          if (w > cap) w = cap;
+        }
+        const bar = (Number.isFinite(lift.barWeight) ? lift.barWeight : S.settings?.barWeight) || 45;
+        return Math.max(bar, w);
+      } catch(_){ return lightSeed(); }
+    }
+    return lightSeed();
+  }
+
+  // Up to 2 swap pairs, Tier 1 filled first (JTS hierarchy), then Tier 2 so
+  // back/row-driven weak points are reachable. Same-tier pairs only. Custom items
+  // (no library entry) are never offered as swap-outs.
+  function buildSwapPairs(liftId, weakPoint){
+    const data = accessoryLiftState(liftId);
+    const lib = ACCESSORY_LIBRARY[liftId] || {};
+    const pairs = [];
+    const usedOut = new Set(), usedIn = new Set();
+    ['tier1','tier2'].forEach(tier => {
+      const tierLib = lib[tier] || [];
+      while (pairs.length < 2){
+        const owned = data.templates.filter(t => t.tier === tier && !usedOut.has(t.id));
+        const ownedNames = new Set(data.templates.filter(t => t.tier === tier).map(t => t.name));
+        const inCand = tierLib.find(ex =>
+          !ownedNames.has(ex.name) && !usedIn.has(ex.name) &&
+          equipmentAvailable(ex) && accessoryMatchesWeakPoint(ex, weakPoint));
+        const outCand = owned.find(t => {
+          const le = tierLib.find(x => x.name === t.name);
+          if (!le || accessoryMatchesWeakPoint(le, weakPoint)) return false;
+          // v13.0.7: on pressing days, rows / face pulls / rear-delt work is
+          // structural (shoulder health, bar-path stability) — never auto-offer
+          // it as a swap-out even when it doesn't match today's weak point.
+          if (liftId === 'bench' || liftId === 'ohp'){
+            const hay = _wpNorm((le.category || '') + ' ' + (le.name || ''));
+            if (['row','back','lat','face pull','rear delt','pull apart'].some(p => hay.includes(_wpNorm(p)))) return false;
+          }
+          return true;
+        });
+        if (!inCand || !outCand) break;
+        usedOut.add(outCand.id); usedIn.add(inCand.name);
+        pairs.push({
+          tier, outId: outCand.id, outName: outCand.name,
+          inName: inCand.name, inCat: inCand.category || 'Accessory',
+          inc: (Number.isFinite(inCand.increment) && inCand.increment > 0) ? inCand.increment : (state.settings.rounding || 5),
+          weight: calibratedSwapWeight(liftId, inCand, tier),
+          applied: false
+        });
+      }
+    });
+    return pairs;
+  }
+
+  function ownedWeakPointMatches(liftId, weakPoint){
+    const lib = ACCESSORY_LIBRARY[liftId] || {};
+    return accessoryLiftState(liftId).templates.filter(t => {
+      const le = (lib[t.tier] || []).find(x => x.name === t.name);
+      return accessoryMatchesWeakPoint(le || t, weakPoint);
+    });
+  }
+
+  async function applySwapPair(idx){
+    const plan = _swapPlan;
+    const p = plan?.pairs?.[idx];
+    if (!p || p.applied) return;
+    const item = findAccessory(plan.liftId, p.outId);
+    if (!item){ toast('Accessory not found.', 'b'); return; }
+    item.name = p.inName;
+    item.category = p.inCat;
+    item.weight = p.weight;
+    item.increment = p.inc;
+    item.pendingProgression = false; item.suggestedWeight = null;
+    item.lastOutcome = 'Swapped in to target ' + plan.weakPoint + '.';
+    p.applied = true;
+    // Block-hold: applying commits this wave to the chosen weak point
+    if (!state.settings.weakTargetLock) state.settings.weakTargetLock = {};
+    state.settings.weakTargetLock[plan.liftId] = {
+      weakPoint: plan.weakPoint, wave: currentWaveId(), appliedAt: nowISO()
+    };
+    await saveState();
+    toast('Swapped to ' + p.inName + '.', 'g');
+    renderSwapCard();
+    render();
+  }
+
+  function renderSwapCard(){
+    const plan = _swapPlan;
+    if (!plan || !el.scoAccText || !el.scoAccRows || !el.scoAccApply) return;
+    const wpL = escapeHtml((plan.weakPoint || '').toLowerCase());
+
+    if (plan.mode === 'hold'){
+      const since = state.history.filter(h =>
+        h.liftId === plan.liftId && (h.completedAt || '') > (plan.lock.appliedAt || '')).length;
+      el.scoAccText.innerHTML = 'You\u2019re <strong>' + since + ' session' + (since===1?'':'s') +
+        '</strong> into targeting <strong>' + escapeHtml(plan.lock.weakPoint) + '</strong> this wave. ' +
+        'Consistency beats variety \u2014 accessories need repeated weeks to move a weak point.';
+      el.scoAccRows.innerHTML =
+        '<div class="swap-row"><span class="sr-desc">Hold <strong>' + escapeHtml(plan.lock.weakPoint) + '</strong> targeting</span>' +
+          '<button class="btn-s" data-swap-keep="1">Keep</button></div>' +
+        '<div class="swap-row"><span class="sr-desc">Switch to <span class="sr-in">' + escapeHtml(plan.weakPoint) + '</span></span>' +
+          '<button class="btn-s" data-swap-switch="1">Switch</button></div>';
+      el.scoAccRows.querySelector('[data-swap-keep]').onclick = () => {
+        el.scoAccText.innerHTML = 'Holding <strong>' + escapeHtml(plan.lock.weakPoint) + '</strong> targeting for this wave. Matching accessories stay starred.';
+        el.scoAccRows.innerHTML = '';
+      };
+      el.scoAccRows.querySelector('[data-swap-switch]').onclick = () =>
+        showAccSuggestion(plan.liftId, plan.weakPoint, true);
+      el.scoAccApply.hidden = true;
+      return;
+    }
+
+    if (plan.mode === 'covered'){
+      const names = plan.matches.slice(0,3).map(m => '<strong>' + escapeHtml(m.name) + '</strong>').join(' + ');
+      el.scoAccText.innerHTML = '\u2713 You\u2019re covered \u2014 ' + names +
+        ' already target your ' + wpL + ' weakness. ' +
+        (plan.repeated ? '<strong>You\u2019ve reported this multiple times \u2014 keep hammering these and expect slow gains; weak points move in months, not sessions.</strong> ' : '') +
+        'They\u2019re starred in today\u2019s list.';
+      el.scoAccRows.innerHTML = '';
+      el.scoAccApply.hidden = true;
+      return;
+    }
+
+    if (plan.mode === 'nomap'){
+      el.scoAccText.innerHTML = 'No movement in this lift\u2019s library maps to ' + wpL +
+        ' \u2014 matching work will be starred once you add it from the Accessories tab.';
+      el.scoAccRows.innerHTML = '';
+      el.scoAccApply.hidden = true;
+      return;
+    }
+
+    // mode === 'pairs'
+    el.scoAccText.innerHTML =
+      (plan.repeated ? '<strong>You\u2019ve reported \u201C' + escapeHtml(plan.weakPoint) + '\u201D multiple times.</strong> ' : '') +
+      'Targeted swap' + (plan.pairs.length > 1 ? 's' : '') + ' for your ' + wpL + ' weakness \u2014 applies to your list now, lifts next session:';
+    el.scoAccRows.innerHTML = plan.pairs.map((p, i) =>
+      '<div class="swap-row' + (p.applied ? ' applied' : '') + '">' +
+        '<span class="sr-desc"><span class="sr-out">' + escapeHtml(p.outName) + '</span> \u2192 ' +
+          '<span class="sr-in">' + escapeHtml(p.inName) + '</span>' +
+          '<span class="sr-wt">' + (p.weight > 0 ? escapeHtml(formatWeight(p.weight)) + ' \u00B7 calibrated' : 'BW') + '</span></span>' +
+        (p.applied
+          ? '<button class="btn-s" disabled>\u2713</button>'
+          : '<button class="btn-s" data-swap-one="' + i + '">Apply</button>') +
+      '</div>'
+    ).join('');
+    el.scoAccRows.querySelectorAll('[data-swap-one]').forEach(btn => {
+      btn.onclick = () => applySwapPair(parseInt(btn.getAttribute('data-swap-one')));
+    });
+    const remaining = plan.pairs.filter(p => !p.applied);
+    if (!remaining.length){
+      el.scoAccApply.hidden = true;
+    } else {
+      el.scoAccApply.hidden = false;
+      el.scoAccApply.disabled = false;
+      el.scoAccApply.textContent = remaining.length > 1 ? 'Swap Both' : 'Apply Swap';
+      el.scoAccApply.onclick = async () => {
+        for (let i = 0; i < plan.pairs.length; i++){
+          if (!plan.pairs[i].applied) await applySwapPair(i);
+        }
+      };
+    }
+  }
+
+  function showAccSuggestion(liftId, weakPoint, force){
     if (!el.scoAccSuggestion || !el.scoAccText || !el.scoAccApply) return;
     if (!weakPoint || weakPoint === 'No issues'){
       el.scoAccSuggestion.hidden = true;
       return;
     }
-    // Check current T1 accessories for this lift
-    const data = accessoryLiftState(liftId);
-    const t1Items = data.templates.filter(t => t.tier === 'tier1');
-    const lib = ACCESSORY_LIBRARY[liftId]?.tier1 || [];
-    // Find a T1 exercise that matches the weak point but isn't currently selected
-    const currentNames = new Set(t1Items.map(t => t.name));
-    const match = lib.find(ex => {
-      if (currentNames.has(ex.name)) return false;
-      if (!equipmentAvailable(ex)) return false;
-      return accessoryMatchesWeakPoint(ex, weakPoint);
-    });
-    if (!match){
-      el.scoAccSuggestion.hidden = true;
+    const repeated = state.history.filter(h => h.liftId === liftId && h.weakPoint === weakPoint).length >= 2;
+
+    // Block-hold gate: an applied targeting commitment holds for the wave
+    const lock = state.settings.weakTargetLock?.[liftId];
+    if (!force && lock && lock.weakPoint && lock.weakPoint !== weakPoint && lock.wave && lock.wave === currentWaveId()){
+      _swapPlan = { mode:'hold', liftId, weakPoint, lock };
+      renderSwapCard();
+      el.scoAccSuggestion.hidden = false;
       return;
     }
-    // Check if a current T1 does NOT match the weak point (candidate to replace)
-    const nonMatch = t1Items.find(t => {
-      const libEntry = lib.find(x => x.name === t.name);
-      return libEntry && !accessoryMatchesWeakPoint(libEntry, weakPoint);
-    });
-    if (!nonMatch){
-      // Both current T1s already target this weakness
-      el.scoAccSuggestion.hidden = true;
-      return;
+
+    const pairs = buildSwapPairs(liftId, weakPoint);
+    if (pairs.length){
+      _swapPlan = { mode:'pairs', liftId, weakPoint, pairs, repeated };
+    } else {
+      const matches = ownedWeakPointMatches(liftId, weakPoint);
+      _swapPlan = matches.length
+        ? { mode:'covered', liftId, weakPoint, matches, repeated }
+        : { mode:'nomap', liftId, weakPoint, repeated };
     }
-    // Check if user picked the same weak point 2+ times recently
-    const recentWP = state.history.filter(h => h.liftId === liftId && h.weakPoint === weakPoint);
-    const repeated = recentWP.length >= 2;
-    const eqLabels = {barbell:'BB',dumbbell:'DB',cable:'Cable',band:'Band',machine:'Mach',pullup_bar:'Bar',bodyweight:'BW'};
-    const eqTag = match.equip ? ' (' + (eqLabels[match.equip]||match.equip) + ')' : '';
-    el.scoAccText.innerHTML = (repeated ? '<strong>You\'ve reported "' + escapeHtml(weakPoint) + '" multiple times.</strong> ' : '') +
-      'Consider swapping <strong>' + escapeHtml(nonMatch.name) + '</strong> → <strong>' + escapeHtml(match.name) + '</strong>' + eqTag +
-      ' to target your ' + escapeHtml(weakPoint).toLowerCase() + ' weakness.';
-    el.scoAccApply.onclick = async () => {
-      nonMatch.name = match.name;
-      nonMatch.category = match.category;
-      nonMatch.weight = match.defaultWeight || 0;
-      nonMatch.increment = match.increment || 5;
-      await saveState();
-      toast('Swapped to ' + match.name + '.', 'g');
-      el.scoAccSuggestion.hidden = true;
-      el.scoAccApply.disabled = true;
-      el.scoAccText.innerHTML += '<br><span style="color:var(--accent)">✓ Applied</span>';
-    };
+    renderSwapCard();
     el.scoAccSuggestion.hidden = false;
   }
 
@@ -5807,7 +6019,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     item.category = newExercise.category;
     // Only apply the new exercise's default weight if the user hasn't set one yet (i.e., still at 0)
     if (!item.weight || item.weight === 0){
-      item.weight = newExercise.defaultWeight || 0;
+      item.weight = calibratedSwapWeight(liftId, newExercise, tier);  // v13.0.8
     }
     // Otherwise preserve the user's current weight — within-tier swaps usually have similar strength
     item.increment = newExercise.increment || item.increment;
@@ -6279,7 +6491,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // the page above the lifter and letting the timeline auto-scroll yank the
     // viewport to the top. display:none also removes the layout box, so the chip
     // scrollIntoView below becomes a natural no-op.
-    el.dashboardCard.style.display = (state.activeSession || _sessionPhase === 'accessories') ? 'none' : '';
+    el.dashboardCard.style.display = (state.activeSession || _sessionPhase === 'accessories' || _sessionPhase === 'complete') ? 'none' : '';  // v13.0.7: complete too — swap-apply renders while the overlay is open
     // v13: deload banner + backup nudge + insight cards
     renderDeloadBanner();
     renderBackupNudge();
@@ -6643,7 +6855,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           const target = targets.sort((a, b) => (a.lastCompletedAt||'').localeCompare(b.lastCompletedAt||''))[0];
           target.name = ex.name;
           target.category = ex.category;
-          target.weight = ex.defaultWeight || 0;
+          target.weight = calibratedSwapWeight(liftId, ex, tier);  // v13.0.8
           target.increment = ex.increment || 5;
           await saveState();
           toast('Swapped to ' + ex.name + '.', 'g');
@@ -7827,7 +8039,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // lifter's position; snapshot scroll here and restore at the end of this same
     // synchronous pass — the restore lands before the next paint, so tapping Log
     // produces zero visible movement.
-    const _keepY = (_sessionPhase === 'accessories') ? window.scrollY : null;
+    const _keepY = (_sessionPhase === 'accessories' || _sessionPhase === 'complete') ? window.scrollY : null;  // v13.0.7: overlay scroll must survive swap-apply renders
     // v13 A2: storage-degraded banner (page-load dismiss only)
     if (el.storageBanner) el.storageBanner.hidden = !(storageDegraded && !_storageBannerDismissed);
     renderLiftSelects(); renderSettings(); renderProgramSummary(); renderProgramChart(); renderDashboard();
@@ -8369,7 +8581,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.6-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.8-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -8485,7 +8697,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     const mainWW = over[0].mainWW;
     el.accOverMainWarn.hidden = false;
     el.accOverMainWarn.innerHTML =
-      '\u26A0 <strong>' + over.length + ' accessor' + (over.length===1?'y is':'ies are') +
+      '\u26A0 <strong>' + over.length + ' supplemental lift' + (over.length===1?' is':'s are') +
       ' heavier than your main working weight</strong> (' + escapeHtml(formatWeight(mainWW)) + ' this microcycle): ' +
       escapeHtml(over.slice(0,4).map(o => o.name + ' ' + formatWeight(o.weight)).join(', ')) +
       (over.length > 4 ? ' +' + (over.length-4) + ' more' : '') +
@@ -8593,7 +8805,8 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         rows.push({
           liftId, id:item.id, name:item.name, tier:item.tier,
           from:item.weight, to:next, basis,
-          overMain: (mainWW !== null && item.weight > mainWW)
+          // v13.0.8: Tier 1 only — see accessoriesOverMain()
+          overMain: (item.tier === 'tier1' && mainWW !== null && item.weight > mainWW)
         });
       });
     });
@@ -8618,8 +8831,15 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
   function accessoriesOverMain(liftId){
     const mainWW = mainWorkingWeight(liftId);
     if (mainWW === null) return [];
+    // v13.0.8 fix: TIER 1 ONLY. The JTS hierarchy ("supplementary work does not take
+    // precedent over your competition lifts") governs supplemental *variations of the
+    // competition lift* — the things Tier 1 holds. Comparing a Tier 2/3 load to the
+    // main lift is meaningless across movement patterns: a Lat Pulldown at 80 is not
+    // "outranking" a 72.5 lb overhead press, it's a vertical pull vs a vertical press,
+    // and pulling more than you press is normal and healthy. The unscoped check fired
+    // a warning banner on correct programming.
     return accessoryLiftState(liftId).templates
-      .filter(t => t.weight > mainWW)
+      .filter(t => t.tier === 'tier1' && t.weight > mainWW)
       .map(t => ({ name:t.name, weight:t.weight, mainWW }));
   }
 
