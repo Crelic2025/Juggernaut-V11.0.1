@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.8</title>
+<title>Juggernaut Method 2.0 — v13.0.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -1559,7 +1559,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.8 — Act on the Signal</div>
+        <div class="hdr-sub">v13.0.9 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -2897,7 +2897,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.8';
+  const APP_VERSION = '13.0.9';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -3787,7 +3787,21 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     base.program = { ...base.program, ...(parsed.program||{}) };
     base.program.completion = { ...(base.program.completion||{}), ...((parsed.program||{}).completion||{}) };
     base.activeSession = parsed.activeSession || null;
-    base.history = Array.isArray(parsed.history) ? parsed.history : [];
+    // v13.0.9: sanitize per-entry at the single ingestion choke point. Old-version
+    // backups and hand-edited imports can carry entries missing sets/wave/phase;
+    // downstream consumers (renderHistory, lift analytics at h.sets.length) read
+    // those raw, and one malformed entry crashed render() — the spine every
+    // interaction runs through — bricking the entire UI. Guarantee shape here
+    // instead of guarding dozens of call sites.
+    base.history = (Array.isArray(parsed.history) ? parsed.history : [])
+      .filter(h => h && typeof h === 'object')
+      .map(h => ({ ...h,
+        sets: Array.isArray(h.sets) ? h.sets.filter(s => s && typeof s === 'object' && !Array.isArray(s)) : [],
+        wave: (typeof h.wave === 'string' && h.wave) ? h.wave : '?',
+        phase: (typeof h.phase === 'string') ? h.phase : '',
+        liftId: (typeof h.liftId === 'string' && h.liftId) ? h.liftId : 'squat',
+        completedAt: (typeof h.completedAt === 'string') ? h.completedAt : ''
+      }));
     base.records = (parsed.records && typeof parsed.records === 'object') ? parsed.records : {}; // v11.0.2 PR ledger
     base.coachChat = (parsed.coachChat && Array.isArray(parsed.coachChat.messages)) // v12 coach chat
       ? { messages: parsed.coachChat.messages.slice(-COACH_CHAT_MAX) }
@@ -6026,7 +6040,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     await saveState();
     toast('Swapped to ' + newName + '.', 'g');
     if (_sessionPhase === 'accessories') renderInlineAccessories(liftId);
-    else renderAccessories();
+    else render();  // v13.0.9: full render inherits scroll preservation; direct
+                    // renderAccessories() wiped the list with no protection
   }
 
   /* ═══ RPE SESSION STATE ═══ */
@@ -6859,7 +6874,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           target.increment = ex.increment || 5;
           await saveState();
           toast('Swapped to ' + ex.name + '.', 'g');
-          renderAccessories();
+          render();  // v13.0.9: scroll-preserving path
         });
         pillRow.appendChild(pill);
       });
@@ -7170,7 +7185,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function renderVolumeSparklines(container){
     LIFTS.filter(l => isActiveLift(l.id)).forEach(lift => {
-      const sessions = state.history.filter(h => h.liftId === lift.id && h.sets.length > 0)
+      const sessions = state.history.filter(h => h.liftId === lift.id && (h.sets || []).length > 0)  // v13.0.9 belt
         .sort((a,b) => (a.completedAt||'').localeCompare(b.completedAt||''));
       if (sessions.length < 2) return;
       const tonnages = sessions.map(s => s.sets.filter(x => !x.isRamp).reduce((sum, x) => sum + (x.weight * x.performedReps), 0));
@@ -7940,8 +7955,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         : isDeload ? '<span class="outcome-badge deload-b">Deload</span>'
         : isManaged ? '<span class="outcome-badge managed">Managed</span>'
         : '<span class="outcome-badge full">Full</span>';
+      // v13.0.9 belt: mergeState sanitizes at ingestion, but read defensively anyway
+      const sets = Array.isArray(item.sets) ? item.sets : [];
+      const wave = String(item.wave || '?');
+      const phase = String(item.phase || '');
       // Session tonnage
-      const workingSets = item.sets.filter(s => !s.isRamp);
+      const workingSets = sets.filter(s => !s.isRamp);
       const tonnage = workingSets.reduce((sum, s) => sum + (s.weight * s.performedReps), 0);
       const readinessStr = item.readiness?.score !== undefined ? (' · R:' + Math.round(readinessScoreNormalized(item.readiness)) + '/30') : '';
       const node = document.createElement('div');
@@ -7950,10 +7969,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       node.innerHTML = `
         <div class="swipe-bg">DELETE</div>
         <div class="h-content">
-          <div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(item.wave.toUpperCase())} ${escapeHtml(capitalize(item.phase))}${badge}</div>
+          <div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(wave.toUpperCase())} ${escapeHtml(capitalize(phase))}${badge}</div>
           <div class="sm mt">${fmtDate(item.completedAt)}${upd}</div>
           <div class="hist-tonnage">${formatWeight(roundToIncrement(tonnage, 5))} tonnage · ${workingSets.length} sets${readinessStr}</div>
-          <div class="xs mt" style="margin-top:4px">${item.sets.filter(s => !s.isRamp).map(s => s.performedReps + '/' + s.targetReps).join(' · ')}</div>
+          <div class="xs mt" style="margin-top:4px">${sets.filter(s => !s.isRamp).map(s => (s.performedReps ?? '?') + '/' + (s.targetReps ?? '?')).join(' · ')}</div>
           ${item.note ? '<div class="xs mt" style="margin-top:4px;opacity:.7">' + escapeHtml(item.note) + '</div>' : ''}
           ${item.userNote ? '<div class="xs mt" style="margin-top:4px;opacity:.7;font-style:italic">' + escapeHtml(item.userNote) + '</div>' : ''}
           ${item.coachingInsight ? '<div class="hist-coaching" style="margin-top:6px;padding:6px 8px;border-radius:var(--r-sm);border:1px solid rgba(167,139,250,.2);background:rgba(167,139,250,.05);font-size:11px;color:var(--purple);line-height:1.5;cursor:pointer" data-coaching-toggle><strong>AI Coaching</strong> <span style="opacity:.5;font-size:10px">tap to expand</span><div class="hist-coaching-text" style="display:none;margin-top:4px;color:var(--text2)">' + escapeHtml(item.coachingInsight) + '</div></div>' : ''}
@@ -8033,13 +8052,22 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* ═══ MASTER RENDER ═══ */
+  let _scrollKeepY = 0; // v13.0.9: latest snapshot — rAF restores read this, never a stale closure
   function render(){
     // v13.0.4: renders during the accessories phase must not move the page. Interim
     // renderers (lift-intel, weekly-plan) still momentarily change layout above the
     // lifter's position; snapshot scroll here and restore at the end of this same
     // synchronous pass — the restore lands before the next paint, so tapping Log
     // produces zero visible movement.
-    const _keepY = (_sessionPhase === 'accessories' || _sessionPhase === 'complete') ? window.scrollY : null;  // v13.0.7: overlay scroll must survive swap-apply renders
+    // v13.0.9: UNCONDITIONAL. The phase gate left every Accessories-TAB flow
+    // (which runs at phase 'idle') completely unprotected — Log, progression,
+    // deload, chip swaps, calibration apply all clamped scroll to the top when
+    // the list innerHTML was wiped mid-pass. render() never scrolls on purpose;
+    // intentional scrolls (Continue buttons, ex-help reveal) live in handlers
+    // that run AFTER render() returns, and the timeline chip's smooth centering
+    // is an animation that outlives the restore — both still win. So preserving
+    // scroll is always correct here, in every phase, on every tab.
+    const _keepY = window.scrollY;
     // v13 A2: storage-degraded banner (page-load dismiss only)
     if (el.storageBanner) el.storageBanner.hidden = !(storageDegraded && !_storageBannerDismissed);
     renderLiftSelects(); renderSettings(); renderProgramSummary(); renderProgramChart(); renderDashboard();
@@ -8073,9 +8101,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (el.weeklyPlanCard) el.weeklyPlanCard.style.display = 'none';
       renderInlineAccessories(inlineAccLiftId());
     }
-    // v13.0.4: restore the lifter's position — must be the last statement so it
-    // wins over every layout change this pass made.
-    if (_keepY !== null) window.scrollTo(0, _keepY);
+    // v13.0.4/v13.0.9: restore the lifter's position — last statement so it wins
+    // over every layout change this pass made. The rAF double-tap re-asserts it
+    // right before the next paint, catching any late same-frame scroll (Safari
+    // clamp timing) that lands after this synchronous pass returns.
+    _scrollKeepY = _keepY;
+    window.scrollTo(0, _scrollKeepY);
+    if (typeof requestAnimationFrame === 'function'){
+      requestAnimationFrame(() => window.scrollTo(0, _scrollKeepY));
+    }
   }
 
   function selectedLiftId(){ return el.liftSelect.value || state.settings.activeLiftIds[0] || 'squat'; }
@@ -8581,7 +8615,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.8-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.9-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -8985,7 +9019,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     if (newIdx < 0 || newIdx >= bucket.templates.length) return;
     // Swap
     [bucket.templates[idx], bucket.templates[newIdx]] = [bucket.templates[newIdx], bucket.templates[idx]];
-    await saveState(); renderAccessories();
+    await saveState(); render();  // v13.0.9: scroll-preserving path
   }
 
   /* ═══ REP BUTTON HANDLER — FIX: single event system ═══ */

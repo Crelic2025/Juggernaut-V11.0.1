@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.8
+# Juggernaut Method 2.0 — v13.0.9
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,9 +9,17 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.8**
+- Current canonical build: **v13.0.9**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `ec92dc36438c1db1511f8fe50f953db9b0ed21a9d045ba66f1e41d37581186b2`
+- Final HTML SHA256: `d2e3da2e04963cc8462caba7fa542d1c29270dbdbdc05b65e7bf6fcca055e844`
+
+## v13.0.9 — Resilient History & Stable Scrolling
+
+- Sanitizes imported and legacy history entries at the state-ingestion boundary, dropping malformed nested set values and defaulting missing sets, wave, phase, lift, or completion date fields so they cannot break the UI.
+- Adds defensive history and volume rendering for malformed legacy entries.
+- Preserves the lifter's scroll position across every render path, including accessory logs, progression, deloads, swaps, and recalibration.
+- Routes accessory mutations through the full scroll-preserving render path.
+- Bumps the title, visible subtitle, `APP_VERSION`, export filename, and derived service-worker cache identity to v13.0.9.
 
 ## v13.0.8 — Calibrated Accessory Authority
 
