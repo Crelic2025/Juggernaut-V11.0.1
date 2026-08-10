@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.0.9
+# Juggernaut Method 2.0 — v13.1.1
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,9 +9,25 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.0.9**
+- Current canonical build: **v13.1.1**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `d2e3da2e04963cc8462caba7fa542d1c29270dbdbdc05b65e7bf6fcca055e844`
+- Final HTML SHA256: `c87492435b9059ea35fe6533ce3b3f75e42d6e1baf7363037b7f09bc2050779c`
+
+## v13.1.1 — One Authority per Accessory Tier
+
+- Tier 1 library supplementals now follow one formula authority: training max × variation
+  ratio × current wave percentage. They re-sync after completed or skipped wave/phase
+  transitions and after realization PRs.
+- Tier 2/3 remain governed only by rep-ceiling progression; formula sync never overwrites
+  their earned loads.
+- Custom Tier 1 movements remain user-managed, including when a custom name matches a
+  library movement. They retain rep-ceiling progression instead of formula ownership.
+- Formula-governed items clear stale staged progression before sync. Boot-time sync repaints
+  changed values without competing with the PR toast.
+- The v13.0.9 history sanitizer remains intact: malformed nested set values are dropped at
+  merge time so legacy/imported history cannot crash rendering.
+- The browser self-test now covers malformed history sanitization, same-name and unique
+  custom Tier 1 exemptions, and genuine library Tier 1 formula ownership.
 
 ## v13.0.9 — Resilient History & Stable Scrolling
 

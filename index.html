@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.0.9</title>
+<title>Juggernaut Method 2.0 — v13.1.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -888,6 +888,12 @@ button:disabled{opacity:.35;pointer-events:none}
 .calib-row .cr-move{font-family:var(--mono);font-size:13px;font-weight:700;white-space:nowrap}
 .calib-row .cr-from{color:var(--muted);text-decoration:line-through}
 .calib-row .cr-to{color:var(--accent)}
+.acc-authority-note{
+  margin-top:10px;padding:10px 12px;border-radius:var(--r-sm);
+  border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.07);
+  font-size:11.5px;font-weight:600;line-height:1.55;color:var(--text2);
+}
+.acc-authority-note strong{color:var(--blue)}
 .acc-overmain-warn{
   margin-top:10px;padding:10px 12px;border-radius:var(--r-sm);
   border:1px solid var(--warn);background:rgba(255,159,67,.10);
@@ -1559,7 +1565,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.0.9 — Act on the Signal</div>
+        <div class="hdr-sub">v13.1.1 — Act on the Signal</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -1820,6 +1826,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
           <div class="tight" style="flex:1"><button id="btnRecalibrateAcc" class="btn-p" style="width:100%">Recalibrate from Training Maxes</button></div>
         </div>
         <div id="accOverMainWarn" class="acc-overmain-warn" hidden></div>
+        <div id="accAuthorityNote" class="acc-authority-note" hidden></div>
         <div class="install-help">
           3-Tier: <strong>T1</strong> Supplemental (5–8 reps) · <strong>T2</strong> Hypertrophy (8–15 reps) · <strong>T3</strong> Core/Prehab (10–20 reps). Hold load until all sets hit ceiling.
         </div>
@@ -2897,7 +2904,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.0.9';
+  const APP_VERSION = '13.1.1';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -3827,6 +3834,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         ? src.templates.map(item => ({
             id:item.id || newAccessoryId(), name:item.name || 'Accessory',
             category:item.category || 'Accessory',
+            // v13.1.1: user-owned marker. This whitelist drops anything not named here,
+            // so it has to be carried explicitly. Legacy states predate the flag —
+            // fall back to the 'Custom' category addAccessory has always stamped.
+            custom:item.custom === true || item.category === 'Custom',
             sets:Math.max(1, Math.floor(n(item.sets)||5)),
             repMin:Math.max(1, Math.floor(n(item.repMin)||10)),
             repMax:Math.max(1, Math.floor(n(item.repMax)||15)),
@@ -4594,7 +4605,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'bwInput','btnLogBW','bwRecent',
      'onboardModal','onboardStep1','onboardStep2','onboardStep3','onboardLifts',
      'onboardNext1','onboardBack2','onboardNext2','onboardBack3','onboardDone','onboardSkip',
-     'btnRecalibrateAcc','accOverMainWarn','calibModal','calibSummary','calibList','btnCalibCancel','btnCalibApply',
+     'btnRecalibrateAcc','accOverMainWarn','accAuthorityNote','calibModal','calibSummary','calibList','btnCalibCancel','btnCalibApply',
      'toast','restModal','restDisplay','restSetsLeft','timerArc','btnRestMinus10','btnRestPlus10','btnRestClose',
      'confirmModal','confirmTitle','confirmMsg','confirmCancel','confirmOk',
      'viewWorkout','viewAccessories','viewHistory','viewCoach','viewSettings'
@@ -6955,6 +6966,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.accessoryList.innerHTML = '';
     renderAccessoryCoverage(); // v11: show weekly pattern coverage
     renderOverMainWarning(liftId); // v13.0.5: flag anything outranking the main lift
+    renderTierAuthorityNote(liftId); // v13.1.0
     if (!data.templates.length){
       el.accessoryList.innerHTML = `<div class="empty-state">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
@@ -8330,6 +8342,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (state.activeSession && state.activeSession.liftId === liftId && state.activeSession.microcycleIndex === micro.index)
       state.activeSession = null;
     maybeAdvanceMicrocycle();
+    try { await maybeSyncFormulaAccessories('skip'); } catch(_){}
     await saveState(); toast('Lift skipped.', 'w'); render();
   }
 
@@ -8439,10 +8452,12 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     const key = session.microcycleKey;
     const comp = state.program.completion[key] || {};
     comp[session.liftId] = 'done'; state.program.completion[key] = comp;
-    // Show completion overlay BEFORE clearing session (need createdAt for duration calc)
+    // Show completion overlay BEFORE clearing session (need createdAt for duration calc).
     showCompletionOverlay(session, entry, realizationUpdate);
     state.activeSession = null;
     maybeAdvanceMicrocycle();
+    // Sync against the post-transition microcycle and any realization-updated TM.
+    try { await maybeSyncFormulaAccessories('session'); } catch(_){}
     await saveState();
     await enqueueSync('main-session', entry);
     tryAutoBackup(); // v13 C1.2: fire-and-forget FS auto-backup
@@ -8615,7 +8630,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.0.9-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.1.1-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -8723,6 +8738,24 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     _calibPlan = null;
   }
 
+  // v13.1.0: explain the governing authority on the Accessories tab
+  function renderTierAuthorityNote(liftId){
+    if (!el.accAuthorityNote) return;
+    const lift = state.lifts?.[liftId];
+    if (!lift || !Number.isFinite(lift.true1RM) || lift.true1RM <= 0){
+      el.accAuthorityNote.hidden = true; return;
+    }
+    let wave = 60;
+    try { wave = Math.round(calibrationWavePct() * 100); } catch(_){}
+    const n = accessoryLiftState(liftId).templates.filter(t => isFormulaGoverned(liftId, t)).length;
+    if (!n){ el.accAuthorityNote.hidden = true; return; }
+    el.accAuthorityNote.hidden = false;
+    el.accAuthorityNote.innerHTML =
+      '<strong>Tier 1 rides the wave.</strong> ' + n + ' supplemental lift' + (n===1?'':'s') +
+      ' auto-set to ' + wave + '% of this microcycle and re-sync as the block advances — ' +
+      'no manual progression needed. Tier 2/3 still climb from your rep performance.';
+  }
+
   // Persistent banner on the Accessories tab whenever anything outranks the main lift
   function renderOverMainWarning(liftId){
     if (!el.accOverMainWarn) return;
@@ -8743,7 +8776,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     const con = TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2;
     const sets = tier === 'tier3' ? 3 : 4;
     accessoryLiftState(liftId).templates.push({
-      id:newAccessoryId(), name:'New ' + con.label, category:'Custom',
+      id:newAccessoryId(), name:'New ' + con.label, category:'Custom', custom:true,
       tier, sets, repMin:con.repMin, repMax:con.repMax,
       weight:0, increment:state.settings.rounding,
       lastLoggedSets:Array(sets).fill(con.repMin),
@@ -8751,6 +8784,48 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       lastCompletedAt:'', pendingProgression:false, suggestedWeight:null
     });
     await saveState(); toast('Added.', 'g'); render();
+  }
+
+  /* ═══ v13.1.0: ONE AUTHORITY PER TIER ═══
+     Two systems used to own the same field. The rep-ceiling engine bumped Tier 1 by
+     one increment whenever every set hit the top of the range; the wave formula wanted
+     TM x ratio x wavePct, a target that legitimately swings (e.g. 102.5 -> 142.5 across
+     a 16-week block). Last writer won: log a good session and the engine bumped you,
+     tap Recalibrate and the formula stomped it backward — 4 earned sessions erased.
+
+     Resolution follows the programming, not convenience. In Chad's templates the
+     supplemental lift is percentage-prescribed and rides the wave alongside the
+     competition lift (Front Squat 6x5 @60% in the 10s, 4x5 @65% in the 8s). It is not
+     meant to creep 2.5 lb at a time off rep performance — that is how hypertrophy
+     accessories progress, not supplemental variations.
+
+       Tier 1  -> FORMULA ONLY. Auto-syncs on wave change and after a realization PR.
+                  Rep-ceiling progression disabled. Nothing to stomp; never stale.
+       Tier 2/3 -> REP-CEILING ONLY, unchanged. Formula never touches an earned weight.
+  */
+  function accLibEntry(liftId, item){
+    return ((ACCESSORY_LIBRARY[liftId] || {})[item?.tier] || []).find(x => x.name === item?.name) || null;
+  }
+  // A user-created item is never formula-governed, regardless of what it is named.
+  // addAccessory/duplicateAccessory stamp `custom`; mergeState carries it and infers it
+  // for legacy states from the 'Custom' category. Identity, not the free-text name.
+  function isCustomAccessory(item){
+    return !!item && (item.custom === true || item.category === 'Custom');
+  }
+  // v13.1.1 audit fix: item-aware, not tier-aware. The formula only governs Tier 1
+  // movements it actually has a ratio for (library entries). A CUSTOM Tier 1 exercise
+  // has no ratio — the old tier-only predicate force-synced it to TM x 0.75 x wave%,
+  // silently overwriting a hand-set weight with a guess, while rep-ceiling was also
+  // disabled for the tier: no progression path at all. Custom Tier 1 now falls back to
+  // the rep-ceiling engine, which doubles as the escape hatch for any lifter who
+  // distrusts a ratio (duplicate as custom -> full manual/rep control).
+  //
+  // The name lookup alone is not enough: a custom lift named 'Front Squat' collides with
+  // a real library Tier 1 entry and would be captured by the formula it has no ratio for.
+  // Custom is checked first so the collision resolves to the user, never the library.
+  function isFormulaGoverned(liftId, item){
+    if (isCustomAccessory(item)) return false;
+    return !!(item && item.tier === 'tier1' && accLibEntry(liftId, item));
   }
 
   /* ═══ v13.0.5: CALIBRATION ENGINE ═══ */
@@ -8798,6 +8873,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
           ? item.increment : (state.settings.rounding || 5);
         let next = null, basis = '';
         if (item.tier === 'tier1'){
+          if (!isFormulaGoverned(liftId, item)) return; // v13.1.1: custom T1 — user-managed, never formula-touched
           if (tm === null){ return; } // no 1RM on file — leave untouched
           const ratio = T1_VARIATION_RATIO[item.name] ?? T1_FALLBACK_RATIO;
           next = roundToIncrement(tm * ratio * wavePct, inc);
@@ -8845,6 +8921,56 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       });
     });
     return { rows, wavePct };
+  }
+
+  /* v13.1.0: reconcile every formula-governed accessory to the current wave + TM.
+     Silent and idempotent — it only writes when a value actually differs, so it can be
+     called freely from render paths. Returns the rows it changed for reporting. */
+  async function syncFormulaAccessories(opts){
+    const changed = [];
+    (state.settings.activeLiftIds || []).forEach(liftId => {
+      const lift = state.lifts?.[liftId];
+      if (!lift || !Number.isFinite(lift.true1RM) || lift.true1RM <= 0) return;
+      const lib = ACCESSORY_LIBRARY[liftId] || {};
+      let clearedStale = false;
+      accessoryLiftState(liftId).templates.forEach(item => {
+        if (!isFormulaGoverned(liftId, item)) return;   // v13.1.1: customs are exempt
+        const libItem = accLibEntry(liftId, item);       // guaranteed by the predicate
+        // v13.1.1: a staged progression on a governed item is always stale — it can
+        // only exist as pre-upgrade leftovers. Clear it even when the weight matches,
+        // or the lifter sees an Apply button whose tap the next sync reverts.
+        if (item.pendingProgression || item.suggestedWeight != null){
+          item.pendingProgression = false; item.suggestedWeight = null; clearedStale = true;
+        }
+        const next = calibratedSwapWeight(liftId, libItem, item.tier);
+        if (!Number.isFinite(next) || next <= 0 || next === item.weight) return;
+        changed.push({ liftId, id:item.id, name:item.name, from:item.weight, to:next });
+        item.weight = next;
+      });
+      if (clearedStale && !changed.length) changed.push({ liftId, id:null, name:'(stale staging cleared)', from:null, to:null });
+    });
+    if (changed.length && opts?.persist !== false) await saveState();
+    return changed;
+  }
+
+  // Fires when the microcycle key changes (wave/phase roll) or a realization PR moves a
+  // TM. Guarded by a stored key so it runs once per transition, not on every render.
+  async function maybeSyncFormulaAccessories(reason){
+    let key;
+    try { const m = currentMicrocycle(); key = m.wave + '_' + m.phase; } catch(_){ return []; }
+    const tmKey = (state.settings.activeLiftIds || [])
+      .map(id => id + ':' + (state.lifts?.[id]?.true1RM ?? 0)).join('|');
+    const stamp = key + '#' + tmKey;
+    if (state.settings.accSyncStamp === stamp) return [];
+    const changed = await syncFormulaAccessories({ persist:false });
+    state.settings.accSyncStamp = stamp;
+    await saveState();
+    // v13.1.1: no toast here — on PR days it collided with the "1RM ->" note (toast()
+    // replaces, so one was always lost). The overlay and the accessories tab already
+    // show the result. Do re-render, though: the boot-path sync previously mutated
+    // weights without repainting, leaving stale numbers on screen until the next tap.
+    if (changed.some(c => c.id !== null)){ try { render(); } catch(_){} }
+    return changed;
   }
 
   async function applyCalibrationPlan(plan){
@@ -8952,6 +9078,14 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       } else {
         item.lastOutcome = (fatigueAdjusted ? 'Reduced volume (fatigue) — keep building through the range when readiness returns.' : 'Deload week — maintenance work.');
       }
+    } else if (isFormulaGoverned(liftId, item)){
+      // v13.1.0: supplemental load is wave-prescribed, not rep-driven. Hitting the
+      // ceiling here is good execution, not a cue to add weight — the wave does that.
+      item.pendingProgression = false; item.suggestedWeight = null;
+      const allCeiling = reps.length === expectedSets && reps.every(r => r >= item.repMax);
+      item.lastOutcome = allCeiling
+        ? 'Strong work at ' + Math.round(calibrationWavePct()*100) + '% wave — load follows the wave, not reps.'
+        : 'Supplemental work logged — load is set by the wave.';
     } else if (reps.length === item.sets && reps.every(r => r >= item.repMax)){
       item.pendingProgression = true;
       item.suggestedWeight = roundToIncrement(item.weight + item.increment, item.increment || state.settings.rounding);
@@ -8998,7 +9132,9 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
   async function duplicateAccessory(id){
     const liftId = el.accLiftSelect.value || 'squat';
     const item = findAccessory(liftId, id); if (!item) return;
-    accessoryLiftState(liftId).templates.push({ ...deepClone(item), id:newAccessoryId(), name:item.name + ' Copy' });
+    // v13.1.1: a duplicate is user-owned — this is the documented escape hatch out of
+    // formula governance, so it must survive a rename back to the library name.
+    accessoryLiftState(liftId).templates.push({ ...deepClone(item), id:newAccessoryId(), name:item.name + ' Copy', custom:true });
     await saveState(); toast('Duplicated.', 'g'); render();
   }
 
@@ -9968,6 +10104,30 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       state.settings.ai.openrouterKey = bakKey;
     }
 
+    /* ── v13.1.1 assertions ── */
+    // mergeState history sanitizer survives the one-authority work (pure: builds off
+    // DEFAULT_STATE and returns, so there is nothing to snapshot or restore)
+    {
+      const merged = mergeState({ history:[{ id:'sn1', liftId:'squat', wave:'5s', phase:'accumulation',
+        completedAt:'2026-01-01T10:00:00.000Z',
+        sets:[null, 5, [{ weight:100, performedReps:5 }], { weight:225, performedReps:5, targetReps:5, isRamp:false }] }] });
+      const cleaned = merged.history[0].sets;
+      assert('mergeState strips null/primitive/nested-array sets, keeps the plain set',
+        cleaned.length === 1 && cleaned[0].weight === 225 && cleaned[0].performedReps === 5);
+    }
+    // isFormulaGoverned: user identity beats the free-text name (v13.1.1 audit fix)
+    {
+      const customCollision = { name:'Front Squat', tier:'tier1', category:'Custom', custom:true };
+      const customUnique    = { name:'Zercher Squat', tier:'tier1', category:'Custom', custom:true };
+      const libraryT1       = { name:'Front Squat', tier:'tier1', category:'Weak out of hole / quad dominant' };
+      assert('isFormulaGoverned false: custom T1 named like a library T1',
+        isFormulaGoverned('squat', customCollision) === false);
+      assert('isFormulaGoverned false: custom T1 with a unique name',
+        isFormulaGoverned('squat', customUnique) === false);
+      assert('isFormulaGoverned true: genuine library T1',
+        isFormulaGoverned('squat', libraryT1) === true);
+    }
+
     const failed = results.filter(r => !r.pass);
     console.log('%c[Juggernaut v13 selftest] ' + (results.length - failed.length) + '/' + results.length + ' passed',
       'font-weight:bold;color:' + (failed.length ? '#f56565' : '#56d4a5'));
@@ -9976,7 +10136,9 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     return { total: results.length, passed: results.length - failed.length, failed: failed.map(f => f.name) };
   }
 
-  boot().catch(err => { console.error(err); alert('Boot failed — check console.'); });
+  boot()
+    .then(() => maybeSyncFormulaAccessories('boot').catch(() => {}))
+    .catch(err => { console.error(err); alert('Boot failed — check console.'); });
 })();
 </script>
 </body>
