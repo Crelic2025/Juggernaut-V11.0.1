@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.1.1
+# Juggernaut Method 2.0 — v13.2.0
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,9 +9,17 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.1.1**
+- Current canonical build: **v13.2.0**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `c87492435b9059ea35fe6533ce3b3f75e42d6e1baf7363037b7f09bc2050779c`
+- Final HTML SHA256: `15e5c226c3cc6dc695e03e404d3b726a49420976b383658938c498aa8367eb90`
+
+## v13.2.0 — Swap on the Fly
+
+- Adds mid-session accessory swapping with calibrated replacement weights, current-movement exclusion, blocked-option reporting, and stale progression cleanup.
+- Adds external prop/implement settings so boards, blocks, specialty bars, ab wheels, and similar equipment can be excluded from defaults, swap lists, and recommendations.
+- Preserves malformed-history sanitization, custom Tier 1 identity, and post-transition formula synchronization from v13.1.1.
+- Release repair makes equipment/prop availability a hard gate: new defaults never backfill an exercise the user disabled, even when a tier has fewer than two usable movements.
+- Browser self-test: **55/55**, including 14 focused v13.2.0 availability and swap-partition assertions.
 
 ## v13.1.1 — One Authority per Accessory Tier
 

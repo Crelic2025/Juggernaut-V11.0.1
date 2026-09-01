@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.1.1</title>
+<title>Juggernaut Method 2.0 — v13.2.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -921,8 +921,54 @@ button:disabled{opacity:.35;pointer-events:none}
   padding:0;touch-action:manipulation;
 }
 .inline-acc-set .ias-btn:active{background:rgba(255,255,255,.1)}
-.inline-acc-actions{display:flex;gap:6px;margin-top:8px}
+.inline-acc-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .inline-acc-actions button{font-size:11px;min-height:36px;padding:0 12px}
+/* ─── v13.2.0: MID-SESSION SWAP DRAWER ─── */
+.inline-acc-warn{
+  font-size:10px;font-weight:700;color:var(--warn);margin-top:3px;line-height:1.4;
+}
+.inline-acc-actions .asd-open{border-color:var(--purple);color:var(--purple)}
+.acc-swap-drawer{
+  margin-top:10px;padding:10px;border-radius:var(--r-sm);
+  border:1px solid rgba(167,139,250,.28);background:rgba(167,139,250,.07);
+  animation:fadeIn .18s ease-out;
+}
+.acc-swap-drawer .asd-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;
+  color:var(--purple);margin-bottom:8px;
+}
+.acc-swap-drawer .asd-wp{
+  font-size:9px;font-weight:800;letter-spacing:.2px;text-transform:none;
+  color:var(--text2);background:rgba(167,139,250,.15);
+  border:1px solid rgba(167,139,250,.3);border-radius:999px;padding:2px 8px;white-space:nowrap;
+}
+.acc-swap-drawer .asd-logged{
+  font-size:10.5px;color:var(--muted);line-height:1.45;margin-bottom:8px;
+}
+.acc-swap-drawer .asd-select{
+  width:100%;min-height:44px;font-size:14px;font-weight:600;
+  border-radius:var(--r-sm);border:1px solid rgba(167,139,250,.35);
+  background:rgba(0,0,0,.35);color:var(--text);padding:0 10px;
+}
+.acc-swap-drawer .asd-desc{margin-top:8px;font-size:11.5px;line-height:1.5;color:var(--text2)}
+.acc-swap-drawer .asd-star{
+  font-size:10px;font-weight:800;color:var(--purple);
+  text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;
+}
+.acc-swap-drawer .asd-cat{font-weight:700;color:var(--text);font-size:12px}
+.acc-swap-drawer .asd-fix{margin-top:2px}
+.acc-swap-drawer .asd-fix strong{color:var(--purple)}
+.acc-swap-drawer .asd-meta{
+  margin-top:4px;font-size:10.5px;color:var(--muted);font-family:var(--mono);
+}
+.acc-swap-drawer .asd-meta strong{color:var(--text2)}
+.acc-swap-drawer .asd-hidden{
+  margin-top:8px;font-size:10px;color:var(--muted);font-style:italic;
+}
+.acc-swap-drawer .asd-empty{font-size:12px;color:var(--text2);line-height:1.5}
+.acc-swap-drawer .asd-actions{display:flex;gap:6px;margin-top:10px}
+.acc-swap-drawer .asd-actions button{flex:1;min-height:42px;font-size:12px}
 .btn-continue-acc{
   width:100%;min-height:52px;border-radius:var(--r);
   font-size:14px;margin-top:12px;
@@ -1565,7 +1611,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.1.1 — Act on the Signal</div>
+        <div class="hdr-sub">v13.2.0 — Swap on the Fly</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -2213,6 +2259,14 @@ body.performance-mode *{animation:none!important;transition:none!important}
               <label class="check"><input id="equipMachine" type="checkbox"><span style="font-size:13px">Machines (leg press, leg curl, GHD, etc.)</span></label>
               <label class="check"><input id="equipPullupBar" type="checkbox"><span style="font-size:13px">Pull-up Bar</span></label>
             </div>
+
+            <!-- v13.2.0: props / implements -->
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+              <div style="font-weight:800;font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Props &amp; Implements</div>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:10px">The small setup items you'd have to drag over and stack &mdash; boards, blocks, boxes, an ab wheel. Switch one off and every exercise that needs it disappears from swap lists, coach recommendations and new default selections.</p>
+              <label class="check" style="margin-bottom:10px"><input id="propsNone" type="checkbox"><span style="font-size:13px"><strong>No prop-assisted exercises</strong> &mdash; bar, dumbbells, cables &amp; machines only</span></label>
+              <div id="propsGrid" style="display:grid;gap:8px"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2399,6 +2453,8 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <p><strong>AI &amp; Readiness:</strong> Toggle Daily Readiness check and RPE logging on/off. Paste your OpenRouter API key for AI coaching, and optionally set the model. Optional — the app works fully without it.</p>
     <p><strong>UI &amp; Performance:</strong> Enable <strong>Performance Mode</strong> to disable blur effects and animations. Useful on older phones. Switches to system fonts for faster rendering.</p>
     <p><strong>Gym Equipment:</strong> Six toggles for the equipment you have access to — Barbell, Dumbbells, Cables, Bands, Machines, and Pull-up Bar. All are on by default. Toggle off anything you don't have and the <strong>swap chip lists</strong> in the exercise help modal will only show alternatives you can actually do. Your default accessories stay unchanged so you don't lose progress tracking — but if an exercise needs equipment you've toggled off, an amber warning appears on the card suggesting you swap. Bodyweight exercises are always available regardless of toggles.</p>
+
+    <p><strong>Props &amp; Implements (v13.2):</strong> Below the equipment toggles is a second list for the small setup items — boards, pulling blocks, a box, an adjustable bench, rack pins, an ab wheel, dip bars, a foot anchor, an SSB, push-up handles. These are the things you'd have to drag over and stack before the set. Switch one off and every exercise that needs it (Board Press, Block Pull, Box Squat, Bulgarian Split Squat, Ab Wheel Rollout, and so on) drops out of swap dropdowns, coach recommendations, template chips and new default selections. There's also a master switch — <strong>"No prop-assisted exercises"</strong> — which kills all of them at once and leaves you with bar, dumbbell, cable, machine and bodyweight work only. Anything already on your list that needs a prop you've switched off gets an amber "Needs blocks — swap it below" line on the card instead of silently disappearing, so nothing vanishes from your history.</p>
   </div>
 
   <h2 id="guide-1rm">Estimating Your 1RM</h2>
@@ -2597,6 +2653,8 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <p><strong>Exercise name</strong>, tier label (T1/T2/T3), category, weight, rep range, and set steppers. If the exercise needs equipment you've toggled off in Settings, an amber warning appears.</p>
     <p>For each set, tap the <strong>+ / −</strong> buttons to enter your reps. When every set in an exercise hits the top of the rep range (e.g. all 4 sets hit 8 reps on a 5–8 range), a green <strong>progression glow</strong> appears with the suggested next weight.</p>
     <p>Tap the <strong>?</strong> on any exercise to see coaching cues (setup, execution, common mistakes), a <strong>Watch Tutorial</strong> YouTube link, the equipment type, and <strong>swap pills</strong> — tappable alternatives filtered by your available equipment, each showing a tag like (BB), (DB), (BW).</p>
+
+    <p><strong>Mid-session swap (v13.2):</strong> Every inline accessory card has a <strong>⇄ Swap</strong> button. Tap it and a dropdown opens listing every legal alternative in that tier — filtered by your equipment and prop settings, with anything already on your list removed. If you picked a sticking point on the completion overlay, the movements that address it are grouped at the top under <strong>★ Targets [your weak point]</strong>. As you scroll the picker, the panel underneath updates with what that exercise is for, which weak points it addresses, the weight it will start at, and any prop it needs. Tap <strong>Swap In</strong> and it replaces the exercise on the spot, recalibrated from your training max — no tab switch, no leaving the session. If you've already logged that accessory today, the drawer says so: the log stays filed under the old name and the swap takes effect from your next set forward.</p>
     <p>You can also swap exercises from the <strong>tier list</strong> at the top of the Accessories tab — currently selected exercises glow green, tap any other pill to swap it in with one tap.</p>
 
     <h3>Step 10 — Finish &amp; Review</h3>
@@ -2904,7 +2962,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.1.1';
+  const APP_VERSION = '13.2.0';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -3394,6 +3452,56 @@ body.performance-mode *{animation:none!important;transition:none!important}
     }
   };
 
+  /* ═══ v13.2.0: EXTERNAL PROPS / IMPLEMENTS ═══
+     Equipment toggles cover the big categories (barbell, DB, cable, band,
+     machine, pull-up bar). They do NOT cover the small stuff you have to drag
+     over and set up — boards, blocks, boxes, an ab wheel. If you don't have it
+     or don't want to use it, an exercise that needs it is noise in a swap list.
+     PROP_CATALOG is the toggle list; EXERCISE_PROPS tags what each movement
+     needs. Untagged = needs nothing beyond its equip category. */
+  const PROP_CATALOG = {
+    box:       { label:'Box / plyo box',            short:'box' },
+    bench_adj: { label:'Adjustable / incline bench', short:'bench' },
+    boards:    { label:'Press boards',              short:'boards' },
+    blocks:    { label:'Pulling blocks or mats',    short:'blocks' },
+    deficit:   { label:'Deficit platform',          short:'platform' },
+    rack_pins: { label:'Rack pins / safeties',      short:'pins' },
+    ab_wheel:  { label:'Ab wheel',                  short:'ab wheel' },
+    dip_bars:  { label:'Dip bars',                  short:'dip bars' },
+    anchor:    { label:'Foot anchor / partner',     short:'anchor' },
+    spec_bar:  { label:'Specialty bar (SSB)',       short:'SSB' },
+    handles:   { label:'Push-up handles / blocks',  short:'handles' }
+  };
+
+  const EXERCISE_PROPS = {
+    'Box Squat':['box'],
+    'Step-Up':['box'],
+    'Pike Push-Up (Elevated)':['box'],
+    'Bulgarian Split Squat':['bench_adj'],
+    'Chest-Supported Row':['bench_adj'],
+    'Incline Dumbbell Press':['bench_adj'],
+    'Barbell Hip Thrust':['bench_adj'],
+    'Seated Barbell Press':['bench_adj'],
+    'Seated DB Shoulder Press':['bench_adj'],
+    'Board Press (2-3 board)':['boards'],
+    'Block Pull':['blocks'],
+    'Deficit Deadlift':['deficit'],
+    'Pin Squat':['rack_pins'],
+    'Pin Press':['rack_pins'],
+    'Inverted Row':['rack_pins'],
+    'Ab Wheel Rollout':['ab_wheel'],
+    'Dip':['dip_bars'],
+    'Nordic Hamstring Curl':['anchor'],
+    'Glute-Ham Raise':['anchor'],
+    'SSB Squat':['spec_bar'],
+    'Push-Up (Deficit)':['handles']
+  };
+
+  function exerciseProps(exercise){
+    if (!exercise) return [];
+    return EXERCISE_PROPS[exercise.name] || [];
+  }
+
   /* ═══ UTILITIES ═══ */
   function newAccessoryId(){ return 'acc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
 
@@ -3523,9 +3631,48 @@ body.performance-mode *{animation:none!important;transition:none!important}
   function equipmentAvailable(exercise){
     if (!exercise || !exercise.equip) return true; // no tag = always available
     if (exercise.equip === 'bodyweight') return true; // always available
-    const eq = state.settings?.equipment;
+    // v13.2.0: same TDZ guard calibratedSwapWeight uses. DEFAULT_STATE runs
+    // buildDefaultAccessoriesForLift() at module-init, before `state` is bound —
+    // and `state` is a let, so a bare read there throws ReferenceError and kills
+    // boot. typeof doesn't help inside the TDZ; only try/catch does.
+    let S = null;
+    try { S = state; } catch(_){ S = null; }
+    const eq = S?.settings?.equipment;
     if (!eq) return true; // no settings yet = all available
     return eq[exercise.equip] !== false;
+  }
+
+  /* v13.2.0: prop gate. propsNone is the blunt switch ("nothing but the bar,
+     dumbbells, cables and machines"); the per-prop map is the scalpel. Both
+     default to available, so nothing changes for anyone who never opens it. */
+  function propsAvailable(exercise){
+    const req = exerciseProps(exercise);
+    if (!req.length) return true;
+    let S = null;
+    try { S = state?.settings; } catch(_){ S = null; }
+    if (!S) return true;
+    if (S.propsNone === true) return false;
+    const p = S.props || {};
+    return req.every(k => p[k] !== false);
+  }
+
+  // Human-readable list of what's blocking this exercise, for warnings.
+  function missingPropLabels(exercise){
+    const req = exerciseProps(exercise);
+    if (!req.length) return [];
+    let S = null;
+    try { S = state?.settings; } catch(_){ S = null; }
+    if (!S) return [];
+    const p = S.props || {};
+    return req
+      .filter(k => S.propsNone === true || p[k] === false)
+      .map(k => (PROP_CATALOG[k]?.short) || k);
+  }
+
+  // THE availability check for anything shown as an option. equipmentAvailable
+  // stays as-is for callers that only care about the big categories.
+  function exerciseAvailable(exercise){
+    return equipmentAvailable(exercise) && propsAvailable(exercise);
   }
 
   function buildDefaultAccessoriesForLift(liftId){
@@ -3533,8 +3680,12 @@ body.performance-mode *{animation:none!important;transition:none!important}
     const templates = [];
     ['tier1','tier2','tier3'].forEach(tier => {
       const con = TIER_CONSTRAINTS[tier];
-      const items = lib[tier] || [];
-      // Always pick the first 2 (best overall) regardless of equipment
+      const all = lib[tier] || [];
+      // v13.2.0: take the top 2 the lifter can actually perform, and nothing else.
+      // An exercise exerciseAvailable() rejects is never backfilled into a new
+      // default — if the filters leave a tier with fewer than 2 usable movements
+      // (or none), the tier gets fewer than 2 (or none).
+      const items = all.filter(x => exerciseAvailable(x));
       items.slice(0, 2).forEach(item => {
         const sets = tier === 'tier3' ? 3 : 4;
         templates.push({
@@ -3563,6 +3714,9 @@ body.performance-mode *{animation:none!important;transition:none!important}
       remoteEndpoint:'',
 ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
       equipment:{ barbell:true, dumbbell:true, cable:true, band:true, machine:true, pullup_bar:true },
+      // v13.2.0: external props/implements. propsNone = master "bar & machines only" switch.
+      propsNone:false,
+      props:{ box:true, bench_adj:true, boards:true, blocks:true, deficit:true, rack_pins:true, ab_wheel:true, dip_bars:true, anchor:true, spec_bar:true, handles:true },
       ai:{ enableReadiness:true, enableRPE:true, openrouterKey:'', model:'anthropic/claude-haiku-4.5' },
       goals:{},                                      // v13 B2.2: { liftId: goal 1RM }
       bridge:{ url:'', auto:false, lastSentAt:null },// v13 C2: Hermes digest webhook
@@ -3787,6 +3941,8 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     if ((parsed.settings||{}).restMatrix) { base.settings.restMatrix = { ...PROGRAM.defaultRestMatrix, ...parsed.settings.restMatrix }; } else { base.settings.restMatrix = { ...PROGRAM.defaultRestMatrix }; }
 base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     base.settings.equipment = { ...DEFAULT_STATE.settings.equipment, ...((parsed.settings||{}).equipment||{}) };
+    base.settings.props = { ...DEFAULT_STATE.settings.props, ...((parsed.settings||{}).props||{}) };
+    base.settings.propsNone = ((parsed.settings||{}).propsNone === true);
     base.settings.ai = { ...base.settings.ai, ...((parsed.settings||{}).ai||{}) };
     base.settings.profile = { ...base.settings.profile, ...((parsed.settings||{}).profile||{}) };
     const inLifts = parsed.lifts || {};
@@ -4588,6 +4744,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'liftIntelCard',
      'weeklyPlanCard',
      'remoteEndpoint','btnRequestPersist','btnRestartCycle','btnSaveSettings','pwaNotes',
+     'propsNone','propsGrid',
 'rpePanel','rpeVal','rpeAnchor','btnRpeMinus','btnRpePlus','missedRepWrap','missedRepChk',
      'readinessModal','readinessScoreDisplay','readinessNote','readinessSkip','readinessGo','readinessQuickFill',
      'warmupModal','warmupStepNum','warmupStepTotal','warmupWeight','warmupReps','warmupPlates','warmupHistory','warmupPoop','warmupThumb','warmupFire','warmupSkip','warmupSubtitle',
@@ -5281,7 +5438,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         const ownedNames = new Set(data.templates.filter(t => t.tier === tier).map(t => t.name));
         const inCand = tierLib.find(ex =>
           !ownedNames.has(ex.name) && !usedIn.has(ex.name) &&
-          equipmentAvailable(ex) && accessoryMatchesWeakPoint(ex, weakPoint));
+          exerciseAvailable(ex) && accessoryMatchesWeakPoint(ex, weakPoint));
         const outCand = owned.find(t => {
           const le = tierLib.find(x => x.name === t.name);
           if (!le || accessoryMatchesWeakPoint(le, weakPoint)) return false;
@@ -5864,6 +6021,112 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
   }
 
+  /* ═══ v13.2.0: MID-SESSION ACCESSORY SWAP ═══
+     The weak-point card on the completion overlay offers at most two curated
+     swaps. This is the manual counterpart: every legal alternative in the tier,
+     in a native picker, with a plain-English line on what each one fixes — so a
+     swap can be made standing at the rack after the coach has spoken, without
+     leaving the session or hunting through the Accessories tab. */
+  const _openSwapDrawers = new Set();
+
+  const EQ_LABEL_LONG = { barbell:'Barbell', dumbbell:'Dumbbells', cable:'Cable', band:'Band',
+                          machine:'Machine', pullup_bar:'Pull-up bar', bodyweight:'Bodyweight' };
+
+  // Which of this lift's sticking points does the movement actually address?
+  function weakPointsAddressed(liftId, libItem){
+    const opts = (WEAK_POINT_OPTIONS[liftId] || []).filter(o => o !== 'No issues');
+    return opts.filter(o => accessoryMatchesWeakPoint(libItem, o));
+  }
+
+  // Alternatives the lifter can legally swap to right now: same tier, not already
+  // on the list, and passing both the equipment and prop filters.
+  function swapCandidates(liftId, item){
+    const tier = item.tier || 'tier2';
+    const lib = ACCESSORY_LIBRARY[liftId]?.[tier] || [];
+    const owned = new Set(accessoryLiftState(liftId).templates.map(t => t.name));
+    const pool = lib.filter(x => x.name !== item.name && !owned.has(x.name));
+    return {
+      available: pool.filter(x => exerciseAvailable(x)),
+      blocked:   pool.filter(x => !exerciseAvailable(x))
+    };
+  }
+
+  function renderSwapDesc(accId){
+    const sel = document.querySelector('[data-swapsel="' + accId + '"]');
+    const box = document.querySelector('[data-swapdesc="' + accId + '"]');
+    if (!sel || !box) return;
+    const liftId = sel.getAttribute('data-swaplift');
+    const tier = sel.getAttribute('data-swaptier');
+    const libItem = (ACCESSORY_LIBRARY[liftId]?.[tier] || []).find(x => x.name === sel.value);
+    if (!libItem){ box.innerHTML = ''; return; }
+
+    const wp = _sessionWeakPoint || getWeakPointForLift(liftId);
+    const isMatch = wp && wp !== 'No issues' && accessoryMatchesWeakPoint(libItem, wp);
+    const hits = weakPointsAddressed(liftId, libItem);
+    const w = calibratedSwapWeight(liftId, libItem, tier);
+    const eq = EQ_LABEL_LONG[libItem.equip] || libItem.equip || 'Barbell';
+    const props = exerciseProps(libItem).map(k => PROP_CATALOG[k]?.short || k);
+
+    const fixLine = hits.length
+      ? 'Helps with: <strong>' + hits.map(escapeHtml).join('</strong> · <strong>') + '</strong>'
+      : 'General ' + escapeHtml((TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2).label.replace(/^Tier \d: /, '').toLowerCase()) + ' work — not tied to one sticking point.';
+
+    box.innerHTML =
+      (isMatch ? '<div class="asd-star">\u2605 Targets today\u2019s weak point \u2014 ' + escapeHtml(wp) + '</div>' : '') +
+      '<div class="asd-cat">' + escapeHtml(libItem.category || 'Accessory') + '</div>' +
+      '<div class="asd-fix">' + fixLine + '</div>' +
+      '<div class="asd-meta">Starts at <strong>' + (w > 0 ? escapeHtml(formatWeight(w)) : 'bodyweight') + '</strong> \u00B7 ' +
+        escapeHtml(eq) + (props.length ? ' \u00B7 needs ' + escapeHtml(props.join(' + ')) : '') + '</div>';
+  }
+
+  function buildSwapDrawerHTML(liftId, item, alreadyLogged){
+    const tier = item.tier || 'tier2';
+    const tierCon = TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2;
+    const { available, blocked } = swapCandidates(liftId, item);
+    const wp = _sessionWeakPoint || getWeakPointForLift(liftId);
+    const hasWP = wp && wp !== 'No issues';
+
+    const hiddenNote = blocked.length
+      ? '<div class="asd-hidden">' + blocked.length + ' option' + (blocked.length === 1 ? '' : 's') +
+        ' hidden by your equipment &amp; prop filters.</div>'
+      : '';
+
+    if (!available.length){
+      return '<div class="acc-swap-drawer">' +
+        '<div class="asd-empty">No other ' + escapeHtml(tierCon.label) + ' movement is available under your current filters.' +
+        (blocked.length ? ' ' + blocked.length + ' are hidden \u2014 loosen Settings \u2192 Gym Equipment to see them.' : '') +
+        '</div>' +
+        '<div class="asd-actions"><button class="btn-s" data-swapcancel="' + item.id + '">Close</button></div>' +
+      '</div>';
+    }
+
+    const matches = hasWP ? available.filter(x => accessoryMatchesWeakPoint(x, wp)) : [];
+    const rest = available.filter(x => !matches.includes(x));
+    const opt = (x) => '<option value="' + escapeHtml(x.name) + '">' + escapeHtml(x.name) +
+      (exerciseProps(x).length ? ' \u2014 needs ' + escapeHtml(exerciseProps(x).map(k => PROP_CATALOG[k]?.short || k).join(' + ')) : '') +
+      '</option>';
+
+    const groups =
+      (matches.length ? '<optgroup label="\u2605 Targets ' + escapeHtml(wp) + '">' + matches.map(opt).join('') + '</optgroup>' : '') +
+      (rest.length ? '<optgroup label="' + escapeHtml(tierCon.label) + ' \u2014 other options">' + rest.map(opt).join('') + '</optgroup>' : '');
+
+    return '<div class="acc-swap-drawer">' +
+      '<div class="asd-head">Swap this exercise' +
+        (hasWP ? '<span class="asd-wp">Coach: ' + escapeHtml(wp) + '</span>' : '') +
+      '</div>' +
+      (alreadyLogged ? '<div class="asd-logged">Today\u2019s log stays filed under <strong>' + escapeHtml(item.name) + '</strong>. The swap applies from your next set forward.</div>' : '') +
+      '<select class="asd-select" data-swapsel="' + item.id + '" data-swaplift="' + escapeHtml(liftId) + '" data-swaptier="' + escapeHtml(tier) + '">' +
+        groups +
+      '</select>' +
+      '<div class="asd-desc" data-swapdesc="' + item.id + '"></div>' +
+      hiddenNote +
+      '<div class="asd-actions">' +
+        '<button class="btn-p" data-swapgo="' + item.id + '">Swap In</button>' +
+        '<button class="btn-s" data-swapcancel="' + item.id + '">Cancel</button>' +
+      '</div>' +
+    '</div>';
+  }
+
   function renderInlineAccessories(liftId){
     if (!el.inlineAccSection || !el.inlineAccList) return;
     const data = accessoryLiftState(liftId);
@@ -5917,6 +6180,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const helpId = 'help_' + item.id;
       const weakBadge = isWeakMatch ? '<span class="acc-weak-badge">\u2605 Targets weak point</span><button class="acc-why-btn" data-why-acc="' + escapeHtml(item.name) + '" data-why-lift="' + escapeHtml(liftId) + '">Why?</button>' : '';
 
+      // v13.2.0: flag props the lifter has switched off, right on the card.
+      const libEntryIn = (ACCESSORY_LIBRARY[liftId]?.[item.tier] || []).find(x => x.name === item.name);
+      const missIn = libEntryIn ? missingPropLabels(libEntryIn) : [];
+      const propWarnTag = (libEntryIn && !exerciseAvailable(libEntryIn))
+        ? '<div class="inline-acc-warn">\u26A0 ' + (missIn.length ? 'Needs ' + escapeHtml(missIn.join(' + ')) : 'Equipment unavailable') + ' \u2014 swap it below</div>'
+        : '';
+
       // v13.0.2: completed-this-session affordances
       const loggedBadge = doneLog
         ? '<span class="acc-logged-badge">\u2713 Logged ' + escapeHtml(doneLog.reps.join('/')) + '</span>' : '';
@@ -5924,10 +6194,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         ? '<button class="btn-s" data-ias-save="' + item.id + '">Re-log</button>'
         : '<button class="btn-p" data-ias-save="' + item.id + '">Log</button>';
 
+      const swapOpen = _openSwapDrawers.has(item.id);
+      const swapDrawer = swapOpen ? buildSwapDrawerHTML(liftId, item, !!doneLog) : '';
+
       card.innerHTML = '<div class="inline-acc-top">' +
         '<div style="min-width:0;flex:1">' +
           '<h3>' + escapeHtml(item.name) + ' <button class="btn-s" data-ex-help="' + item.id + '" style="font-size:9px;min-height:24px;min-width:24px;padding:0 6px;border-radius:6px;vertical-align:middle">?</button>' + weakBadge + '</h3>' +
           '<div class="inline-acc-meta"><span style="color:var(--blue);font-weight:700">' + escapeHtml(tierCon.label) + '</span> · ' + escapeHtml(weightStr) + ' · ' + item.repMin + '-' + item.repMax + ' reps</div>' +
+          propWarnTag +
         '</div>' +
         loggedBadge +
         (hasProg ? '<span class="pill g" style="margin:0;font-size:9px">\u2191 ' + escapeHtml(formatWeight(item.suggestedWeight)) + '</span>' : '') +
@@ -5937,9 +6211,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       '<div class="inline-acc-actions">' +
         logBtn +
         (hasProg ? '<button class="btn-s" data-ias-progress="' + item.id + '">Apply \u2191</button>' : '') +
-      '</div>';
+        '<button class="btn-s' + (swapOpen ? ' asd-open' : '') + '" data-ias-swap="' + item.id + '">' + (swapOpen ? 'Close' : '\u21C4 Swap') + '</button>' +
+      '</div>' +
+      swapDrawer;
 
       el.inlineAccList.appendChild(card);
+    });
+    // v13.2.0: fill in the description for every open swap drawer
+    el.inlineAccList.querySelectorAll('[data-swapsel]').forEach(sel => {
+      renderSwapDesc(sel.getAttribute('data-swapsel'));
     });
     // Direct click handlers on ? buttons
     el.inlineAccList.querySelectorAll('[data-ex-help]').forEach(btn => {
@@ -5962,7 +6242,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const tier = item.tier || 'tier2';
     const tierCon = TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2;
     const lib = ACCESSORY_LIBRARY[liftId]?.[tier] || [];
-    const swaps = lib.filter(x => x.name !== item.name && equipmentAvailable(x));
+    const swaps = lib.filter(x => x.name !== item.name && exerciseAvailable(x));
 
     // Build modal content
     let swapHTML = '';
@@ -6032,7 +6312,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     };
   }
 
-  async function swapExercise(accId, newName){
+  async function swapExercise(accId, newName, opts){
     const liftId = state.activeSession?.liftId || el.accLiftSelect?.value || 'squat';
     const item = findAccessory(liftId, accId);
     if (!item) return;
@@ -6042,12 +6322,20 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (!newExercise) return;
     item.name = newExercise.name;
     item.category = newExercise.category;
-    // Only apply the new exercise's default weight if the user hasn't set one yet (i.e., still at 0)
-    if (!item.weight || item.weight === 0){
+    // v13.2.0: a mid-session swap re-seeds from the calibration formula, matching
+    // what the weak-point card does on apply. Chip/help-modal swaps keep the old
+    // behaviour of preserving a weight the lifter already dialled in.
+    if (opts && opts.recalibrate){
+      item.weight = calibratedSwapWeight(liftId, newExercise, tier);
+      item.lastOutcome = 'Swapped in mid-session.';
+    } else if (!item.weight || item.weight === 0){
       item.weight = calibratedSwapWeight(liftId, newExercise, tier);  // v13.0.8
     }
     // Otherwise preserve the user's current weight — within-tier swaps usually have similar strength
     item.increment = newExercise.increment || item.increment;
+    // v13.2.0: a progression staged off the OLD movement's reps must not follow the
+    // new one across. Apply ↑ was bumping a different exercise's weight.
+    item.pendingProgression = false; item.suggestedWeight = null;
     await saveState();
     toast('Swapped to ' + newName + '.', 'g');
     if (_sessionPhase === 'accessories') renderInlineAccessories(liftId);
@@ -6246,6 +6534,21 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.equipBand.checked = eq.band !== false;
     el.equipMachine.checked = eq.machine !== false;
     el.equipPullupBar.checked = eq.pullup_bar !== false;
+    // v13.2.0: props / implements
+    if (el.propsNone && el.propsGrid){
+      const pr = state.settings.props || {};
+      el.propsNone.checked = state.settings.propsNone === true;
+      el.propsGrid.innerHTML = Object.keys(PROP_CATALOG).map(k =>
+        '<label class="check"><input type="checkbox" data-prop="' + k + '"' + (pr[k] !== false ? ' checked' : '') +
+        '><span style="font-size:13px">' + escapeHtml(PROP_CATALOG[k].label) + '</span></label>').join('');
+      const syncPropsGrid = () => {
+        const off = el.propsNone.checked;
+        el.propsGrid.style.opacity = off ? '.4' : '1';
+        el.propsGrid.style.pointerEvents = off ? 'none' : 'auto';
+      };
+      el.propsNone.onchange = syncPropsGrid;
+      syncPropsGrid();
+    }
     // Rest matrix grid (wave × phase)
     const matrix = state.settings.restMatrix || PROGRAM.defaultRestMatrix;
     el.restMatrixGrid.innerHTML = '';
@@ -6862,7 +7165,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.templateChips.innerHTML = '';
     ['tier1','tier2','tier3'].forEach(tier => {
       const con = TIER_CONSTRAINTS[tier];
-      const items = (lib[tier] || []).filter(x => equipmentAvailable(x));
+      const items = (lib[tier] || []).filter(x => exerciseAvailable(x));
       const box = document.createElement('div'); box.className = 'template-chip';
       const heading = document.createElement('h4'); heading.textContent = con.label;
       box.appendChild(heading);
@@ -6988,8 +7291,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
       // Check if exercise needs unavailable equipment
       const libEntry = (ACCESSORY_LIBRARY[liftId]?.[item.tier] || []).find(x => x.name === item.name);
-      const equipUnavail = libEntry && !equipmentAvailable(libEntry);
-      const equipWarnTag = equipUnavail ? '<span style="display:block;font-size:10px;color:var(--warn);font-weight:700;margin-top:2px">⚠ Equipment not available — consider swapping</span>' : '';
+      const equipUnavail = libEntry && !exerciseAvailable(libEntry);
+      const missProps = libEntry ? missingPropLabels(libEntry) : [];
+      const warnWhy = missProps.length ? ('Needs ' + escapeHtml(missProps.join(' + '))) : 'Equipment not available';
+      const equipWarnTag = equipUnavail ? '<span style="display:block;font-size:10px;color:var(--warn);font-weight:700;margin-top:2px">⚠ ' + warnWhy + ' — consider swapping</span>' : '';
 
       // Collapsed summary info
       const weightStr = item.weight > 0 ? formatWeight(item.weight) : 'BW';
@@ -8497,6 +8802,16 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       machine: !!el.equipMachine.checked,
       pullup_bar: !!el.equipPullupBar.checked
     };
+    // v13.2.0: props / implements
+    if (el.propsNone) state.settings.propsNone = !!el.propsNone.checked;
+    if (el.propsGrid){
+      const nextProps = {};
+      Object.keys(PROP_CATALOG).forEach(k => { nextProps[k] = true; });
+      el.propsGrid.querySelectorAll('[data-prop]').forEach(cb => {
+        nextProps[cb.getAttribute('data-prop')] = !!cb.checked;
+      });
+      state.settings.props = nextProps;
+    }
     state.settings.remoteEndpoint = String(el.remoteEndpoint.value || '').trim();
     const keyVal = String(el.openrouterKey.value || '').trim();
     const modelVal = String((el.aiModel && el.aiModel.value) || '').trim() || 'anthropic/claude-haiku-4.5';
@@ -8630,7 +8945,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // v13 C1: shared sanitizer (key-stripped); download triggers FIRST, meta update is best-effort after
     const blob = new Blob([buildExportJson()], { type:'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v13.1.1-export.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'juggernaut-v' + APP_VERSION + '-export.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1200);
     state.backupMeta.lastBackupAt = nowISO();
@@ -9446,10 +9761,39 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         });
         return;
       }
+      // v13.2.0: open / close the mid-session swap drawer
+      const swapToggle = t.getAttribute('data-ias-swap');
+      if (swapToggle){
+        if (_openSwapDrawers.has(swapToggle)) _openSwapDrawers.delete(swapToggle);
+        else { _openSwapDrawers.clear(); _openSwapDrawers.add(swapToggle); }
+        renderInlineAccessories(inlineAccLiftId());
+        return;
+      }
+      const swapCancel = t.getAttribute('data-swapcancel');
+      if (swapCancel){
+        _openSwapDrawers.delete(swapCancel);
+        renderInlineAccessories(inlineAccLiftId());
+        return;
+      }
+      const swapGo = t.getAttribute('data-swapgo');
+      if (swapGo){
+        const sel = document.querySelector('[data-swapsel="' + swapGo + '"]');
+        const pick = sel && sel.value;
+        if (!pick){ toast('Pick a replacement first.', 'w'); return; }
+        _openSwapDrawers.delete(swapGo);
+        await swapExercise(swapGo, pick, { recalibrate:true });
+        return;
+      }
       // Swap
       const swapAcc = t.getAttribute('data-swap-acc');
       const swapTo = t.getAttribute('data-swap-to');
       if (swapAcc && swapTo){ await swapExercise(swapAcc, swapTo); return; }
+    });
+
+    // v13.2.0: live description as the swap picker changes
+    el.inlineAccList.addEventListener('change', (e) => {
+      const sel = e.target.closest('[data-swapsel]');
+      if (sel) renderSwapDesc(sel.getAttribute('data-swapsel'));
     });
 
     // Mid-session movement check
@@ -10126,6 +10470,88 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         isFormulaGoverned('squat', customUnique) === false);
       assert('isFormulaGoverned true: genuine library T1',
         isFormulaGoverned('squat', libraryT1) === true);
+    }
+
+    /* ── v13.2.0 assertions: availability is a hard gate on new defaults ── */
+    // Exercises the prop/equipment filters reject must never be backfilled into
+    // buildDefaultAccessoriesForLift(), and swapCandidates must show them as
+    // blocked rather than offering them. Snapshot/restore every setting touched.
+    {
+      const bakNone   = state.settings.propsNone;
+      const bakProps  = state.settings.props;
+      const bakEquip  = state.settings.equipment;
+      const bakByLift = state.accessories.byLift;
+      const ALL_PROPS = { box:true, bench_adj:true, boards:true, blocks:true, deficit:true, rack_pins:true, ab_wheel:true, dip_bars:true, anchor:true, spec_bar:true, handles:true };
+      const ALL_EQUIP = { barbell:true, dumbbell:true, cable:true, band:true, machine:true, pullup_bar:true };
+      const namesIn  = (build, tier) => build.templates.filter(t => t.tier === tier).map(t => t.name);
+      const libEntry = (name, tier) => (ACCESSORY_LIBRARY.squat[tier] || []).find(x => x.name === name);
+      const allUsable = build => build.templates.length > 0 &&
+        build.templates.every(t => { const e = libEntry(t.name, t.tier); return !!e && exerciseAvailable(e); });
+      try{
+        // Baseline: every prop owned. SSB Squat (spec_bar) is a ranked squat T1
+        // default and Ab Wheel Rollout (ab_wheel) a ranked T3 default.
+        state.settings.propsNone = false;
+        state.settings.props     = { ...ALL_PROPS };
+        state.settings.equipment = { ...ALL_EQUIP };
+        const base = buildDefaultAccessoriesForLift('squat');
+        assert('v13.2.0 baseline: prop-requiring movements are defaults when the props are owned',
+          namesIn(base,'tier1').includes('SSB Squat') && namesIn(base,'tier3').includes('Ab Wheel Rollout'));
+
+        // (1a) One individually disabled required prop removes that exercise from
+        // new defaults; nothing unavailable takes its slot.
+        state.settings.props = { ...ALL_PROPS, spec_bar:false };
+        const oneOff = buildDefaultAccessoriesForLift('squat');
+        assert('v13.2.0: disabled spec_bar keeps SSB Squat out of new defaults',
+          !oneOff.templates.some(t => t.name === 'SSB Squat'));
+        assert('v13.2.0: disabling one prop leaves the other prop defaults alone',
+          namesIn(oneOff,'tier3').includes('Ab Wheel Rollout'));
+        assert('v13.2.0: every default picked with one prop off is available', allUsable(oneOff));
+
+        // (1b) propsNone is the blunt switch: no prop-requiring exercise survives.
+        state.settings.propsNone = true;
+        state.settings.props     = { ...ALL_PROPS };
+        const none = buildDefaultAccessoriesForLift('squat');
+        assert('v13.2.0: propsNone excludes every prop-requiring movement from new defaults',
+          none.templates.every(t => exerciseProps(libEntry(t.name, t.tier)).length === 0));
+        assert('v13.2.0: propsNone defaults are all available', allUsable(none));
+        assert('v13.2.0: propsNone still fills tiers that have usable movements left',
+          namesIn(none,'tier1').length === 2 && namesIn(none,'tier2').length === 2 && namesIn(none,'tier3').length === 2);
+
+        // (1c) A tier with zero usable movements stays empty — no backfill.
+        state.settings.equipment = { ...ALL_EQUIP, barbell:false };
+        const noBar = buildDefaultAccessoriesForLift('squat');
+        assert('v13.2.0: all-barbell T1 with barbell off yields zero T1 defaults',
+          namesIn(noBar,'tier1').length === 0);
+        assert('v13.2.0: an empty tier does not starve the tiers that still have options',
+          namesIn(noBar,'tier2').length === 2 && allUsable(noBar));
+
+        // (2) swapCandidates: current exercise excluded, unavailable options
+        // partitioned into `blocked` instead of being dropped or offered.
+        state.settings.propsNone = false;
+        state.settings.props     = { ...ALL_PROPS, spec_bar:false };
+        state.settings.equipment = { ...ALL_EQUIP };
+        state.accessories.byLift = { squat:{ framework:'3tier', templates:[
+          { id:'sc_cur', name:'Pause Squat', tier:'tier1' }
+        ] } };
+        const cur  = { name:'Pause Squat', tier:'tier1' };
+        const cand = swapCandidates('squat', cur);
+        const pool = ACCESSORY_LIBRARY.squat.tier1.filter(x => x.name !== cur.name);
+        assert('v13.2.0: swapCandidates excludes the current exercise from both lists',
+          !cand.available.some(x => x.name === cur.name) && !cand.blocked.some(x => x.name === cur.name));
+        assert('v13.2.0: swapCandidates routes the unavailable option to blocked, not available',
+          cand.blocked.some(x => x.name === 'SSB Squat') && !cand.available.some(x => x.name === 'SSB Squat'));
+        assert('v13.2.0: every swapCandidates available option passes exerciseAvailable',
+          cand.available.length > 0 && cand.available.every(x => exerciseAvailable(x)));
+        assert('v13.2.0: every swapCandidates blocked option fails exerciseAvailable',
+          cand.blocked.length > 0 && cand.blocked.every(x => !exerciseAvailable(x)));
+        assert('v13.2.0: swapCandidates partitions the pool exactly once',
+          cand.available.length + cand.blocked.length === pool.length);
+      } finally {
+        state.settings.propsNone = bakNone;
+        state.settings.props     = bakProps;
+        state.settings.equipment = bakEquip;
+        state.accessories.byLift = bakByLift;
+      }
     }
 
     const failed = results.filter(r => !r.pass);
