@@ -1,4 +1,4 @@
-# Juggernaut Method 2.0 — v13.2.0
+# Juggernaut Method 2.0 — v13.2.1
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -9,9 +9,17 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.2.0**
+- Current canonical build: **v13.2.1**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `15e5c226c3cc6dc695e03e404d3b726a49420976b383658938c498aa8367eb90`
+- Final HTML SHA256: `16cd08d548f1da4c7086d7e33cedd931c68ee3887ed2b957fa9c8738b56dbd5b`
+
+## v13.2.1 — Data Safety (released with known limitations)
+
+- Exact audited HTML; no post-audit application edits.
+- Improves import validation/recovery, rendering safety, save completion handling, workout context, unit conversion, coaching and session behavior. Training-math comparison and built-in self-test remain unchanged (55/55).
+- **Use one window at a time.** Same-storage concurrent windows can lose work; degraded fallback saves can select older history on restart. These issues are not fixed in this release.
+- Read [the full changelog and limitations](CHANGELOG-v13.2.1.md) and [the manual iPhone checklist](iPhone-Checklist-v13.2.1.md). Actual iPhone testing is not claimed.
+- Export a backup before upgrading when possible. Tests and synthetic results are retained outside the Pages repository.
 
 ## v13.2.0 — Swap on the Fly
 

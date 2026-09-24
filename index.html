@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.2.0</title>
+<title>Juggernaut Method 2.0 — v13.2.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -1611,7 +1611,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.2.0 — Swap on the Fly</div>
+        <div class="hdr-sub">v13.2.1 — Data Safety</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -1909,6 +1909,11 @@ body.performance-mode *{animation:none!important;transition:none!important}
           </div>
           <div class="tight"><button id="btnPurgeHistory" class="btn-s">Purge</button></div>
           <div class="tight"><button id="btnSyncNow" class="btn-s">Sync</button></div>
+        </div>
+        <!-- v13.2.1: recovery copies — shown only when one exists on this device -->
+        <div id="recoveryRow" class="row" style="margin-top:8px" hidden>
+          <div class="tight"><button id="btnUndoImport" class="btn-s" hidden>Undo import</button></div>
+          <div class="tight"><button id="btnExportRecovery" class="btn-s">Export recovery copies</button></div>
         </div>
         <div id="historySummary" class="sm mt" style="margin-top:10px">—</div>
       </div>
@@ -2962,7 +2967,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.2.0';
+  const APP_VERSION = '13.2.1';
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -3523,7 +3528,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
   }
   function formatWeight(w){
     if (!Number.isFinite(w)) return '—';
-    return (Math.round(w * 10) / 10).toFixed(1).replace(/\.0$/,'') + ' ' + state.settings.units;
+    return (Math.round(w * 10) / 10).toFixed(1).replace(/\.0$/,'') + ' ' + unitLabel();
   }
   function formatPercent(p){ return Number.isFinite(p) ? Math.round(p * 100) + '%' : '—'; }
   function fmtDate(iso){
@@ -3598,6 +3603,13 @@ body.performance-mode *{animation:none!important;transition:none!important}
   }
 
   // Escape HTML special characters to prevent XSS
+  // v13.2.1: render-sink guards — defense in depth (mergeState already normalizes everything loaded).
+  // Units reach dozens of templates through formatWeight; numbers reach attributes and text.
+  function unitLabel(){ return state.settings.units === 'kg' ? 'kg' : 'lb'; }
+  function numText(v, fallback = ''){
+    const x = Number(v);
+    return (v !== null && v !== '' && typeof v !== 'boolean' && Number.isFinite(x)) ? String(x) : fallback;
+  }
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] || c));
   }
@@ -3731,6 +3743,7 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     },
     program:{ index:0, completion:{} },
     activeSession:null,
+    accessoryPhase:null, // v13.2.1: { liftId, index, wave, phase, at } while post-workout accessories are open
     history:[],
     records:{}, // v11.0.2: persistent lifetime PR ledger — survives history pruning
     coachChat:{ messages:[] }, // v12: longitudinal coach conversation
@@ -3740,6 +3753,7 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     blockSummaries:[],                                        // v13 B2 (cap 12)
     backupMeta:{ lastBackupAt:null, nudgeSnoozedUntil:null }, // v13 C1
     bodyweight:[], // v10: array of { date:ISO, weight:number }
+    quarantine:[], // v13.2.1: damaged entries skipped on load/import (kept for recovery, never rendered)
     accessories:{
       byLift:{
         squat:buildDefaultAccessoriesForLift('squat'),
@@ -3901,27 +3915,22 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
         r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
       });
     },
-    put(store, value, key){
-      return new Promise((res,rej) => {
-        const tx = db.transaction(store,'readwrite');
-        const r = key === undefined ? tx.objectStore(store).put(value) : tx.objectStore(store).put(value, key);
-        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    // v13.2.1 (R01): a write resolves only when its transaction commits. A request can succeed and the
+    // commit still fail (quota, abort) — that used to be reported as saved, so the app never degraded.
+    _commit(store, fn){
+      return new Promise((res, rej) => {
+        const tx = db.transaction(store, 'readwrite');
+        let result;
+        const r = fn(tx.objectStore(store));
+        r.onsuccess = () => { result = r.result; };
+        tx.oncomplete = () => res(result);
+        tx.onabort = () => rej(tx.error || r.error || new Error('IndexedDB transaction aborted'));
+        tx.onerror = () => rej(tx.error || r.error || new Error('IndexedDB transaction failed'));
       });
     },
-    add(store, value){
-      return new Promise((res,rej) => {
-        const tx = db.transaction(store,'readwrite');
-        const r = tx.objectStore(store).put(value);
-        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
-      });
-    },
-    del(store, key){
-      return new Promise((res,rej) => {
-        const tx = db.transaction(store,'readwrite');
-        const r = tx.objectStore(store).delete(key);
-        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
-      });
-    },
+    put(store, value, key){ return idb._commit(store, os => key === undefined ? os.put(value) : os.put(value, key)); },
+    add(store, value){ return idb._commit(store, os => os.put(value)); },
+    del(store, key){ return idb._commit(store, os => os.delete(key)).then(() => undefined); },
     getAll(store){
       return new Promise((res,rej) => {
         const tx = db.transaction(store,'readonly');
@@ -3932,8 +3941,204 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
   };
 
   /* ═══ STATE MERGE ═══ */
+  /* ═══ v13.2.1: INGESTION NORMALIZATION ═══ */
+  // Every path into `state` — boot, backup restore, legacy migration, import, undo — runs through
+  // mergeState, so type-checking here protects every renderer downstream. Rules: valid values pass
+  // through unchanged; invalid scalars fall back to defaults; a damaged list entry is skipped and a
+  // copy kept in state.quarantine — never the whole save.
+  const _NORM = {
+    units:['lb','kg'], maxFormula:['epley','brzycki'], programMode:['standard16','omit10s12','omitDeload12'],
+    tiers:['tier1','tier2','tier3'], ageBracket:['under25','25-34','35-44','45-54','55plus']
+  };
+  let _lastNormReport = { setAside:[] };
+  function _isObj(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
+  function _num(v, fallback, min = -Infinity, max = Infinity){ const x = n(v); return (Number.isFinite(x) && x >= min && x <= max) ? x : fallback; }
+  function _int(v, fallback, min = -Infinity, max = Infinity){ const x = _num(v, NaN, min, max); return Number.isFinite(x) ? Math.floor(x) : fallback; }
+  function _enum(v, list, fallback){ return list.includes(v) ? v : fallback; }
+  // Ids end up inside HTML attributes: anything that could close one is refused.
+  function _safeId(v, fallback){ return (typeof v === 'string' && /^[^"'<>&`\s\\]{1,120}$/.test(v)) ? v : fallback; }
+  function _slug(v, fallback, max = 40){ return (typeof v === 'string' && v.length <= max && /^[A-Za-z0-9_+-]+$/.test(v)) ? v : fallback; }
+  function _timeOrNull(v){ return ((typeof v === 'string' && v && v.length <= 40) || Number.isFinite(v)) ? v : null; }
+  function _dateish(v){ return (typeof v === 'string' && /^[0-9T:.+\-Z ]{0,40}$/.test(v)) ? v : ''; }
+  function _plates(v, fallback){
+    if (!Array.isArray(v)) return fallback;
+    const p = v.map(x => n(x)).filter(x => Number.isFinite(x) && x > 0 && x <= 1000);
+    return p.length ? p : fallback;
+  }
+  function _keepOrSetAside(ok, item, where, report){ if (!ok) report.setAside.push({ where, raw:item }); return ok; }
+  function _isLift(id){ return LIFTS.some(l => l.id === id); }
+  function _normLiftIds(v){
+    const ids = Array.isArray(v) ? [...new Set(v.filter(_isLift))] : [];
+    return ids.length ? ids : LIFTS.map(l => l.id);
+  }
+  function _normSet(s){
+    const o = { ...s };
+    if (o.weight != null) o.weight = _num(o.weight, 0, 0, 5000);
+    if (o.targetReps != null) o.targetReps = _int(o.targetReps, 0, 0, 999);
+    if (o.performedReps != null) o.performedReps = _int(o.performedReps, 0, 0, 999);
+    if (o.rpe != null) o.rpe = _num(o.rpe, null, 0, 10);
+    if (o.pctTM != null) o.pctTM = _num(o.pctTM, null, 0, 1000);
+    return o;
+  }
+  // An in-progress workout must point at a real lift and a real wave/phase; otherwise it is set aside
+  // (rendering it used to throw on every launch).
+  function _normSession(s, report){
+    if (s == null) return null;
+    const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+    const ok = _isObj(s) && _isLift(s.liftId) && typeof s.wave === 'string' && typeof s.phase === 'string'
+      && has(PROGRAM.defs, s.wave) && _isObj(PROGRAM.defs[s.wave]) && has(PROGRAM.defs[s.wave], s.phase)
+      && Array.isArray(s.sets) && s.sets.some(_isObj);
+    if (!ok){ report.setAside.push({ where:'activeSession', raw:s }); return null; }
+    const out = { ...s, sets:s.sets.filter(_isObj).map(_normSet) };
+    out.activeSetIndex = _int(s.activeSetIndex, 0, 0, out.sets.length - 1);
+    if (typeof out.createdAt !== 'string' || Number.isNaN(Date.parse(out.createdAt))) out.createdAt = nowISO();
+    out.microcycleKey = _slug(s.microcycleKey, s.wave + '_' + s.phase);
+    if (!Array.isArray(out.undoStack)) out.undoStack = [];
+    for (const k of ['_pauseOffset', '_pausedAt']) if (k in out && !Number.isFinite(out[k])) delete out[k];
+    return out;
+  }
+  function _normHistoryEntry(h, i){
+    const o = { ...h };
+    o.id = _safeId(h.id, 'session_legacy_' + i);
+    o.sets = Array.isArray(h.sets) ? h.sets.filter(_isObj).map(_normSet) : [];
+    o.wave = _slug(h.wave, '?', 24);
+    o.phase = _slug(h.phase, '', 24);
+    o.liftId = _slug(h.liftId, 'squat');
+    o.completedAt = (typeof h.completedAt === 'string') ? h.completedAt : '';
+    o.units = (h.units === 'lb' || h.units === 'kg') ? h.units : undefined;   // v13.2.1: unit the workout was logged in
+    for (const k of ['note', 'userNote', 'coachingInsight']) if (k in o && typeof o[k] !== 'string') o[k] = '';
+    if ('microcycleKey' in o) o.microcycleKey = _slug(h.microcycleKey, o.wave + '_' + o.phase);
+    if (o.realizationUpdate != null){
+      const r = h.realizationUpdate;
+      o.realizationUpdate = _isObj(r)
+        ? { ...r, reason:_slug(r.reason, 'unknown'), new1RM:_num(r.new1RM, null), creditedExtraReps:_num(r.creditedExtraReps, 0) }
+        : null;
+    }
+    return o;
+  }
+  // PR ledger: records[liftId][range] = { weight, reps, date } (ranges from rangeForReps)
+  function _normRecords(raw){
+    const out = {};
+    if (!_isObj(raw)) return out;
+    for (const l of LIFTS){
+      const src = raw[l.id];
+      if (!_isObj(src)) continue;
+      for (const [range, r] of Object.entries(src)){
+        if (!/^(1|3|5|8|12|15\+)RM$/.test(range) || !_isObj(r)) continue;
+        const weight = n(r.weight), reps = n(r.reps);
+        if (!Number.isFinite(weight) || weight <= 0 || !Number.isFinite(reps) || reps < 1) continue;
+        (out[l.id] = out[l.id] || {})[range] = { ...r, weight, reps:Math.floor(reps), date:(typeof r.date === 'string' ? r.date : null) };
+      }
+    }
+    return out;
+  }
+  function _normCoachAction(a){
+    const o = { ...a };
+    o.id = _safeId(a.id, 'ca_legacy_' + Math.random().toString(36).slice(2, 8));
+    o.type = _slug(a.type, 'unknown');
+    o.at = (typeof a.at === 'string') ? a.at : '';
+    if ('lifts' in o) o.lifts = Array.isArray(a.lifts) ? a.lifts.filter(_isLift) : [];
+    if ('prior' in o) o.prior = _isObj(a.prior)
+      ? Object.fromEntries(Object.entries(a.prior).filter(([k, v]) => _isLift(k) && Number.isFinite(n(v))).map(([k, v]) => [k, n(v)]))
+      : {};
+    return o;
+  }
+  function _normBlockSummary(s){
+    const o = { ...s };
+    o.id = _safeId(s.id, 'bs_legacy_' + Math.random().toString(36).slice(2, 8));
+    o.wave = _slug(s.wave, '?', 24);
+    o.from = _dateish(s.from); o.to = _dateish(s.to);
+    o.lifts = {};
+    if (_isObj(s.lifts)) for (const [id, l] of Object.entries(s.lifts)){
+      if (!_isLift(id) || !_isObj(l)) continue;
+      const c = { ...l, name:(typeof l.name === 'string' ? l.name : (getLiftMeta(id)?.name || id)) };
+      for (const k of Object.keys(c)) if (k !== 'name' && c[k] !== null && typeof c[k] !== 'boolean') c[k] = Number.isFinite(n(c[k])) ? n(c[k]) : null;
+      o.lifts[id] = c;
+    }
+    return o;
+  }
+  function _normAccessoryLog(a){
+    return { ...a,
+      id:_safeId(a.id, 'acclog_legacy_' + Math.random().toString(36).slice(2, 8)),
+      liftId:_slug(a.liftId, 'squat'),
+      accessoryId:_safeId(a.accessoryId, ''),
+      name:(typeof a.name === 'string' ? a.name : 'Accessory'),
+      weight:Math.min(5000, Math.max(0, n(a.weight) || 0)),
+      reps:(Array.isArray(a.reps) ? a.reps.slice(0, 20).map(v => Math.min(999, Math.max(0, Math.floor(n(v) || 0)))) : []),
+      completedAt:(typeof a.completedAt === 'string' ? a.completedAt : ''),
+      outcome:(typeof a.outcome === 'string' ? a.outcome : ''),
+      units:((a.units === 'lb' || a.units === 'kg') ? a.units : undefined) };
+  }
+  function _normSettingsAndLifts(base){
+    const s = base.settings, d = DEFAULT_STATE.settings;
+    s.units = _enum(s.units, _NORM.units, d.units);
+    s.maxFormula = _enum(s.maxFormula, _NORM.maxFormula, d.maxFormula);
+    s.programMode = _enum(s.programMode, _NORM.programMode, d.programMode);
+    s.barWeight = _num(s.barWeight, d.barWeight, 0, 1000);
+    s.rounding = _num(s.rounding, d.rounding, 0.01, 100);
+    s.plates = _plates(s.plates, d.plates.slice());
+    s.remoteEndpoint = (typeof s.remoteEndpoint === 'string') ? s.remoteEndpoint : '';
+    const rm = {};
+    for (const [k, v] of Object.entries(PROGRAM.defaultRestMatrix)) rm[k] = _int(s.restMatrix && s.restMatrix[k], v, 0, 3600);
+    s.restMatrix = rm;
+    for (const [k, v] of Object.entries(d.amrap)){
+      s.amrap[k] = (typeof v === 'boolean') ? (typeof s.amrap[k] === 'boolean' ? s.amrap[k] : v) : _num(s.amrap[k], v, 0, 100);
+    }
+    for (const grp of ['ui', 'equipment', 'props']) for (const [k, v] of Object.entries(d[grp])) if (typeof s[grp][k] !== 'boolean') s[grp][k] = v;
+    if (typeof s.ai.enableReadiness !== 'boolean') s.ai.enableReadiness = d.ai.enableReadiness;
+    if (typeof s.ai.enableRPE !== 'boolean') s.ai.enableRPE = d.ai.enableRPE;
+    s.ai.openrouterKey = (typeof s.ai.openrouterKey === 'string') ? s.ai.openrouterKey.trim() : '';
+    s.ai.model = (typeof s.ai.model === 'string' && /^[A-Za-z0-9._:\/-]{1,100}$/.test(s.ai.model.trim())) ? s.ai.model.trim() : d.ai.model;
+    const p = s.profile, dp = d.profile;
+    p.ageBracket = _enum(p.ageBracket, _NORM.ageBracket, dp.ageBracket);
+    p.experienceYears = _num(p.experienceYears, dp.experienceYears, 0, 80);
+    p.pedAssisted = (p.pedAssisted === true);
+    p.bodyweightLb = _num(p.bodyweightLb, dp.bodyweightLb, 0, 2000);
+    p.lifestyleStress = _num(p.lifestyleStress, dp.lifestyleStress, 1, 5);
+    if (s.weakPoints !== undefined){
+      s.weakPoints = _isObj(s.weakPoints)
+        ? Object.fromEntries(Object.entries(s.weakPoints).filter(([k, v]) => _isLift(k) && _slug(v, null, 60)))
+        : {};
+    }
+    for (const l of LIFTS){
+      const x = base.lifts[l.id], dl = DEFAULT_STATE.lifts[l.id];
+      x.id = l.id;
+      x.true1RM = _num(x.true1RM, dl.true1RM, 1, 5000);
+      x.tmAdjustment = _num(x.tmAdjustment, 1, 0.3, 1.5);
+      x.underTargetStreak = _int(x.underTargetStreak, 0, 0, 1000);
+      x.barWeight = _num(x.barWeight, s.barWeight, 0, 1000);
+      x.collarWeight = _num(x.collarWeight, 0, 0, 100);
+      x.rounding = _num(x.rounding, s.rounding, 0.01, 100);
+      x.plates = _plates(x.plates, s.plates.slice());
+    }
+    base.program.index = _int(base.program.index, 0, 0, 1000);
+    base.program.completion = _isObj(base.program.completion)
+      ? Object.fromEntries(Object.entries(base.program.completion)
+          .filter(([k, v]) => _slug(k, null) && _isObj(v))
+          .map(([k, v]) => [k, Object.fromEntries(Object.entries(v).filter(([id, st]) => _slug(id, null) && typeof st === 'string' && st.length <= 20))]))
+      : {};
+  }
+  function _mergeQuarantine(prev, report){
+    const out = Array.isArray(prev) ? prev.filter(q => _isObj(q) && typeof q.raw === 'string').slice(-20) : [];
+    for (const item of report.setAside){
+      let raw;
+      try{ raw = JSON.stringify(item.raw); }catch(_){ raw = String(item.raw); }
+      if (raw === undefined || raw === 'null') continue;   // nothing worth keeping
+      out.push({ at:nowISO(), where:String(item.where), raw:raw.slice(0, 20000) });
+    }
+    return out.slice(-20);
+  }
+
+  function _normAccessoryPhase(c){
+    const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+    if (!_isObj(c) || !_isLift(c.liftId) || typeof c.wave !== 'string' || typeof c.phase !== 'string') return null;
+    if (!has(PROGRAM.defs, c.wave) || !_isObj(PROGRAM.defs[c.wave]) || !has(PROGRAM.defs[c.wave], c.phase)) return null;
+    return { liftId:c.liftId, index:_int(c.index, 0, 0, 1000), wave:c.wave, phase:c.phase, at:(typeof c.at === 'string' ? c.at : '') };
+  }
   function mergeState(parsed){
     const base = deepClone(DEFAULT_STATE);
+    const _report = { setAside:[] };   // v13.2.1: entries skipped by normalization (copied into base.quarantine)
+    _lastNormReport = _report;
     if (!parsed || typeof parsed !== 'object') return base;
     base.version = 2; base.appVersion = APP_VERSION;
     base.settings = { ...base.settings, ...(parsed.settings || {}) };
@@ -3949,70 +4154,87 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     for (const lift of LIFTS) base.lifts[lift.id] = { ...base.lifts[lift.id], ...(inLifts[lift.id]||{}) };
     base.program = { ...base.program, ...(parsed.program||{}) };
     base.program.completion = { ...(base.program.completion||{}), ...((parsed.program||{}).completion||{}) };
-    base.activeSession = parsed.activeSession || null;
+    // v13.2.1: known lifts only, then a validated in-progress workout (an unreadable one is set aside, not resumed)
+    base.settings.activeLiftIds = _normLiftIds(base.settings.activeLiftIds);
+    base.activeSession = _normSession(parsed.activeSession, _report);
+    base.accessoryPhase = base.activeSession ? null : _normAccessoryPhase(parsed.accessoryPhase);   // v13.2.1 (F19)
     // v13.0.9: sanitize per-entry at the single ingestion choke point. Old-version
     // backups and hand-edited imports can carry entries missing sets/wave/phase;
     // downstream consumers (renderHistory, lift analytics at h.sets.length) read
     // those raw, and one malformed entry crashed render() — the spine every
     // interaction runs through — bricking the entire UI. Guarantee shape here
     // instead of guarding dozens of call sites.
+    // v13.2.1: entries are fully type-checked (numbers, ids, text) — see _normHistoryEntry.
     base.history = (Array.isArray(parsed.history) ? parsed.history : [])
-      .filter(h => h && typeof h === 'object')
-      .map(h => ({ ...h,
-        sets: Array.isArray(h.sets) ? h.sets.filter(s => s && typeof s === 'object' && !Array.isArray(s)) : [],
-        wave: (typeof h.wave === 'string' && h.wave) ? h.wave : '?',
-        phase: (typeof h.phase === 'string') ? h.phase : '',
-        liftId: (typeof h.liftId === 'string' && h.liftId) ? h.liftId : 'squat',
-        completedAt: (typeof h.completedAt === 'string') ? h.completedAt : ''
-      }));
-    base.records = (parsed.records && typeof parsed.records === 'object') ? parsed.records : {}; // v11.0.2 PR ledger
-    base.coachChat = (parsed.coachChat && Array.isArray(parsed.coachChat.messages)) // v12 coach chat
-      ? { messages: parsed.coachChat.messages.slice(-COACH_CHAT_MAX) }
-      : { messages: [] };
+      .filter(h => _keepOrSetAside(_isObj(h), h, 'history', _report))
+      .map((h, i) => _normHistoryEntry(h, i));
+    base.records = _normRecords(parsed.records); // v11.0.2 PR ledger — v13.2.1: numbers checked, unknown lifts dropped
+    // v12 coach chat — v13.2.1: only well-formed user/assistant messages
+    base.coachChat = { messages:(parsed.coachChat && Array.isArray(parsed.coachChat.messages) ? parsed.coachChat.messages : [])
+      .filter(m => _isObj(m) && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
+      .slice(-COACH_CHAT_MAX) };
     // v13 fields
     base.sync = { lastResult: (typeof parsed.sync?.lastResult === 'string' ? parsed.sync.lastResult : 'never'),
-                  lastAt: parsed.sync?.lastAt || null };
+                  lastAt: _timeOrNull(parsed.sync?.lastAt) };
     base.deloadUX = { dismissedAtIndex: Number.isFinite(parsed.deloadUX?.dismissedAtIndex) ? parsed.deloadUX.dismissedAtIndex : null };
-    base.coachActions = Array.isArray(parsed.coachActions) ? parsed.coachActions.slice(-50) : [];
-    base.blockSummaries = Array.isArray(parsed.blockSummaries) ? parsed.blockSummaries.slice(-12) : [];
-    base.backupMeta = { lastBackupAt: parsed.backupMeta?.lastBackupAt || null,
-                        nudgeSnoozedUntil: parsed.backupMeta?.nudgeSnoozedUntil || null };
+    base.coachActions = (Array.isArray(parsed.coachActions) ? parsed.coachActions : [])
+      .filter(a => _keepOrSetAside(_isObj(a), a, 'coachActions', _report)).map(_normCoachAction).slice(-50);
+    base.blockSummaries = (Array.isArray(parsed.blockSummaries) ? parsed.blockSummaries : [])
+      .filter(s => _keepOrSetAside(_isObj(s), s, 'blockSummaries', _report)).map(_normBlockSummary).slice(-12);
+    base.backupMeta = { lastBackupAt: _timeOrNull(parsed.backupMeta?.lastBackupAt),
+                        nudgeSnoozedUntil: _timeOrNull(parsed.backupMeta?.nudgeSnoozedUntil) };
     base.settings.goals = sanitizeGoals(parsed.settings?.goals, base.settings.activeLiftIds);
     base.settings.bridge = { url: String(parsed.settings?.bridge?.url || ''),
                              auto: parsed.settings?.bridge?.auto === true,
-                             lastSentAt: parsed.settings?.bridge?.lastSentAt || null };
-    base.bodyweight = Array.isArray(parsed.bodyweight) ? parsed.bodyweight : []; // v10
-    const inAcc = (parsed.accessories||{}).byLift || {};
-    for (const lift of LIFTS){
-      const def = buildDefaultAccessoriesForLift(lift.id);
-      const src = inAcc[lift.id] || {};
-      const templates = Array.isArray(src.templates) && src.templates.length
-        ? src.templates.map(item => ({
-            id:item.id || newAccessoryId(), name:item.name || 'Accessory',
-            category:item.category || 'Accessory',
-            // v13.1.1: user-owned marker. This whitelist drops anything not named here,
-            // so it has to be carried explicitly. Legacy states predate the flag —
-            // fall back to the 'Custom' category addAccessory has always stamped.
-            custom:item.custom === true || item.category === 'Custom',
-            sets:Math.max(1, Math.floor(n(item.sets)||5)),
-            repMin:Math.max(1, Math.floor(n(item.repMin)||10)),
-            repMax:Math.max(1, Math.floor(n(item.repMax)||15)),
-            tier:item.tier || 'tier2',
-            weight:Math.max(0, n(item.weight)||0),
-            increment:Math.max(0.5, n(item.increment)||base.settings.rounding),
-            lastLoggedSets:Array.isArray(item.lastLoggedSets)
-              ? item.lastLoggedSets.map(v => Math.max(0, Math.floor(n(v)||0)))
-              : Array(Math.max(1, Math.floor(n(item.sets)||5))).fill(Math.max(1, Math.floor(n(item.repMin)||10))),
-            lastOutcome:item.lastOutcome || '', lastCompletedAt:item.lastCompletedAt || '',
-            pendingProgression:!!item.pendingProgression,
-            suggestedWeight:Number.isFinite(n(item.suggestedWeight)) ? n(item.suggestedWeight) : null
-          }))
-        : def.templates;
-      base.accessories.byLift[lift.id] = { framework:src.framework || def.framework, templates };
-    }
-    base.accessories.history = Array.isArray((parsed.accessories||{}).history) ? parsed.accessories.history : [];
+                             lastSentAt: _timeOrNull(parsed.settings?.bridge?.lastSentAt) };
+    base.bodyweight = (Array.isArray(parsed.bodyweight) ? parsed.bodyweight : []) // v10 — v13.2.1: positive weights only
+      .filter(b => _keepOrSetAside(_isObj(b) && Number.isFinite(n(b.weight)) && n(b.weight) > 0 && n(b.weight) < 2000, b, 'bodyweight', _report))
+      .map(b => ({ ...b, weight:n(b.weight), date:(typeof b.date === 'string' ? b.date : '') }));
+    // v13.2.1: settings/lifts/program are normalized before accessory defaults are built from them.
+    _normSettingsAndLifts(base);
+    const inAcc = (_isObj(parsed.accessories) && _isObj(parsed.accessories.byLift)) ? parsed.accessories.byLift : {};
+    // v13.2.1 (F13): defaults are built against the state being loaded — its equipment, maxes and
+    // week — not whatever happens to be live. The builders read the global `state`, so point it at
+    // the candidate for the duration (mergeState is synchronous; restored in `finally`).
+    const _live = state; state = base;
+    try{
+      for (const lift of LIFTS){
+        const src = _isObj(inAcc[lift.id]) ? inAcc[lift.id] : null;
+        // v13.2.1 (F14): an explicit empty list means "no accessories" and is kept; only a missing
+        // list gets defaults.
+        const templates = (src && Array.isArray(src.templates))
+          ? src.templates.filter(item => _keepOrSetAside(_isObj(item), item, 'accessories.' + lift.id, _report)).map(item => ({
+              id:_safeId(item.id, null) || newAccessoryId(),
+              name:(typeof item.name === 'string' && item.name) ? item.name : 'Accessory',
+              category:(typeof item.category === 'string' && item.category) ? item.category : 'Accessory',
+              // v13.1.1: user-owned marker. This whitelist drops anything not named here,
+              // so it has to be carried explicitly. Legacy states predate the flag —
+              // fall back to the 'Custom' category addAccessory has always stamped.
+              custom:item.custom === true || item.category === 'Custom',
+              sets:Math.min(20, Math.max(1, Math.floor(n(item.sets)||5))),
+              repMin:Math.min(100, Math.max(1, Math.floor(n(item.repMin)||10))),
+              repMax:Math.min(100, Math.max(1, Math.floor(n(item.repMax)||15))),
+              tier:_enum(item.tier, _NORM.tiers, 'tier2'),
+              weight:Math.min(5000, Math.max(0, n(item.weight)||0)),
+              increment:Math.min(500, Math.max(0.5, n(item.increment)||base.settings.rounding)),
+              lastLoggedSets:Array.isArray(item.lastLoggedSets)
+                ? item.lastLoggedSets.slice(0, 20).map(v => Math.min(999, Math.max(0, Math.floor(n(v)||0))))
+                : Array(Math.min(20, Math.max(1, Math.floor(n(item.sets)||5)))).fill(Math.min(100, Math.max(1, Math.floor(n(item.repMin)||10)))),
+              lastOutcome:(typeof item.lastOutcome === 'string' ? item.lastOutcome : ''),
+              lastCompletedAt:(typeof item.lastCompletedAt === 'string' ? item.lastCompletedAt : ''),
+              pendingProgression:!!item.pendingProgression,
+              suggestedWeight:Number.isFinite(n(item.suggestedWeight)) ? n(item.suggestedWeight) : null,
+              manualWeek:_slug(item.manualWeek, undefined)   // v13.2.1 (K3)
+            }))
+          : buildDefaultAccessoriesForLift(lift.id).templates;
+        base.accessories.byLift[lift.id] = { framework:(src && typeof src.framework === 'string' && src.framework) ? src.framework : '3tier', templates };
+      }
+    } finally { state = _live; }
+    base.accessories.history = (Array.isArray((parsed.accessories||{}).history) ? parsed.accessories.history : [])
+      .filter(a => _keepOrSetAside(_isObj(a), a, 'accessories.history', _report)).map(_normAccessoryLog);
     if (!Array.isArray(base.settings.activeLiftIds) || !base.settings.activeLiftIds.length)
       base.settings.activeLiftIds = LIFTS.map(x => x.id);
+    base.quarantine = _mergeQuarantine(parsed.quarantine, _report);
     return base;
   }
 
@@ -4022,26 +4244,117 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // for heavy users) to localStorage, burning battery and risking the 5MB Safari quota silently.
   let _lastLocalBackupAt = 0;
   const LOCAL_BACKUP_MIN_MS = 60 * 1000;
+  // v13.2.1 storage integrity:
+  //  • every save carries a revision (state.rev), mirrored in meta 'rev' and beside the backup copy;
+  //  • a save never overwrites a newer revision written by another window (compare-and-swap) — this
+  //    window loads the newer data instead (F07); other windows hear about saves via BroadcastChannel;
+  //  • IndexedDB writes count only once the transaction commits (R01, idb._commit), and a write that
+  //    hangs is treated as failed so the backup copy still gets the data;
+  //  • launch reads both copies and keeps the newer one (F01, loadState).
+  const LS_BACKUP_KEY = 'juggernaut_v4_backup';
+  const LS_REV_KEY = 'juggernaut_v4_backup_rev';
+  const TAB_ID = Math.random().toString(36).slice(2, 10);
+  let IDB_SAVE_TIMEOUT_MS = 15000;
+  let _baseRev = 0;          // revision this window's in-memory state is based on
+  let _fallbackWarned = false;
+  function _revOf(x){ return (x && Number.isFinite(x.rev)) ? x.rev : null; }
+  function _lsRev(){ try{ const v = Number(localStorage.getItem(LS_REV_KEY)); return Number.isFinite(v) ? v : 0; }catch(_){ return 0; } }
+  function _writeFallback(){
+    localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(state));
+    localStorage.setItem(LS_REV_KEY, String(state.rev || 0));
+  }
+  function _warnFallbackFailed(err){
+    console.error('Backup copy write failed', err);
+    if (_fallbackWarned) return;
+    _fallbackWarned = true;
+    toast('This device\u2019s backup copy couldn\u2019t be updated. Export a backup to be safe.', 'w');
+  }
   function writeLocalBackup(force){
     try{
       if (!force && (Date.now() - _lastLocalBackupAt) < LOCAL_BACKUP_MIN_MS) return;
-      localStorage.setItem('juggernaut_v4_backup', JSON.stringify(state));
+      if (_lsRev() > (state.rev || 0)) return;   // v13.2.1: another window wrote newer data — keep it
+      _writeFallback();
       _lastLocalBackupAt = Date.now();
-    }catch(_){ /* quota or disabled — silent, IDB is primary */ }
+    }catch(err){ _warnFallbackFailed(err); }     // v13.2.1: no longer silent
+  }
+  function _withTimeout(p, ms, what){
+    return new Promise((res, rej) => {
+      const t = setTimeout(() => rej(new Error(what + ' did not respond')), ms);
+      p.then(v => { clearTimeout(t); res(v); }, e => { clearTimeout(t); rej(e); });
+    });
+  }
+  // Saves and cross-window reloads run one at a time in this window.
+  let _storageChain = Promise.resolve();
+  function _withStorageLock(fn){
+    const run = _storageChain.then(fn, fn);
+    _storageChain = run.then(() => {}, () => {});
+    return run;
+  }
+  let _bc = null;
+  try{
+    if (typeof BroadcastChannel === 'function'){
+      _bc = new BroadcastChannel('juggernaut-state:' + DB_NAME);
+      _bc.onmessage = (e) => {
+        const m = (e && e.data) || {};
+        if (m.type === 'saved' && m.tab !== TAB_ID && Number(m.rev) > _baseRev) adoptNewerSave('broadcast');
+      };
+    }
+  }catch(_){ _bc = null; }
+  function announceSave(rev){ try{ if (_bc) _bc.postMessage({ type:'saved', rev, tab:TAB_ID }); }catch(_){} }
+  function adoptNewerSave(reason){ return _withStorageLock(() => _adoptNewerSave(reason)); }
+  // Another window saved newer data: show it here. On a save conflict this window's copy is kept as a
+  // recovery copy first (every change saves immediately, so it rarely holds anything unique).
+  async function _adoptNewerSave(reason){
+    if (!idbAvailable) return false;
+    try{
+      const storedRev = _revOf(await idb.get('meta', 'rev')) || 0;
+      if (storedRev <= _baseRev) return false;
+      const latest = await idb.get('meta', 'state');
+      if (!latest) return false;
+      let next;
+      try{ next = mergeState(latest); }
+      catch(err){ console.error('Newer data from another window is unreadable', err); await keepUnreadableCopy(latest, 'other-window'); return false; }
+      if (reason === 'conflict') await _recoveryPut('recovery:conflict', 'conflict', { state });
+      state = next;
+      _baseRev = Math.max(storedRev, _revOf(latest) || 0);
+      state.rev = _baseRev;
+      if (state.settings?.ai?.openrouterKey) sessionApiKey = state.settings.ai.openrouterKey;
+      try{ render(); }catch(err){ console.error(err); }
+      toast(reason === 'conflict'
+        ? 'Juggernaut was changed in another window, so this one loaded the latest data. Its previous copy was kept.'
+        : 'Updated with changes from another Juggernaut window.', 'w');
+      return true;
+    }catch(err){ console.error('Could not load newer data', err); return false; }
   }
 
-  async function saveState(){
+  function saveState(){ return _withStorageLock(_saveStateNow); }
+  async function _saveStateNow(){
     state.appVersion = APP_VERSION;
+    ensureAccessoryPhaseRecorded();   // v13.2.1 (F19): an open accessory phase survives a reload
     // v13 A2: degraded mode persists via localStorage only — never touch idb.put
     if (!idbAvailable){
-      try{ localStorage.setItem('juggernaut_v4_backup', JSON.stringify(state)); }
+      state.rev = Math.max(_baseRev, _lsRev()) + 1; state.savedAt = nowISO();
+      _baseRev = state.rev;
+      try{ _writeFallback(); }
       catch(err){
         if (!storageFailureToasted){ storageFailureToasted = true; toast('Storage unavailable — export a backup now.', 'b'); }
       }
       return;
     }
+    let rev = 0;
     try{
-      await idb.put('meta', state, 'state');
+      // v13.2.1 (F07): compare-and-swap on the revision — never overwrite newer data from another window
+      const storedRev = _revOf(await _withTimeout(idb.get('meta', 'rev'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB')) || 0;
+      if (storedRev > _baseRev){
+        if (await _adoptNewerSave('conflict')) return;
+        _baseRev = storedRev;   // the newer copy couldn't be shown (it was kept) — save over it
+      }
+      rev = Math.max(storedRev, _baseRev) + 1;
+      state.rev = rev; state.savedAt = nowISO();
+      await _withTimeout(idb.put('meta', state, 'state'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB');
+      await _withTimeout(idb.put('meta', { rev, savedAt:state.savedAt, tab:TAB_ID }, 'rev'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB');
+      _baseRev = rev;
+      announceSave(rev);
       writeLocalBackup(false); // throttled: skips if last write was <60s ago
     }catch(err){
       // v13 patch (Blocker 1): a runtime IDB write failure proves IDB unusable.
@@ -4050,7 +4363,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       idbAvailable = false;
       storageDegraded = true;
       console.error(err);
-      try{ localStorage.setItem('juggernaut_v4_backup', JSON.stringify(state)); }
+      // v13.2.1 (F01): the backup copy now carries a newer revision than the primary, so the next
+      // launch restores it instead of the stale primary.
+      if (!rev){ state.rev = Math.max(_baseRev, _lsRev()) + 1; state.savedAt = nowISO(); }
+      _baseRev = state.rev;
+      try{ _writeFallback(); }
       catch(_){
         // Toast only when BOTH persistence layers fail (banner covers the IDB-only case)
         if (!storageFailureToasted){ storageFailureToasted = true; toast('Storage unavailable — export a backup now.', 'b'); }
@@ -4059,32 +4376,170 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   async function loadState(){
-    let stored = null;
+    let stored = null, head = null;
     if (idbAvailable){
-      try{ stored = await idb.get('meta', 'state'); }
+      try{ stored = await idb.get('meta', 'state'); head = await idb.get('meta', 'rev'); }
       catch(err){ idbAvailable = false; storageDegraded = true; console.error('IDB read failed', err); }
     }
-    if (stored){ state = mergeState(stored); return; }
-    // Try localStorage backup
-    try{
-      const backup = localStorage.getItem('juggernaut_v4_backup');
-      if (backup){
-        state = mergeState(JSON.parse(backup));
-        await saveState();
-        toast('Restored from backup.', 'g');
-        return;
+    // v13.2.1 (F01): read the backup copy too — after a failed save it can hold newer work than the primary.
+    let fallback = null;
+    try{ const b = localStorage.getItem(LS_BACKUP_KEY); if (b) fallback = JSON.parse(b); }
+    catch(err){ console.error('Backup copy unreadable', err); }
+    if (!_isObj(fallback)) fallback = null;
+    const headRev = _revOf(head) || 0;
+    if (stored){
+      await keepPreUpgradeCopy(stored);   // v13.2.1: verbatim copy before this version's first save
+      if (fallback && _fallbackIsNewer(fallback, stored)){
+        try{
+          state = mergeState(fallback);
+          _baseRev = Math.max(_revOf(fallback) || 0, _revOf(stored) || 0, headRev);
+          state.rev = _baseRev;
+          await _recoveryPut('recovery:stale-primary', 'stale-primary', { state:stored });
+          await saveState();   // brings the primary up to date
+          toast('Restored newer data from the backup copy.', 'g');
+          return;
+        }catch(err){ console.error('Newer backup copy unreadable', err); }
       }
-    }catch(_){}
+      try{
+        state = mergeState(stored);
+        _baseRev = Math.max(_revOf(stored) || 0, headRev);
+        state.rev = _baseRev;
+        return;
+      }catch(err){
+        // v13.2.1: an unreadable save is kept as a recovery copy, never silently replaced
+        console.error('Saved data unreadable', err);
+        await keepUnreadableCopy(stored, 'primary');
+        _bootNotice = { kind:'unreadable', label:'a fresh start' };
+      }
+    }
+    // Try localStorage backup
+    if (fallback){
+      try{
+        state = mergeState(fallback);
+        _baseRev = Math.max(_revOf(fallback) || 0, headRev);
+        state.rev = _baseRev;
+        await saveState();
+        if (_bootNotice) _bootNotice.label = 'the backup copy';
+        else toast('Restored from backup.', 'g');
+        return;
+      }catch(err){ console.error('Backup copy unreadable', err); }
+    }
     // Try legacy migration
     const migrated = tryLegacyMigration();
     if (migrated){
       state = mergeState(migrated);
+      _baseRev = headRev;
       await saveState();
-      toast('Migrated older data into IndexedDB.', 'g');
+      if (_bootNotice) _bootNotice.label = 'migrated older data';
+      else toast('Migrated older data into IndexedDB.', 'g');
       return;
     }
     state = deepClone(DEFAULT_STATE);
+    _baseRev = headRev;
     await saveState();
+  }
+
+  // v13.2.1 (F01): which copy is newer? Revisions decide. When a copy predates revisions (13.2.0),
+  // the most recent thing the lifter did decides; a tie prefers the copy stamped by 13.2.1, then the primary.
+  function _lastActivity(s){
+    let t = '';
+    const bump = v => { if (typeof v === 'string' && v > t) t = v; };
+    for (const h of (Array.isArray(s.history) ? s.history : [])) if (h) bump(h.completedAt);
+    for (const a of (Array.isArray(s.accessories?.history) ? s.accessories.history : [])) if (a) bump(a.completedAt);
+    if (s.activeSession) bump(s.activeSession.updatedAt);
+    bump(s.savedAt);
+    return t;
+  }
+  function _fallbackIsNewer(fb, primary){
+    const rf = _revOf(fb), rp = _revOf(primary);
+    if (rf !== null && rp !== null) return rf > rp;
+    const af = _lastActivity(fb), ap = _lastActivity(primary);
+    if (af !== ap) return af > ap;
+    return rf !== null && rp === null;
+  }
+
+  /* ═══ v13.2.1: RECOVERY COPIES ═══ */
+  // Verbatim copies in IndexedDB so no import, upgrade or unreadable save is ever the only copy.
+  // History → "Undo import" restores the pre-import copy; "Export recovery copies" downloads them all
+  // (API keys stripped) as a file that Import accepts.
+  const RECOVERY_INDEX_KEY = 'recovery:index';
+  let _recoveryIndex = [];
+  let _bootNotice = null;
+  let _safeMode = false;
+  async function _recoveryPut(key, kind, payload){
+    if (!idbAvailable || !db) return false;
+    try{
+      await idb.put('meta', { key, kind, savedAt:nowISO(), appVersion:APP_VERSION, ...payload }, key);
+      let idx = await idb.get('meta', RECOVERY_INDEX_KEY);
+      idx = (Array.isArray(idx) ? idx : []).filter(e => e && e.key !== key);
+      idx.push({ key, kind, savedAt:nowISO() });
+      const unreadable = idx.filter(e => e.kind === 'unreadable');
+      for (const old of unreadable.slice(0, Math.max(0, unreadable.length - 3))){
+        try{ await idb.del('meta', old.key); }catch(_){}
+        idx = idx.filter(e => e !== old);
+      }
+      await idb.put('meta', idx, RECOVERY_INDEX_KEY);
+      _recoveryIndex = idx;
+      refreshRecoveryRow();
+      return true;
+    }catch(err){ console.error('Recovery copy failed', err); return false; }
+  }
+  async function _recoveryDrop(key){
+    try{
+      if (idbAvailable && db){
+        await idb.del('meta', key);
+        _recoveryIndex = _recoveryIndex.filter(e => e.key !== key);
+        await idb.put('meta', _recoveryIndex, RECOVERY_INDEX_KEY);
+      }
+    }catch(err){ console.error(err); }
+    refreshRecoveryRow();
+  }
+  async function loadRecoveryIndex(){
+    try{
+      const idx = (idbAvailable && db) ? await idb.get('meta', RECOVERY_INDEX_KEY) : null;
+      _recoveryIndex = Array.isArray(idx) ? idx.filter(e => e && typeof e.key === 'string') : [];
+    }catch(_){ _recoveryIndex = []; }
+    refreshRecoveryRow();
+  }
+  function refreshRecoveryRow(){
+    if (el.recoveryRow) el.recoveryRow.hidden = !_recoveryIndex.length;
+    if (el.btnUndoImport) el.btnUndoImport.hidden = !_recoveryIndex.some(e => e.kind === 'preimport');
+  }
+  async function keepPreUpgradeCopy(raw){
+    if (!idbAvailable || !db || !raw || typeof raw !== 'object') return;
+    const from = String(raw.appVersion || 'unknown').replace(/[^0-9A-Za-z._-]/g, '').slice(0, 20) || 'unknown';
+    if (from === APP_VERSION) return;
+    const key = 'recovery:preupgrade:' + from;
+    try{ if (await idb.get('meta', key)) return; }catch(_){ return; }
+    await _recoveryPut(key, 'preupgrade', { fromVersion:from, state:raw });
+  }
+  function keepUnreadableCopy(raw, where){
+    return _recoveryPut('recovery:unreadable:' + Date.now().toString(36), 'unreadable', { where, state:raw });
+  }
+  // Exports never carry the AI key (same rule as buildExportJson).
+  function _withoutKeys(x){
+    let c;
+    try{ c = JSON.parse(JSON.stringify(x)); }catch(_){ return null; }
+    const strip = s => { if (s && s.settings && s.settings.ai) delete s.settings.ai.openrouterKey; };
+    if (c && Array.isArray(c.copies)) c.copies.forEach(k => strip(k && k.state)); else strip(c);
+    return c;
+  }
+  function downloadJsonFile(obj, filename){
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1200);
+  }
+  async function exportRecoveryCopies(){
+    try{
+      const copies = [];
+      for (const e of _recoveryIndex){ const v = await idb.get('meta', e.key); if (v) copies.push(v); }
+      if (!copies.length){ toast('No recovery copies on this device.', 'w'); return; }
+      downloadJsonFile(_withoutKeys({ kind:'juggernaut-recovery-copies', exportedAt:nowISO(), appVersion:APP_VERSION, copies }),
+        'juggernaut-recovery-' + new Date().toISOString().slice(0, 10) + '.json');
+      toast('Recovery copies exported.', 'g');
+    }catch(err){ console.error(err); toast('Export failed: ' + (err.message || err), 'b'); }
   }
 
   function updatePerformanceMode(){
@@ -4477,8 +4932,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function currentMicrocycle(){
     const tl = buildTimeline();
-    const idx = clamp(state.program.index, 0, Math.max(0, tl.length - 1));
-    return { ...(tl[idx] || { wave:'done', phase:'complete' }), index:idx, total:tl.length };
+    // v13.2.1 (F09): past the last week the cycle is complete (the index used to be clamped to week 16,
+    // so the app offered week 16 again and answered "Already handled this microcycle.")
+    const idx = Math.max(0, Math.floor(Number(state.program.index) || 0));
+    if (idx >= tl.length) return { wave:'done', phase:'complete', index:tl.length, total:tl.length };
+    return { ...tl[idx], index:idx, total:tl.length };
   }
 
   function microcycleKey(idx){
@@ -4529,7 +4987,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     let barBase = state.settings.barWeight;
     let collar = 0;
     let rounding = state.settings.rounding;
-    let plates = state.settings.plates.slice();
+    let plates = (Array.isArray(state.settings.plates) ? state.settings.plates : DEFAULT_STATE.settings.plates).slice();   // v13.2.1: never crash on a missing global list
     if (liftId && state.lifts && state.lifts[liftId]){
       const lift = state.lifts[liftId];
       if (Number.isFinite(lift.barWeight)) barBase = lift.barWeight;
@@ -4594,7 +5052,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (!Number.isFinite(reps) || reps < 0) return { new1RM:current1RM, creditedExtraReps:0, reason:'invalid-reps' };
     if (!Number.isFinite(target) || target <= 0) return { new1RM:current1RM, creditedExtraReps:0, reason:'invalid-target' };
     let extra = reps - target;
-    if (extra <= 0) return { new1RM:current1RM, creditedExtraReps:0, reason:'no-progress' };
+    // v13.2.1 (F10): hitting the target exactly is not a miss
+    if (extra < 0) return { new1RM:current1RM, creditedExtraReps:0, reason:'no-progress' };
+    if (extra === 0) return { new1RM:current1RM, creditedExtraReps:0, reason:'target-met' };
 
     // v11: Chad Wesley Smith's 5% differential rule (from his official TM Increase Calculator).
     // Original rule: new Training Max must remain ≤ 95% of new estimated 1RM.
@@ -4635,7 +5095,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // Round to user's increment
     proposed = roundToIncrement(proposed, state.settings.rounding);
 
-    return { new1RM:proposed, creditedExtraReps:extra, reason:'progress' };
+    // v13.2.1 (F10): 'progress' only when the max actually rises; beating the target while the 5% buffer
+    // rule keeps the max where it is is 'held' (no PR badge, no streak)
+    return { new1RM:proposed, creditedExtraReps:extra, reason:(proposed > current1RM ? 'progress' : 'held') };
   }
 
   /* ═══ SESSION BUILDER ═══ */
@@ -4738,7 +5200,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'weeklySummaryCard','weeklyTitle','weeklyStats',
      'programChart','programChartSVG',
      'historySummary','historyList','historyFilter','sparklineContainer',
-     'btnExport','importFile','btnPurgeHistory','btnSyncNow',
+     'btnExport','importFile','btnPurgeHistory','btnSyncNow','recoveryRow','btnUndoImport','btnExportRecovery',
      'units','barWeight','rounding','programMode','activeLifts','liftEditor',
      'restMatrixGrid','maxFormula','barbellProfileEditor',
      'liftIntelCard',
@@ -4770,21 +5232,30 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* ═══ TOAST ═══ */
-  function toast(msg, tone=''){
+  function toast(msg, tone='', action=null){   // v13.2.1: optional { label, onClick } (e.g. Undo)
     const icons = {
       g:'<svg viewBox="0 0 24 24" stroke="var(--accent)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
       w:'<svg viewBox="0 0 24 24" stroke="var(--warn)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
       b:'<svg viewBox="0 0 24 24" stroke="var(--bad)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
     };
     const iconHTML = icons[tone] ? '<span class="toast-icon">' + icons[tone] + '</span>' : '';
-    el.toast.innerHTML = iconHTML + '<span>' + escapeHtml(msg) + '</span>';
+    const hasAction = !!(action && action.label && typeof action.onClick === 'function');
+    el.toast.innerHTML = iconHTML + '<span>' + escapeHtml(msg) + '</span>' + (hasAction
+      ? '<button type="button" class="toast-action" style="margin-left:auto;background:none;border:0;color:var(--accent);font-weight:800;font-size:13px;padding:6px 4px;min-height:32px;cursor:pointer">' + escapeHtml(action.label) + '</button>'
+      : '');
+    if (hasAction){
+      el.toast.querySelector('.toast-action').onclick = () => {
+        el.toast.classList.remove('show'); clearTimeout(_toastTimer);
+        try{ action.onClick(); }catch(err){ console.error(err); }
+      };
+    }
     el.toast.style.borderColor =
       tone === 'g' ? 'var(--accent-mid)' :
       tone === 'w' ? 'rgba(245,166,35,.3)' :
       tone === 'b' ? 'rgba(245,101,101,.3)' : 'var(--line)';
     el.toast.classList.add('show');
     clearTimeout(_toastTimer);
-    _toastTimer = setTimeout(() => el.toast.classList.remove('show'), 2500);
+    _toastTimer = setTimeout(() => el.toast.classList.remove('show'), hasAction ? 6000 : 2500);
   }
 
   /* ═══ RPE ANCHOR MAP ═══ */
@@ -5609,7 +6080,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const meta = getLiftMeta(entry.liftId);
     const workingSets = entry.sets.filter(s => !s.isRamp);
     const totalTonnage = workingSets.reduce((sum, s) => sum + (s.weight * s.performedReps), 0);
-    const duration = session.createdAt ? Math.floor((Date.now() - new Date(session.createdAt).getTime()) / 1000) : 0;
+    // v13.2.1 (F18): active time — paused time excluded, including a pause that is still running
+    const pausedMs = (Number(session._pauseOffset) || 0) + (session._pausedAt ? Math.max(0, Date.now() - session._pausedAt) : 0);
+    const duration = session.createdAt ? Math.max(0, Math.floor((Date.now() - new Date(session.createdAt).getTime() - pausedMs) / 1000)) : 0;
     const dMin = Math.floor(duration / 60);
     const dSec = duration % 60;
     const amrapSet = workingSets.find(s => s.isAMRAP);
@@ -6096,7 +6569,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         '<div class="asd-empty">No other ' + escapeHtml(tierCon.label) + ' movement is available under your current filters.' +
         (blocked.length ? ' ' + blocked.length + ' are hidden \u2014 loosen Settings \u2192 Gym Equipment to see them.' : '') +
         '</div>' +
-        '<div class="asd-actions"><button class="btn-s" data-swapcancel="' + item.id + '">Close</button></div>' +
+        '<div class="asd-actions"><button class="btn-s" data-swapcancel="' + escapeHtml(item.id) + '">Close</button></div>' +
       '</div>';
     }
 
@@ -6115,14 +6588,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         (hasWP ? '<span class="asd-wp">Coach: ' + escapeHtml(wp) + '</span>' : '') +
       '</div>' +
       (alreadyLogged ? '<div class="asd-logged">Today\u2019s log stays filed under <strong>' + escapeHtml(item.name) + '</strong>. The swap applies from your next set forward.</div>' : '') +
-      '<select class="asd-select" data-swapsel="' + item.id + '" data-swaplift="' + escapeHtml(liftId) + '" data-swaptier="' + escapeHtml(tier) + '">' +
+      '<select class="asd-select" data-swapsel="' + escapeHtml(item.id) + '" data-swaplift="' + escapeHtml(liftId) + '" data-swaptier="' + escapeHtml(tier) + '">' +
         groups +
       '</select>' +
-      '<div class="asd-desc" data-swapdesc="' + item.id + '"></div>' +
+      '<div class="asd-desc" data-swapdesc="' + escapeHtml(item.id) + '"></div>' +
       hiddenNote +
       '<div class="asd-actions">' +
-        '<button class="btn-p" data-swapgo="' + item.id + '">Swap In</button>' +
-        '<button class="btn-s" data-swapcancel="' + item.id + '">Cancel</button>' +
+        '<button class="btn-p" data-swapgo="' + escapeHtml(item.id) + '">Swap In</button>' +
+        '<button class="btn-s" data-swapcancel="' + escapeHtml(item.id) + '">Cancel</button>' +
       '</div>' +
     '</div>';
   }
@@ -6170,14 +6643,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         const val = lastSets[i] ?? item.repMin;
         setsHTML += '<div class="inline-acc-set">' +
           '<span class="ias-label">S' + (i+1) + '</span>' +
-          '<button class="ias-btn" data-ias-minus="' + item.id + '" data-si="' + i + '">-</button>' +
-          '<span class="ias-val" data-ias-val="' + item.id + '" data-si="' + i + '">' + val + '</span>' +
-          '<button class="ias-btn" data-ias-plus="' + item.id + '" data-si="' + i + '">+</button>' +
+          '<button class="ias-btn" data-ias-minus="' + escapeHtml(item.id) + '" data-si="' + i + '">-</button>' +
+          '<span class="ias-val" data-ias-val="' + escapeHtml(item.id) + '" data-si="' + i + '">' + numText(val, '0') + '</span>' +
+          '<button class="ias-btn" data-ias-plus="' + escapeHtml(item.id) + '" data-si="' + i + '">+</button>' +
         '</div>';
       }
 
       // Help button and swap area
-      const helpId = 'help_' + item.id;
+      const helpId = 'help_' + escapeHtml(item.id);
       const weakBadge = isWeakMatch ? '<span class="acc-weak-badge">\u2605 Targets weak point</span><button class="acc-why-btn" data-why-acc="' + escapeHtml(item.name) + '" data-why-lift="' + escapeHtml(liftId) + '">Why?</button>' : '';
 
       // v13.2.0: flag props the lifter has switched off, right on the card.
@@ -6191,16 +6664,16 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const loggedBadge = doneLog
         ? '<span class="acc-logged-badge">\u2713 Logged ' + escapeHtml(doneLog.reps.join('/')) + '</span>' : '';
       const logBtn = doneLog
-        ? '<button class="btn-s" data-ias-save="' + item.id + '">Re-log</button>'
-        : '<button class="btn-p" data-ias-save="' + item.id + '">Log</button>';
+        ? '<button class="btn-s" data-ias-save="' + escapeHtml(item.id) + '">Re-log</button>'
+        : '<button class="btn-p" data-ias-save="' + escapeHtml(item.id) + '">Log</button>';
 
       const swapOpen = _openSwapDrawers.has(item.id);
       const swapDrawer = swapOpen ? buildSwapDrawerHTML(liftId, item, !!doneLog) : '';
 
       card.innerHTML = '<div class="inline-acc-top">' +
         '<div style="min-width:0;flex:1">' +
-          '<h3>' + escapeHtml(item.name) + ' <button class="btn-s" data-ex-help="' + item.id + '" style="font-size:9px;min-height:24px;min-width:24px;padding:0 6px;border-radius:6px;vertical-align:middle">?</button>' + weakBadge + '</h3>' +
-          '<div class="inline-acc-meta"><span style="color:var(--blue);font-weight:700">' + escapeHtml(tierCon.label) + '</span> · ' + escapeHtml(weightStr) + ' · ' + item.repMin + '-' + item.repMax + ' reps</div>' +
+          '<h3>' + escapeHtml(item.name) + ' <button class="btn-s" data-ex-help="' + escapeHtml(item.id) + '" style="font-size:9px;min-height:24px;min-width:24px;padding:0 6px;border-radius:6px;vertical-align:middle">?</button>' + weakBadge + '</h3>' +
+          '<div class="inline-acc-meta"><span style="color:var(--blue);font-weight:700">' + escapeHtml(tierCon.label) + '</span> · ' + escapeHtml(weightStr) + ' · ' + numText(item.repMin, '?') + '-' + numText(item.repMax, '?') + ' reps</div>' +
           propWarnTag +
         '</div>' +
         loggedBadge +
@@ -6210,8 +6683,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       '<div id="' + helpId + '" class="ex-help" hidden></div>' +
       '<div class="inline-acc-actions">' +
         logBtn +
-        (hasProg ? '<button class="btn-s" data-ias-progress="' + item.id + '">Apply \u2191</button>' : '') +
-        '<button class="btn-s' + (swapOpen ? ' asd-open' : '') + '" data-ias-swap="' + item.id + '">' + (swapOpen ? 'Close' : '\u21C4 Swap') + '</button>' +
+        (hasProg ? '<button class="btn-s" data-ias-progress="' + escapeHtml(item.id) + '">Apply \u2191</button>' : '') +
+        '<button class="btn-s' + (swapOpen ? ' asd-open' : '') + '" data-ias-swap="' + escapeHtml(item.id) + '">' + (swapOpen ? 'Close' : '\u21C4 Swap') + '</button>' +
       '</div>' +
       swapDrawer;
 
@@ -6232,9 +6705,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function showExerciseHelp(accId){
     // Determine liftId from multiple contexts
-    const liftId = state.activeSession?.liftId
+    // v13.2.1: the lift that owns the exercise — the "?" used to say "Exercise not found" in the
+    // Accessories tab whenever it showed a different lift from the last workout.
+    const liftId = accessoryOwnerLift(accId, state.activeSession?.liftId || state.accessoryPhase?.liftId || el.accLiftSelect?.value)
       || (state.history.length ? state.history[state.history.length - 1].liftId : null)
-      || el.accLiftSelect?.value
       || 'squat';
     const item = findAccessory(liftId, accId);
     if (!item){ toast('Exercise not found.', 'w'); return; }
@@ -6302,7 +6776,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const newName = chip.getAttribute('data-swap-to');
       const swapLift = chip.getAttribute('data-swap-lift') || liftId;
       closeConfirm(false);
-      await swapExercise(accId, newName);
+      await swapExercise(accId, newName, { liftId:swapLift });
     };
     el.confirmMsg.addEventListener('click', swapHandler, { once:false });
 
@@ -6312,14 +6786,23 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     };
   }
 
+  // v13.2.1: which lift owns this accessory? The caller's lift wins when it really owns the id;
+  // otherwise the owner is found (ids are unique per template), whatever tab or phase is showing.
+  function accessoryOwnerLift(accId, hint){
+    if (hint && findAccessory(hint, accId)) return hint;
+    const owner = LIFTS.find(l => findAccessory(l.id, accId));
+    return owner ? owner.id : null;
+  }
   async function swapExercise(accId, newName, opts){
-    const liftId = state.activeSession?.liftId || el.accLiftSelect?.value || 'squat';
+    // v13.2.1 (K5/C21): callers say which lift the swap belongs to. It used to fall back to the
+    // Accessories tab's lift during the post-workout phase, so the swap failed silently.
+    const liftId = accessoryOwnerLift(accId, (opts && opts.liftId) || state.activeSession?.liftId || el.accLiftSelect?.value) || 'squat';
     const item = findAccessory(liftId, accId);
-    if (!item) return;
+    if (!item){ toast('Couldn\u2019t find that exercise to swap.', 'w'); return; }
     const tier = item.tier || 'tier2';
     const lib = ACCESSORY_LIBRARY[liftId]?.[tier] || [];
     const newExercise = lib.find(x => x.name === newName);
-    if (!newExercise) return;
+    if (!newExercise){ toast('That exercise isn\u2019t available for this slot.', 'w'); return; }
     item.name = newExercise.name;
     item.category = newExercise.category;
     // v13.2.0: a mid-session swap re-seeds from the calibration formula, matching
@@ -6338,7 +6821,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     item.pendingProgression = false; item.suggestedWeight = null;
     await saveState();
     toast('Swapped to ' + newName + '.', 'g');
-    if (_sessionPhase === 'accessories') renderInlineAccessories(liftId);
+    if (_sessionPhase === 'accessories' && liftId === inlineAccLiftId()) renderInlineAccessories(liftId);
     else render();  // v13.0.9: full render inherits scroll preservation; direct
                     // renderAccessories() wiped the list with no protection
   }
@@ -6387,8 +6870,26 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.confirmModal.classList.remove('show');
     setTimeout(() => { el.confirmModal.hidden = true; }, 220);
     el.confirmCancel.hidden = false; // Always restore cancel button visibility
+    const altBtn = document.getElementById('confirmAlt'); if (altBtn) altBtn.hidden = true;   // v13.2.1: three-way sheets
     el.confirmOk.onclick = null; // Clear any override from showExerciseHelp
     if (_confirmResolve){ _confirmResolve(result); _confirmResolve = null; }
+  }
+
+  // v13.2.1: the confirm sheet with a third button. Resolves 'ok' | 'alt' | 'cancel'.
+  let _choiceAlt = false;
+  function showChoice(title, msg, okLabel, altLabel){
+    let alt = document.getElementById('confirmAlt');
+    if (!alt){
+      alt = document.createElement('button');
+      alt.id = 'confirmAlt'; alt.type = 'button'; alt.className = 'btn-s'; alt.style.minWidth = '100px';
+      el.confirmOk.parentNode.insertBefore(alt, el.confirmOk);
+      alt.addEventListener('click', () => { _choiceAlt = true; closeConfirm(true); });
+    }
+    alt.textContent = altLabel;
+    _choiceAlt = false;
+    const p = showConfirm(title, msg, okLabel, 'btn-p');
+    alt.hidden = false;
+    return p.then(ok => { const r = _choiceAlt ? 'alt' : (ok ? 'ok' : 'cancel'); _choiceAlt = false; return r; });
   }
 
   /* ═══ SESSION DURATION TIMER ═══ */
@@ -6415,7 +6916,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function tickSessionTimer(){
     if (!state.activeSession){ stopSessionTimer(); return; }
     if (_timerPausedAt){
-      // Show paused indicator — don't update time
+      // v13.2.1 (F18): show the frozen active time (it stayed at 00:00 after a reload while paused)
+      const frozen = Math.max(0, Math.floor((_timerPausedAt - new Date(state.activeSession.createdAt).getTime() - _timerPauseOffset) / 1000));
+      el.sessionTimerText.textContent = Math.floor(Math.min(frozen, 43200) / 60) + ':' + String(Math.min(frozen, 43200) % 60).padStart(2,'0');
       return;
     }
     const raw = Date.now() - new Date(state.activeSession.createdAt).getTime();
@@ -6561,7 +7064,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         const key = wave + '_' + phase;
         const val = matrix[key] ?? PROGRAM.defaultRestMatrix[key] ?? 0;
         const div = document.createElement('div');
-        div.innerHTML = '<label>' + capitalize(phase) + '</label><input type="number" step="5" min="0" data-rest-key="' + key + '" value="' + val + '">';
+        div.innerHTML = '<label>' + capitalize(phase) + '</label><input type="number" step="5" min="0" data-rest-key="' + key + '" value="' + numText(val) + '">';
         grid.appendChild(div);
       });
       el.restMatrixGrid.appendChild(grid);
@@ -6578,8 +7081,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     LIFTS.forEach(lift => {
       const data = state.lifts[lift.id];
       const row = document.createElement('div'); row.className = 'row'; row.style.marginBottom = '10px';
-      row.innerHTML = `<div><label>${lift.name} 1RM</label><input type="number" step="0.5" data-max="${lift.id}" value="${data.true1RM}"></div>
-        <div><label>TM mult</label><input type="number" step="0.01" min="0.5" max="1" data-tm="${lift.id}" value="${data.tmAdjustment}"></div>
+      row.innerHTML = `<div><label>${lift.name} 1RM</label><input type="number" step="0.5" data-max="${lift.id}" value="${numText(data.true1RM)}"></div>
+        <div><label>TM mult</label><input type="number" step="0.01" min="0.5" max="1" data-tm="${lift.id}" value="${numText(data.tmAdjustment)}"></div>
         <div><label>Goal 1RM</label><input type="number" step="2.5" data-goal="${lift.id}" placeholder="—" value="${Number.isFinite(state.settings.goals?.[lift.id]) ? state.settings.goals[lift.id] : ''}"></div>
         <div><label>Current TM</label><input type="text" disabled value="${formatWeight(trainingMax(data))}"></div>`;
       el.liftEditor.appendChild(row);
@@ -6590,10 +7093,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       LIFTS.forEach(lift => {
         const data = state.lifts[lift.id];
         const row = document.createElement('div'); row.className = 'row'; row.style.marginBottom = '10px';
-        row.innerHTML = '<div><label>' + lift.name + ' Bar</label><input type="number" step="0.5" data-bar="' + lift.id + '" value="' + (data.barWeight||45) + '"></div>' +
-          '<div><label>Collar</label><input type="number" step="0.5" data-collar="' + lift.id + '" value="' + (data.collarWeight||0) + '"></div>' +
-          '<div><label>Round</label><input type="number" step="0.5" data-round="' + lift.id + '" value="' + (data.rounding||2.5) + '"></div>' +
-          '<div><label>Plates</label><input type="text" data-plates="' + lift.id + '" value="' + (Array.isArray(data.plates) ? data.plates.join(',') : '') + '" placeholder="45,35,25,10,5,2.5,1.25"></div>';
+        row.innerHTML = '<div><label>' + lift.name + ' Bar</label><input type="number" step="0.5" data-bar="' + lift.id + '" value="' + numText(data.barWeight||45, 45) + '"></div>' +
+          '<div><label>Collar</label><input type="number" step="0.5" data-collar="' + lift.id + '" value="' + numText(data.collarWeight||0, 0) + '"></div>' +
+          '<div><label>Round</label><input type="number" step="0.5" data-round="' + lift.id + '" value="' + numText(data.rounding||2.5, 2.5) + '"></div>' +
+          '<div><label>Plates</label><input type="text" data-plates="' + lift.id + '" value="' + (Array.isArray(data.plates) ? data.plates.map(p => numText(p)).filter(Boolean).join(',') : '') + '" placeholder="45,35,25,10,5,2.5,1.25"></div>';
         el.barbellProfileEditor.appendChild(row);
       });
     }
@@ -6847,6 +7350,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       el.dashboardCard.insertAdjacentElement('afterbegin', banner);
     }
 
+    // v13.2.1 (F09): Start is disabled at the end of the cycle (restart it in Settings)
+    if (el.btnStartResume){
+      const cur = currentMicrocycle(), done = cur.index >= cur.total;
+      el.btnStartResume.disabled = done;
+      if (done) el.btnStartResume.textContent = 'Cycle complete';
+      else if (el.btnStartResume.textContent === 'Cycle complete') el.btnStartResume.textContent = 'Start Workout';
+    }
     // === Phase title & description ===
     if (micro.index >= tl.length){
       el.dashPhaseTitle.textContent = 'Cycle Complete';
@@ -7113,7 +7623,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       row.innerHTML = `<div class="set-l"><strong>Set ${idx + 1}</strong>${pill}
         <div style="font-family:var(--mono);font-size:13px;font-weight:700;margin-top:2px">${formatWeight(item.weight)} <span style="font-weight:500;color:var(--muted);font-size:11px">${formatPercent(item.pctTM || item.pctTrue)} TM</span> ${quickHint}</div>${plateChange}</div>
         <div class="set-r" style="display:flex;align-items:center;gap:8px">
-          <div>${item.performedReps}/${item.targetReps}</div>
+          <div>${numText(item.performedReps, '—')}/${numText(item.targetReps, '—')}</div>
           ${checkIcon}
         </div>`;
       // Click handler: quick-log or navigate
@@ -7135,11 +7645,39 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* ═══ DELOAD ACCESSORY HALVING ═══ */
-  function isDeloadWeek(){
+  // v13.2.1 (F05): while the post-workout accessory phase is open, accessory prescriptions belong to the
+  // week the workout was done in — even when finishing it advanced the program to the next week.
+  function accessoryMicrocycle(){
+    const c = state.accessoryPhase;
+    if (c && typeof c.wave === 'string' && typeof c.phase === 'string') return { index:c.index, wave:c.wave, phase:c.phase };
+    return currentMicrocycle();
+  }
+  function isDeloadWeek(){   // used only by accessory prescriptions (sets, deload note, progression)
+    if (state.accessoryPhase) return state.accessoryPhase.phase === 'deload';
     const micro = currentMicrocycle();
     const tl = buildTimeline();
     return micro.index < tl.length && micro.phase === 'deload';
   }
+  const ACCESSORY_PHASE_MAX_MS = 12 * 3600 * 1000;   // an unfinished phase older than this closes on its own
+  function _accessoryPhaseIsFresh(c){ const t = Date.parse(c && c.at); return Number.isFinite(t) && (Date.now() - t) < ACCESSORY_PHASE_MAX_MS; }
+  // Records the phase if it was entered some other way (older flows, restores): the last workout owns it.
+  function ensureAccessoryPhaseRecorded(){
+    if (_sessionPhase !== 'accessories' || state.accessoryPhase || state.activeSession) return;
+    const h = state.history[state.history.length - 1];
+    if (!h) return;
+    state.accessoryPhase = _normAccessoryPhase({ liftId:h.liftId, index:(Number.isFinite(h.microcycleIndex) ? h.microcycleIndex : state.program.index),
+      wave:h.wave, phase:h.phase, at:h.completedAt || nowISO() });
+  }
+  // Closes the phase (Finish, Return to Dashboard, a new workout, or a stale restore) and runs the Tier 1
+  // sync it deferred, so next week's accessory weights appear only once this workout is done.
+  async function endAccessoryPhase(){
+    const had = !!state.accessoryPhase;
+    state.accessoryPhase = null;
+    if (had){ try{ await maybeSyncFormulaAccessories('session'); }catch(_){} }
+    await saveState();
+  }
+  // Follow-up renders after async work must never surface as unhandled errors.
+  function renderSafely(){ try{ render(); }catch(err){ console.error('Render failed', err); } }
 
   function getEffectiveAccSets(item){
     let sets = item.sets;
@@ -7308,23 +7846,23 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         const val = lastSets[i] ?? item.repMin;
         setRows += `<div class="acc-set-row">
           <span class="acc-set-label">S${i+1}</span>
-          <span class="acc-range">${item.repMin}–${item.repMax}</span>
+          <span class="acc-range">${numText(item.repMin, '?')}–${numText(item.repMax, '?')}</span>
           <div class="acc-set-stepper">
-            <button class="acc-step-btn" data-acc-step-minus="${item.id}" data-si="${i}" type="button">−</button>
-            <span class="acc-set-val" data-acc-val="${item.id}" data-si="${i}">${val}</span>
-            <button class="acc-step-btn" data-acc-step-plus="${item.id}" data-si="${i}" type="button">+</button>
+            <button class="acc-step-btn" data-acc-step-minus="${escapeHtml(item.id)}" data-si="${i}" type="button">−</button>
+            <span class="acc-set-val" data-acc-val="${escapeHtml(item.id)}" data-si="${i}">${numText(val, '0')}</span>
+            <button class="acc-step-btn" data-acc-step-plus="${escapeHtml(item.id)}" data-si="${i}" type="button">+</button>
           </div>
         </div>`;
       }
 
       card.innerHTML = `
-        <div class="acc-header" data-acc-toggle="${item.id}">
+        <div class="acc-header" data-acc-toggle="${escapeHtml(item.id)}">
           <div class="acc-header-left">
-            <h3>${escapeHtml(item.name)} <button class="btn-s" data-ex-help="${item.id}" style="font-size:9px;min-height:24px;min-width:24px;padding:0 6px;border-radius:6px;vertical-align:middle">?</button></h3>
+            <h3>${escapeHtml(item.name)} <button class="btn-s" data-ex-help="${escapeHtml(item.id)}" style="font-size:9px;min-height:24px;min-width:24px;padding:0 6px;border-radius:6px;vertical-align:middle">?</button></h3>
             <div class="acc-header-meta">
               <span style="color:var(--blue);font-weight:800">${escapeHtml(tierLabel)}</span>
               <span>${escapeHtml(item.category || '')}</span>
-              <span>${effectiveSets}×${item.repMin}-${item.repMax}${deloadNote}</span>
+              <span>${numText(effectiveSets, '?')}×${numText(item.repMin, '?')}-${numText(item.repMax, '?')}${deloadNote}</span>
               <span>${escapeHtml(weightStr)}</span>
               ${progBadge}
             </div>${equipWarnTag}
@@ -7337,12 +7875,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         <div class="acc-body">
           <div class="acc-body-inner">
             <div class="row" style="margin-top:10px">
-              <div><label>Name</label><input type="text" data-acc-name="${item.id}" value="${escapeHtml(item.name)}"></div>
-              <div><label>Category</label><input type="text" data-acc-category="${item.id}" value="${escapeHtml(item.category || '')}"></div>
+              <div><label>Name</label><input type="text" data-acc-name="${escapeHtml(item.id)}" value="${escapeHtml(item.name)}"></div>
+              <div><label>Category</label><input type="text" data-acc-category="${escapeHtml(item.id)}" value="${escapeHtml(item.category || '')}"></div>
             </div>
             <div class="row" style="margin-top:8px">
-              <div><label>Weight (${escapeHtml(state.settings.units)})</label><input type="number" step="0.5" min="0" data-acc-weight="${item.id}" value="${item.weight}"></div>
-              <div><label>Increment</label><input type="number" step="0.5" min="0.5" data-acc-increment="${item.id}" value="${item.increment}"></div>
+              <div><label>Weight (${escapeHtml(state.settings.units)})</label><input type="number" step="0.5" min="0" data-acc-weight="${escapeHtml(item.id)}" value="${numText(item.weight, '0')}"></div>
+              <div><label>Increment</label><input type="number" step="0.5" min="0.5" data-acc-increment="${escapeHtml(item.id)}" value="${numText(item.increment)}"></div>
             </div>
             <div class="acc-set-grid">${setRows}</div>
             <div class="progress-note" style="margin-top:10px">
@@ -7351,15 +7889,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
                 : `<span class="pill w">${escapeHtml(item.lastOutcome || 'Hold load.')}</span>`}
             </div>
             <div class="row" style="margin-top:12px">
-              <div class="tight"><button class="btn-p" data-acc-save="${item.id}" style="font-size:13px">Save Log</button></div>
-              ${hasProg ? `<div class="tight"><button class="btn-s" data-acc-progress="${item.id}" style="font-size:13px">Apply ↑</button></div>` : ''}
-              ${item.weight > 0 ? `<div class="tight"><button class="btn-w" data-acc-deload="${item.id}" style="font-size:13px" title="Drop weight 10% if stuck">Deload ↓</button></div>` : ''}
-              <div class="tight"><button class="acc-move-btn" data-acc-move-up="${item.id}" ${_accIdx === 0 ? 'disabled' : ''} title="Move up">▲</button></div>
-              <div class="tight"><button class="acc-move-btn" data-acc-move-down="${item.id}" ${_accIdx === data.templates.length - 1 ? 'disabled' : ''} title="Move down">▼</button></div>
-              <div class="tight"><button class="btn-s" data-acc-duplicate="${item.id}" style="font-size:13px">Dupe</button></div>
-              <div class="tight"><button class="btn-d" data-acc-delete="${item.id}" style="font-size:13px">Del</button></div>
+              <div class="tight"><button class="btn-p" data-acc-save="${escapeHtml(item.id)}" style="font-size:13px">Save Log</button></div>
+              ${hasProg ? `<div class="tight"><button class="btn-s" data-acc-progress="${escapeHtml(item.id)}" style="font-size:13px">Apply ↑</button></div>` : ''}
+              ${item.weight > 0 ? `<div class="tight"><button class="btn-w" data-acc-deload="${escapeHtml(item.id)}" style="font-size:13px" title="Drop weight 10% if stuck">Deload ↓</button></div>` : ''}
+              <div class="tight"><button class="acc-move-btn" data-acc-move-up="${escapeHtml(item.id)}" ${_accIdx === 0 ? 'disabled' : ''} title="Move up">▲</button></div>
+              <div class="tight"><button class="acc-move-btn" data-acc-move-down="${escapeHtml(item.id)}" ${_accIdx === data.templates.length - 1 ? 'disabled' : ''} title="Move down">▼</button></div>
+              <div class="tight"><button class="btn-s" data-acc-duplicate="${escapeHtml(item.id)}" style="font-size:13px">Dupe</button></div>
+              <div class="tight"><button class="btn-d" data-acc-delete="${escapeHtml(item.id)}" style="font-size:13px">Del</button></div>
             </div>
-            <div id="help_${item.id}" class="ex-help" hidden></div>
+            <div id="help_${escapeHtml(item.id)}" class="ex-help" hidden></div>
             <div class="xs mt" style="margin-top:8px">${item.lastCompletedAt ? 'Last: ' + fmtDate(item.lastCompletedAt) : 'Not logged yet'}</div>
           </div>
         </div>`;
@@ -7408,7 +7946,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     filtered.slice(0, 25).forEach(item => {
       const node = document.createElement('div'); node.className = 'history-item';
       node.innerHTML = `<div class="h-content"><div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(item.name)}</div>
-        <div class="sm mt">${fmtDate(item.completedAt)} · ${formatWeight(item.weight)} · ${escapeHtml((item.reps||[]).join('/'))}</div>
+        <div class="sm mt">${fmtDate(item.completedAt)} · ${formatWeightAs(item.weight, item.units)} · ${escapeHtml((item.reps||[]).join('/'))}</div>
         <div class="xs mt" style="margin-top:4px">${escapeHtml(item.outcome || '')}</div></div>`;
       el.accessoryHistoryList.appendChild(node);
     });
@@ -7901,6 +8439,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (!ok) return;
     logCoachAction({ type:'deload_jump', from:state.program.index, to });
     state.program.index = to;
+    try{ await maybeSyncFormulaAccessories('deload-jump'); }catch(_){}   // v13.2.1 (F06)
     await saveState(); toast('Deload pulled forward.', 'g'); render();
   }
 
@@ -7914,6 +8453,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (!ok) return;
     const prior = applyTmReduce(ids);
     logCoachAction({ type:'tm_reduce', lifts:ids, prior });
+    try{ await maybeSyncFormulaAccessories('tm'); }catch(_){}   // v13.2.1 (F06)
     await saveState(); toast('TM reduced 5% on ' + names + '.', 'g'); render();
   }
 
@@ -7978,8 +8518,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const stale = (a.type === 'deload_jump' && !a.reverted && a.to !== state.program.index);
       return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">' +
         '<div style="flex:1"><div style="font-size:13px;color:var(--text)">' + escapeHtml(desc) + '</div>' +
-        '<div style="font-size:11px;color:var(--muted)">' + (a.at || '').slice(0, 16).replace('T', ' ') + '</div></div>' +
-        (fresh ? '<button class="btn-s" data-ca-revert="' + a.id + '" style="font-size:12px;padding:4px 10px;min-height:auto">Revert</button>'
+        '<div style="font-size:11px;color:var(--muted)">' + escapeHtml(String(a.at || '').slice(0, 16).replace('T', ' ')) + '</div></div>' +
+        (fresh ? '<button class="btn-s" data-ca-revert="' + escapeHtml(a.id) + '" style="font-size:12px;padding:4px 10px;min-height:auto">Revert</button>'
                : (stale ? '<span style="font-size:11px;color:var(--muted)">stale</span>' : '')) +
         '</div>';
     }).join('');
@@ -7989,7 +8529,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (!entry) return;
       const ok = await showConfirm('Revert action', 'Undo this coach action?', 'Revert', 'btn-w');
       if (!ok) return;
-      if (applyRevert(entry)){ await saveState(); toast('Reverted.', 'g'); render(); renderCoachActions(); }
+      if (applyRevert(entry)){
+        try{ await maybeSyncFormulaAccessories('revert'); }catch(_){}   // v13.2.1 (F06)
+        await saveState(); toast('Reverted.', 'g'); render(); renderCoachActions();
+      }
       else toast('Action is stale — program has moved on.', 'w');
     };
   }
@@ -8086,14 +8629,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     node.innerHTML = sums.map(s => {
       const rows = Object.values(s.lifts || {}).map(l => {
         const d = (Number.isFinite(l.e1rmStart) && Number.isFinite(l.e1rmEnd)) ? (l.e1rmEnd - l.e1rmStart) : null;
-        return '<div style="font-size:12px;color:var(--text2)">' + escapeHtml(l.name) + ': ' + l.sessions + ' sessions · ' + formatWeight(l.tonnage) + ' tonnage · e1RM ' +
-          (l.e1rmStart ?? '?') + '→' + (l.e1rmEnd ?? '?') + (d !== null ? ' (' + (d >= 0 ? '+' : '') + d + ')' : '') + '</div>';
+        return '<div style="font-size:12px;color:var(--text2)">' + escapeHtml(l.name) + ': ' + numText(l.sessions, '?') + ' sessions · ' + formatWeight(l.tonnage) + ' tonnage · e1RM ' +
+          numText(l.e1rmStart, '?') + '→' + numText(l.e1rmEnd, '?') + (d !== null ? ' (' + (d >= 0 ? '+' : '') + d + ')' : '') + '</div>';
       }).join('');
       return '<div class="card"><details><summary style="cursor:pointer;font-weight:700;font-size:14px">' +
-        escapeHtml(String(s.wave).toUpperCase()) + ' wave summary <span style="color:var(--muted);font-weight:400;font-size:12px">' + s.from + ' → ' + s.to + '</span></summary>' +
+        escapeHtml(String(s.wave).toUpperCase()) + ' wave summary <span style="color:var(--muted);font-weight:400;font-size:12px">' + escapeHtml(s.from || '') + ' → ' + escapeHtml(s.to || '') + '</span></summary>' +
         '<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">' + rows + '</div>' +
         (s.narration ? '<p style="margin-top:8px;font-size:13px;color:var(--text2)">' + escapeHtml(s.narration) + '</p>'
-                     : '<button class="btn-s" data-bs-narrate="' + s.id + '" style="margin-top:8px;font-size:12px">Narrate</button>') +
+                     : '<button class="btn-s" data-bs-narrate="' + escapeHtml(s.id) + '" style="margin-top:8px;font-size:12px">Narrate</button>') +
         '</details></div>';
     }).join('');
     node.onclick = async (e) => {
@@ -8114,6 +8657,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   /* ═══ v13 C1/C2: EXPORT REFACTOR + NUDGE + FS BACKUP + BRIDGE ═══ */
   function buildExportJson(){
+    ensureAccessoryPhaseRecorded();   // v13.2.1: an open accessory phase travels with the backup
     const sanitized = JSON.parse(JSON.stringify(state));
     if (sanitized.settings?.ai){
       sanitized.settings.ai = { ...sanitized.settings.ai };
@@ -8235,7 +8779,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         html += '<div style="flex:0 0 auto;padding:4px 8px;border-radius:8px;background:rgba(86,212,165,.08);border:1px solid var(--accent-mid);font-size:11px">'
           + '<span style="color:var(--muted);font-weight:700">' + r + '</span> '
           + '<strong>' + escapeHtml(formatWeight(p.weight)) + '</strong>'
-          + ' × ' + p.reps + '</div>';
+          + ' × ' + numText(p.reps, '?') + '</div>';
       });
       html += '</div></div>';
     });
@@ -8263,7 +8807,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
     filtered.forEach((item, idx) => {
       const upd = item.realizationUpdate && Number.isFinite(item.realizationUpdate.new1RM)
-        ? ' · <span style="color:var(--accent)">1RM → ' + formatWeight(item.realizationUpdate.new1RM) + '</span>' : '';
+        ? ' · <span style="color:var(--accent)">1RM → ' + formatWeightAs(item.realizationUpdate.new1RM, item.units) + '</span>' : '';
       // Session outcome badge
       const isPR = item.realizationUpdate?.reason === 'progress';
       const isDeload = item.phase === 'deload';
@@ -8288,8 +8832,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         <div class="h-content">
           <div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(wave.toUpperCase())} ${escapeHtml(capitalize(phase))}${badge}</div>
           <div class="sm mt">${fmtDate(item.completedAt)}${upd}</div>
-          <div class="hist-tonnage">${formatWeight(roundToIncrement(tonnage, 5))} tonnage · ${workingSets.length} sets${readinessStr}</div>
-          <div class="xs mt" style="margin-top:4px">${sets.filter(s => !s.isRamp).map(s => (s.performedReps ?? '?') + '/' + (s.targetReps ?? '?')).join(' · ')}</div>
+          <div class="hist-tonnage">${formatWeightAs(roundToIncrement(tonnage, 5), item.units)} tonnage · ${workingSets.length} sets${readinessStr}</div>
+          <div class="xs mt" style="margin-top:4px">${sets.filter(s => !s.isRamp).map(s => numText(s.performedReps, '?') + '/' + numText(s.targetReps, '?')).join(' · ')}</div>
           ${item.note ? '<div class="xs mt" style="margin-top:4px;opacity:.7">' + escapeHtml(item.note) + '</div>' : ''}
           ${item.userNote ? '<div class="xs mt" style="margin-top:4px;opacity:.7;font-style:italic">' + escapeHtml(item.userNote) + '</div>' : ''}
           ${item.coachingInsight ? '<div class="hist-coaching" style="margin-top:6px;padding:6px 8px;border-radius:var(--r-sm);border:1px solid rgba(167,139,250,.2);background:rgba(167,139,250,.05);font-size:11px;color:var(--purple);line-height:1.5;cursor:pointer" data-coaching-toggle><strong>AI Coaching</strong> <span style="opacity:.5;font-size:10px">tap to expand</span><div class="hist-coaching-text" style="display:none;margin-top:4px;color:var(--text2)">' + escapeHtml(item.coachingInsight) + '</div></div>' : ''}
@@ -8371,6 +8915,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   /* ═══ MASTER RENDER ═══ */
   let _scrollKeepY = 0; // v13.0.9: latest snapshot — rAF restores read this, never a stale closure
   function render(){
+    // v13.2.1 (F19): an unfinished accessory phase (e.g. after a reload) comes back; a stale one closes.
+    if (state.accessoryPhase && !state.activeSession && _sessionPhase === 'idle'){
+      if (_accessoryPhaseIsFresh(state.accessoryPhase)) _sessionPhase = 'accessories';
+      else endAccessoryPhase().then(renderSafely);
+    }
     // v13.0.4: renders during the accessories phase must not move the page. Interim
     // renderers (lift-intel, weekly-plan) still momentarily change layout above the
     // lifter's position; snapshot scroll here and restore at the end of this same
@@ -8455,6 +9004,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (el.sessionSummary) el.sessionSummary.hidden = true;
     if (el.dashboardCard) el.dashboardCard.style.display = 'none';
     // Show readiness modal if enabled
+    // v13.2.1: starting a new workout closes an unfinished accessory phase (and runs its deferred sync)
+    if (state.accessoryPhase){ state.accessoryPhase = null; maybeSyncFormulaAccessories('session').catch(() => {}); }
     _sessionPhase = 'main';
     _midCheckShown = false;
     _movementQuality = 'normal';
@@ -8673,32 +9224,47 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* ═══ SYNC ═══ */
+  let _memOutbox = [];   // v13.2.1: sync items wait here when the IndexedDB outbox can't take them
   async function enqueueSync(kind, payload){
     // v13 patch (Blocker 2): best-effort — sync enqueue must never break a caller
     // (a thrown enqueue inside completeSession made saved sessions look failed).
     if (!state.settings.remoteEndpoint) return;
-    if (!idbAvailable || !db) return; // degraded: outbox can't queue; skip silently (no new transport invented)
-    try{
-      await idb.add('outbox', {
-        id:'out_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8),
-        createdAt:nowISO(), endpoint:state.settings.remoteEndpoint,
-        payload:{ appVersion:APP_VERSION, kind, payload }
-      });
-    }catch(err){ console.warn('Sync enqueue failed', err); }
+    const item = {
+      id:'out_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8),
+      createdAt:nowISO(), endpoint:state.settings.remoteEndpoint,
+      payload:{ appVersion:APP_VERSION, kind, payload }
+    };
+    // v13.2.1: degraded mode (no outbox) keeps items in memory instead of dropping them
+    const hold = () => { _memOutbox.push(item); if (_memOutbox.length > 50) _memOutbox.splice(0, _memOutbox.length - 50); };
+    if (!idbAvailable || !db){ hold(); return; }
+    try{ await idb.add('outbox', item); }
+    catch(err){ console.warn('Sync enqueue failed — holding in memory', err); hold(); }
   }
 
-  async function flushOutbox(){
+  // v13.2.1 (F16): one sync at a time — a second tap joins the running one instead of re-sending
+  let _flushInFlight = null;
+  function flushOutbox(){
+    if (_flushInFlight) return _flushInFlight;
+    _flushInFlight = _flushOutboxNow().finally(() => { _flushInFlight = null; });
+    return _flushInFlight;
+  }
+  async function _flushOutboxNow(){
     const setSync = (r) => { state.sync = { lastResult:r, lastAt:nowISO() }; };
-    if (!idbAvailable){ setSync('storage_unavailable'); toast('Sync unavailable — storage degraded.', 'w'); fillSyncStatus(); return; }
+    const fromMemoryOnly = !idbAvailable;   // v13.2.1: degraded mode sends the in-memory queue
+    if (fromMemoryOnly && !_memOutbox.length){ setSync('storage_unavailable'); toast('Sync unavailable — storage degraded.', 'w'); fillSyncStatus(); return; }
     if (!state.settings.remoteEndpoint){ setSync('blocked_no_endpoint'); await saveState(); toast('No sync endpoint set.', 'w'); fillSyncStatus(); return; }
-    const outbox = await idb.getAll('outbox');
+    const outbox = fromMemoryOnly ? _memOutbox.slice() : [...(await idb.getAll('outbox')), ..._memOutbox];
     if (!outbox.length){ setSync('empty'); await saveState(); toast('Nothing to sync.'); fillSyncStatus(); return; }
     outbox.sort((a,b) => (a.createdAt||'').localeCompare(b.createdAt||''));
     let ok = 0, failed = false;
     for (const item of outbox){
       try{
-        const resp = await fetch(item.endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(item.payload), keepalive:true });
-        if (resp?.ok){ await idb.del('outbox', item.id); ok++; } else { failed = true; break; }
+        const resp = await fetch(item.endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ ...item.payload, idempotencyKey:item.id }), keepalive:true });
+        if (resp?.ok){
+          if (_memOutbox.some(x => x.id === item.id)) _memOutbox = _memOutbox.filter(x => x.id !== item.id);
+          else await idb.del('outbox', item.id);
+          ok++;
+        } else { failed = true; break; }
       }catch(_){ failed = true; break; }
     }
     setSync(!failed ? 'ok' : (ok > 0 ? 'partial' : 'fail'));
@@ -8710,7 +9276,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // v13 A3: async status line in Settings (guarded for degraded storage)
   function fillSyncStatus(){
     const node = el.syncStatus; if (!node) return;
-    if (!idbAvailable){ node.textContent = 'Sync unavailable — storage degraded.'; node.style.color = 'var(--bad)'; return; }
+    if (!idbAvailable){
+      node.textContent = _memOutbox.length
+        ? _memOutbox.length + ' pending (held in memory until storage recovers — sync before closing the app)'
+        : 'Sync unavailable — storage degraded.';
+      node.style.color = 'var(--bad)'; return;
+    }
     idb.getAll('outbox').then(items => {
       const n = items.length;
       const r = state.sync?.lastResult || 'never';
@@ -8736,6 +9307,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (realizationUpdate.reason === 'progress'){
         lift.true1RM = realizationUpdate.new1RM; lift.underTargetStreak = 0;
         note = '1RM → ' + formatWeight(realizationUpdate.new1RM) + ' (+' + realizationUpdate.creditedExtraReps + ' extra reps)';
+      } else if (realizationUpdate.reason === 'target-met' || realizationUpdate.reason === 'held'){
+        // v13.2.1 (F10): reaching the target breaks an under-target streak
+        lift.underTargetStreak = 0;
+        const extraReps = realizationUpdate.creditedExtraReps;
+        note = realizationUpdate.reason === 'held'
+          ? 'Beat the target by ' + extraReps + (extraReps === 1 ? ' rep' : ' reps') + ' — 1RM stays at ' + formatWeight(lift.true1RM) + ' (5% buffer rule).'
+          : 'Target hit — 1RM stays at ' + formatWeight(lift.true1RM) + '.';
+      } else if (realizationUpdate.reason !== 'no-progress'){
+        note = 'No change — the logged reps couldn\u2019t be read.';   // v13.2.1: bad input is not a miss
       } else {
         lift.underTargetStreak = (lift.underTargetStreak||0) + 1;
         const s = state.settings.amrap;
@@ -8750,7 +9330,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       microcycleIndex:session.microcycleIndex, completedAt:nowISO(),
       sets:deepClone(session.sets), realizationUpdate, note,
 readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
-      movementQuality:_movementQuality || 'normal'
+      movementQuality:_movementQuality || 'normal',
+      units:unitLabel()   // v13.2.1: the unit this workout was logged in
     };
     state.history.push(entry);
     updateRecordsFromEntry(entry); // v11.0.2: capture PRs into persistent ledger before any future pruning
@@ -8760,8 +9341,14 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // Show completion overlay BEFORE clearing session (need createdAt for duration calc).
     showCompletionOverlay(session, entry, realizationUpdate);
     state.activeSession = null;
+    // v13.2.1 (F05/F19): accessories after this workout keep its week, survive a reload, and the Tier 1
+    // sync waits until the phase ends (Finish / Return to Dashboard) instead of running now.
+    const hasAccessoryPhase = accessoryLiftState(session.liftId).templates.length > 0;
+    state.accessoryPhase = hasAccessoryPhase ? _normAccessoryPhase({ liftId:session.liftId,
+      index:(Number.isFinite(session.microcycleIndex) ? session.microcycleIndex : state.program.index),
+      wave:session.wave, phase:session.phase, at:entry.completedAt }) : null;
     maybeAdvanceMicrocycle();
-    // Sync against the post-transition microcycle and any realization-updated TM.
+    // Sync against the post-transition microcycle and any realization-updated TM (deferred while the phase is open).
     try { await maybeSyncFormulaAccessories('session'); } catch(_){}
     await saveState();
     await enqueueSync('main-session', entry);
@@ -8783,14 +9370,107 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     }catch(err){ console.error('completeSession error:', err); toast('Error completing session.', 'b'); }
   }
 
+  // v13.2.1 (F12): the same wave/phase in the new program mode; if the new mode skips it, the next week it has.
+  function remapProgramIndex(before){
+    const tl = buildTimeline();
+    if (!before || before.phase === 'complete') return tl.length;
+    const W = ['10s','8s','5s','3s'], P = ['accumulation','intensification','realization','deload'];
+    const ord = m => W.indexOf(m.wave) * 4 + P.indexOf(m.phase);
+    const target = ord(before);
+    const i = tl.findIndex(m => ord(m) >= target);
+    return i === -1 ? tl.length : i;
+  }
+
+  /* ═══ v13.2.1: UNITS (F04) ═══ */
+  // Switching lb ⇄ kg used to relabel every number (a 315 lb squat became 315 kg). Now the lifter picks:
+  // Convert (numbers follow the unit) or Keep numbers (they were typed in the other unit). Logged workouts
+  // are never rewritten — they carry the unit they were logged in (`units`), shown in History.
+  const LB_PER_KG = 2.20462262;
+  let _unitChoice = null;   // { from, to, mode:'convert'|'relabel' } picked in the units dialog
+  function formatWeightAs(w, units){
+    if (!Number.isFinite(w)) return '—';
+    const u = (units === 'kg' || units === 'lb') ? units : unitLabel();
+    return (Math.round(w * 10) / 10).toFixed(1).replace(/\.0$/,'') + ' ' + u;
+  }
+  function _convW(v, factor, step){
+    const x = Number(v);
+    if (!Number.isFinite(x)) return v;
+    return Math.round(Math.round((x * factor) / step) * step * 100) / 100;
+  }
+  function convertTrainingNumbers(from, to){
+    const f = (from === 'lb' && to === 'kg') ? 1 / LB_PER_KG : LB_PER_KG;
+    const BAR = from === 'lb' ? { 45:20, 35:15, 55:25, 33:15, 25:10, 15:7, 0:0 } : { 20:45, 15:35, 25:55, 10:25, 7:15, 0:0 };
+    const ROUND = from === 'lb' ? { 10:5, 5:2.5, 2.5:1.25, 1.25:0.5, 1:0.5 } : { 5:10, 2.5:5, 1.25:2.5, 1:2.5, 0.5:1 };
+    const PLATES = { lb:[45,35,25,10,5,2.5,1.25], kg:[25,20,15,10,5,2.5,1.25] };
+    const bar = v => (BAR[v] !== undefined ? BAR[v] : _convW(v, f, 0.5));
+    const inc = v => (ROUND[v] !== undefined ? ROUND[v] : Math.max(0.25, _convW(v, f, 0.25)));
+    const plates = arr => !Array.isArray(arr) ? arr
+      : (arr.join(',') === PLATES[from].join(',') ? PLATES[to].slice() : arr.map(p => _convW(p, f, 0.25)).filter(p => p > 0));
+    const s = state.settings;
+    s.barWeight = bar(s.barWeight); s.rounding = inc(s.rounding); s.plates = plates(s.plates);
+    for (const l of LIFTS){
+      const x = state.lifts[l.id]; if (!x) continue;
+      x.true1RM = _convW(x.true1RM, f, 0.5); x.barWeight = bar(x.barWeight); x.collarWeight = _convW(x.collarWeight, f, 0.25);
+      x.rounding = inc(x.rounding); x.plates = plates(x.plates);
+    }
+    s.goals = Object.fromEntries(Object.entries(s.goals || {}).map(([k, v]) => [k, _convW(v, f, 0.5)]));
+    for (const l of LIFTS){
+      for (const t of ((state.accessories.byLift[l.id] || {}).templates || [])){
+        t.weight = _convW(t.weight, f, 0.5); t.increment = inc(t.increment);
+        if (Number.isFinite(t.suggestedWeight)) t.suggestedWeight = _convW(t.suggestedWeight, f, 0.5);
+      }
+    }
+    state.bodyweight = (state.bodyweight || []).map(b => ({ ...b, weight:_convW(b.weight, f, 0.1) }));
+    // PR ledger is derived data: converted so new sets compare in the same unit
+    for (const byRange of Object.values(state.records || {})) for (const r of Object.values(byRange || {})) if (r && Number.isFinite(r.weight)) r.weight = _convW(r.weight, f, 0.5);
+    if (state.activeSession && Array.isArray(state.activeSession.sets)) for (const x of state.activeSession.sets) x.weight = _convW(x.weight, f, 0.5);
+    // Logged workouts keep their numbers and say which unit they were logged in
+    for (const h of state.history) if (h && !h.units) h.units = from;
+    for (const a of (state.accessories.history || [])) if (a && !a.units) a.units = from;
+  }
+  function applyUnitChange(prev, next){
+    if (prev === next){ _unitChoice = null; return ''; }
+    const mode = (_unitChoice && _unitChoice.from === prev && _unitChoice.to === next) ? _unitChoice.mode : 'convert';
+    _unitChoice = null;
+    if (mode === 'convert'){ convertTrainingNumbers(prev, next); return 'Settings saved — numbers converted to ' + next + '.'; }
+    return 'Settings saved — unit label changed to ' + next + ' (numbers kept).';
+  }
+  async function onUnitsSelectChange(){
+    const from = state.settings.units === 'kg' ? 'kg' : 'lb';
+    const to = el.units.value === 'kg' ? 'kg' : 'lb';
+    if (from === to){ _unitChoice = null; return; }
+    const f = to === 'kg' ? 1 / LB_PER_KG : LB_PER_KG;
+    const b = state.lifts.bench && state.lifts.bench.true1RM;
+    const example = Number.isFinite(b) ? ' (bench 1RM ' + b + ' ' + from + ' → ' + (Math.round(b * f * 2) / 2) + ' ' + to + ')' : '';
+    const pick = await showChoice('Switch to ' + to + '?',
+      'Convert: your numbers change to ' + to + example + '. Bar, plates, accessories, goals and bodyweight convert too.\n\n' +
+      'Keep numbers: only the label changes. Use this if you typed ' + to + ' numbers while ' + from + ' was selected.\n\n' +
+      'Logged workouts keep the unit they were logged in.', 'Convert', 'Keep numbers');
+    if (pick === 'cancel'){ el.units.value = from; _unitChoice = null; return; }
+    _unitChoice = { from, to, mode:(pick === 'ok' ? 'convert' : 'relabel') };
+    await saveSettings();
+  }
+
   /* ═══ SETTINGS SAVE ═══ */
   async function saveSettings(){
     const nextActive = [...document.querySelectorAll('[data-lift-check]')].filter(n => n.checked).map(n => n.getAttribute('data-lift-check'));
     if (!nextActive.length){ toast('Pick at least one lift.', 'w'); return; }
-    state.settings.units = el.units.value;
+    const prevUnits = state.settings.units;   // v13.2.1 (F04)
+    state.settings.units = el.units.value === 'kg' ? 'kg' : 'lb';
     state.settings.barWeight = Math.max(0, n(el.barWeight.value) || 0);
     state.settings.rounding = Math.max(0.5, n(el.rounding.value) || 2.5);
-    state.settings.programMode = el.programMode.value;
+    // v13.2.1 (F12): a program-mode change keeps the current week, and waits while a workout is open
+    let modeNote = '';
+    if (el.programMode.value !== state.settings.programMode){
+      if (state.activeSession){
+        el.programMode.value = state.settings.programMode;
+        modeNote = 'Settings saved — program mode not changed: finish or cancel the current workout first.';
+      } else {
+        const before = currentMicrocycle();
+        state.settings.programMode = el.programMode.value;
+        state.program.index = remapProgramIndex(before);
+      }
+    }
     if (el.maxFormula) state.settings.maxFormula = el.maxFormula.value || 'epley';
     if (!state.settings.ui) state.settings.ui = {};
     state.settings.ui.performanceMode = !!el.performanceMode.checked;
@@ -8856,7 +9536,8 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     LIFTS.forEach(lift => {
       const maxV = n(document.querySelector('[data-max="' + lift.id + '"]').value);
       const tmV = n(document.querySelector('[data-tm="' + lift.id + '"]').value);
-      if (Number.isFinite(maxV) && maxV > 0) state.lifts[lift.id].true1RM = roundToIncrement(maxV, state.settings.rounding);
+      // v13.2.1: only a 1RM the lifter changed is rounded — an unrelated save must not nudge an existing one
+      if (Number.isFinite(maxV) && maxV > 0 && maxV !== state.lifts[lift.id].true1RM) state.lifts[lift.id].true1RM = roundToIncrement(maxV, state.settings.rounding);
       if (Number.isFinite(tmV) && tmV > 0) state.lifts[lift.id].tmAdjustment = clamp(tmV, 0.5, 1);
     });
     // v13 B2.2: per-lift goal 1RMs (blank/invalid clears)
@@ -8882,7 +9563,9 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       }
     });
     if (state.activeSession && !isActiveLift(state.activeSession.liftId)) state.activeSession = null;
-    await saveState(); toast('Settings saved.', 'g'); updatePerformanceMode(); render();
+    const unitNote = applyUnitChange(prevUnits, state.settings.units);   // v13.2.1 (F04): after the form is read
+    try{ await maybeSyncFormulaAccessories('settings'); }catch(_){}       // v13.2.1 (F06): 1RM/TM edits reach Tier 1 now
+    await saveState(); toast(modeNote || unitNote || 'Settings saved.', modeNote ? 'w' : 'g'); updatePerformanceMode(); render();
   }
 
   async function restartCycle(){
@@ -8952,39 +9635,107 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     saveState(); // best-effort; degraded path handles it
   }
 
+  // v13.2.1: parse → recognise → normalise → preview → keep a pre-import copy → apply → render check → save.
+  // Anything that fails before the save leaves the current data untouched; a render failure rolls back.
+  function looksLikeJuggernautBackup(p){
+    if (!_isObj(p)) return false;
+    const hits = ['lifts', 'program', 'settings', 'history', 'accessories', 'records', 'appVersion'].filter(k => k in p).length;
+    return hits >= 2 && (_isObj(p.lifts) || _isObj(p.program) || Array.isArray(p.history));
+  }
+  // A file from History → Export recovery copies imports its newest usable copy.
+  function unwrapRecoveryFile(p){
+    if (!_isObj(p) || p.kind !== 'juggernaut-recovery-copies' || !Array.isArray(p.copies)) return null;
+    const usable = p.copies.filter(c => _isObj(c) && looksLikeJuggernautBackup(c.state))
+      .sort((a, b) => String(b.savedAt || '').localeCompare(String(a.savedAt || '')));
+    return usable[0] || null;
+  }
   function importData(file){
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async () => {
+      let parsed;
+      try{ parsed = JSON.parse(String(reader.result || '')); }
+      catch(_){ toast('That file isn\u2019t valid JSON. Nothing was changed.', 'b'); return; }
+      const lines = [];
+      const copy = unwrapRecoveryFile(parsed);
+      if (copy){
+        parsed = copy.state;
+        lines.push('Using recovery copy: ' + (copy.kind || 'copy') + ', saved ' + (copy.savedAt ? new Date(copy.savedAt).toLocaleString() : 'at an unknown time') + '.');
+      }
+      if (!looksLikeJuggernautBackup(parsed)){ toast('That file isn\u2019t a Juggernaut backup. Nothing was changed.', 'b'); return; }
+      let candidate;
+      try{ candidate = mergeState(parsed); }
+      catch(err){ console.error(err); toast('That backup couldn\u2019t be read. Nothing was changed.', 'b'); return; }
+      const skipped = _lastNormReport.setAside.length;
       try{
-        const parsed = JSON.parse(String(reader.result || '{}'));
-        const lines = [];
-        const cs = state.settings || {};
-        const ns = (parsed.settings || {});
-        if (cs.units !== ns.units) lines.push('Units: ' + (cs.units||'—') + ' → ' + (ns.units||'—'));
-        if (cs.barWeight !== ns.barWeight) lines.push('Bar weight: ' + (cs.barWeight??'—') + ' → ' + (ns.barWeight??'—'));
-        if (cs.programMode !== ns.programMode) lines.push('Program mode: ' + (cs.programMode||'—') + ' → ' + (ns.programMode||'—'));
-        if (cs.maxFormula !== ns.maxFormula) lines.push('1RM formula: ' + (cs.maxFormula||'epley') + ' → ' + (ns.maxFormula||'epley'));
-        const cl = state.lifts || {}; const nl = parsed.lifts || {};
-        Object.keys(cl).forEach(id => {
-          if (cl[id]?.true1RM !== nl[id]?.true1RM) lines.push(capitalize(id) + ' 1RM: ' + (cl[id]?.true1RM||'—') + ' → ' + (nl[id]?.true1RM||'—'));
-        });
-        const hc = (state.history||[]).length; const hn = (parsed.history||[]).length;
-        if (hc !== hn) lines.push('History: ' + hc + ' → ' + hn + ' sessions');
-        const summary = lines.length ? lines.join('\n') : 'No obvious changes. Data will overwrite current state.';
-        const ok = await showConfirm('Import Preview', summary, 'Import', 'btn-w');
-        if (!ok) return;
-        // Preserve current local API key if import has none (exports strip it)
-        const currentKey = state.settings?.ai?.openrouterKey || '';
-        state = mergeState(parsed);
-        if (currentKey && !state.settings.ai.openrouterKey){
-          state.settings.ai.openrouterKey = currentKey;
-          sessionApiKey = currentKey;
+        const cs = state.settings || {}, ns = candidate.settings;
+        if (cs.units !== ns.units) lines.push('Units: ' + (cs.units || '—') + ' → ' + ns.units);
+        if (cs.barWeight !== ns.barWeight) lines.push('Bar weight: ' + (cs.barWeight ?? '—') + ' → ' + ns.barWeight);
+        if (cs.programMode !== ns.programMode) lines.push('Program mode: ' + (cs.programMode || '—') + ' → ' + ns.programMode);
+        if (cs.maxFormula !== ns.maxFormula) lines.push('1RM formula: ' + (cs.maxFormula || 'epley') + ' → ' + ns.maxFormula);
+        for (const l of LIFTS){
+          const a = state.lifts?.[l.id]?.true1RM, b = candidate.lifts[l.id].true1RM;
+          if (a !== b) lines.push(capitalize(l.id) + ' 1RM: ' + (a ?? '—') + ' → ' + b);
         }
-        await saveState(); toast('Imported.', 'g'); render();
-      }catch(err){ console.error(err); toast('Import failed — invalid JSON.', 'b'); }
+        const hc = (state.history || []).length, hn = candidate.history.length;
+        if (hc !== hn) lines.push('History: ' + hc + ' → ' + hn + ' sessions');
+        if (skipped) lines.push(skipped + ' damaged ' + (skipped === 1 ? 'entry' : 'entries') + ' will be skipped.');
+      }catch(err){ console.error(err); }
+      const summary = lines.length ? lines.join('\n') : 'No obvious changes. Data will overwrite current state.';
+      const ok = await showConfirm('Import Preview', summary, 'Import', 'btn-w');
+      if (!ok) return;
+      const previous = state;
+      const kept = await _recoveryPut('recovery:preimport', 'preimport', { state:previous });
+      // Preserve current local API key if import has none (exports strip it)
+      const currentKey = previous.settings?.ai?.openrouterKey || '';
+      state = candidate;
+      if (currentKey && !state.settings.ai.openrouterKey){
+        state.settings.ai.openrouterKey = currentKey;
+        sessionApiKey = currentKey;
+      }
+      try{ render(); }
+      catch(err){
+        console.error(err);
+        state = previous;
+        try{ render(); }catch(_){}
+        toast('That backup couldn\u2019t be displayed, so it wasn\u2019t imported. Nothing was changed.', 'b');
+        return;
+      }
+      await saveState();
+      toast(kept ? 'Imported. To undo, use History → Undo import.' : 'Imported.', 'g');
+      if (_safeMode) location.reload();
     };
     reader.readAsText(file);
+  }
+
+  // v13.2.1: History → Undo import. The data being replaced is kept as a recovery copy too.
+  async function undoLastImport(){
+    let snap = null;
+    try{ snap = (idbAvailable && db) ? await idb.get('meta', 'recovery:preimport') : null; }catch(_){}
+    if (!snap || !snap.state){ toast('No import to undo.', 'w'); await loadRecoveryIndex(); return; }
+    const when = snap.savedAt ? new Date(snap.savedAt).toLocaleString() : 'earlier';
+    const ok = await showConfirm('Undo import', 'Restore the data you had before the import on ' + when +
+      '? Anything logged since then will be replaced (a copy is kept).', 'Restore', 'btn-w');
+    if (!ok) return;
+    let restored;
+    try{ restored = mergeState(snap.state); }
+    catch(err){ console.error(err); toast('The pre-import copy couldn\u2019t be read. Nothing was changed.', 'b'); return; }
+    const previous = state;
+    const currentKey = previous.settings?.ai?.openrouterKey || '';
+    state = restored;
+    if (currentKey && !state.settings.ai.openrouterKey){ state.settings.ai.openrouterKey = currentKey; sessionApiKey = currentKey; }
+    try{ render(); }
+    catch(err){
+      console.error(err);
+      state = previous;
+      try{ render(); }catch(_){}
+      toast('The pre-import copy couldn\u2019t be displayed. Nothing was changed.', 'b');
+      return;
+    }
+    await _recoveryPut('recovery:preundo', 'preundo', { state:previous });
+    await saveState();
+    await _recoveryDrop('recovery:preimport');
+    toast('Import undone.', 'g');
   }
 
   async function purgeHistory(){
@@ -9150,7 +9901,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
   // wave's accumulation figure — Tier 1 shouldn't spike on a peak or deload week.
   function calibrationWavePct(){
     try{
-      const micro = currentMicrocycle();
+      const micro = accessoryMicrocycle();   // v13.2.1: the workout's week during the accessory phase
       const def = PROGRAM.defs[micro.wave];
       if (!def) return 0.60;
       // v13.0.6 audit fix: sustained-work phases only. Realization DOES define pctTM —
@@ -9241,8 +9992,12 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
   /* v13.1.0: reconcile every formula-governed accessory to the current wave + TM.
      Silent and idempotent — it only writes when a value actually differs, so it can be
      called freely from render paths. Returns the rows it changed for reporting. */
+  // v13.2.1 (K3): week key a hand-set Tier 1 weight belongs to (the workout's week during the accessory phase)
+  function manualWeekKey(){ try{ const m = accessoryMicrocycle(); return m.wave + '_' + m.phase; }catch(_){ return ''; } }
+  let _syncWeekKey = '';
   async function syncFormulaAccessories(opts){
     const changed = [];
+    try{ const m = currentMicrocycle(); _syncWeekKey = m.wave + '_' + m.phase; }catch(_){ _syncWeekKey = ''; }
     (state.settings.activeLiftIds || []).forEach(liftId => {
       const lift = state.lifts?.[liftId];
       if (!lift || !Number.isFinite(lift.true1RM) || lift.true1RM <= 0) return;
@@ -9250,6 +10005,8 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       let clearedStale = false;
       accessoryLiftState(liftId).templates.forEach(item => {
         if (!isFormulaGoverned(liftId, item)) return;   // v13.1.1: customs are exempt
+        // v13.2.1 (K3): a Tier 1 weight set by hand this week is kept until the week turns over
+        if (opts && opts.respectManual && item.manualWeek && item.manualWeek === _syncWeekKey) return;
         const libItem = accLibEntry(liftId, item);       // guaranteed by the predicate
         // v13.1.1: a staged progression on a governed item is always stale — it can
         // only exist as pre-upgrade leftovers. Clear it even when the weight matches,
@@ -9271,13 +10028,19 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
   // Fires when the microcycle key changes (wave/phase roll) or a realization PR moves a
   // TM. Guarded by a stored key so it runs once per transition, not on every render.
   async function maybeSyncFormulaAccessories(reason){
+    if (state.accessoryPhase) return [];   // v13.2.1: deferred until the accessory phase ends (endAccessoryPhase)
     let key;
     try { const m = currentMicrocycle(); key = m.wave + '_' + m.phase; } catch(_){ return []; }
-    const tmKey = (state.settings.activeLiftIds || [])
-      .map(id => id + ':' + (state.lifts?.[id]?.true1RM ?? 0)).join('|');
+    // v13.2.1 (F06): the stamp includes the TM multiplier, so a TM change reaches Tier 1.
+    const ids = state.settings.activeLiftIds || [];
+    const tmKey = ids.map(id => id + ':' + (state.lifts?.[id]?.true1RM ?? 0) + 'x' + (state.lifts?.[id]?.tmAdjustment ?? 1)).join('|');
     const stamp = key + '#' + tmKey;
     if (state.settings.accSyncStamp === stamp) return [];
-    const changed = await syncFormulaAccessories({ persist:false });
+    // A 13.2.0 stamp (no multiplier) that otherwise matches is adopted without re-syncing, so a Tier 1
+    // weight set by hand this week survives the upgrade (K3).
+    const legacyStamp = key + '#' + ids.map(id => id + ':' + (state.lifts?.[id]?.true1RM ?? 0)).join('|');
+    if (state.settings.accSyncStamp === legacyStamp){ state.settings.accSyncStamp = stamp; await saveState(); return []; }
+    const changed = await syncFormulaAccessories({ persist:false, respectManual:true });
     state.settings.accSyncStamp = stamp;
     await saveState();
     // v13.1.1: no toast here — on PR days it collided with the "1RM ->" note (toast()
@@ -9325,6 +10088,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
      lifter browses another lift's accessories. */
   function inlineAccLiftId(){
     return state.activeSession?.liftId
+      || state.accessoryPhase?.liftId          // v13.2.1: the workout this accessory phase belongs to
       || (state.history.length ? state.history[state.history.length - 1].liftId : null)
       || state.settings.activeLiftIds[0] || 'squat';
   }
@@ -9352,7 +10116,15 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
      whenever the tab was parked on a different lift, or (b) logged the tab's reps and
      zeroed the accessory's weight, because [data-acc-weight] resolved to nothing.
      `source` now selects the correct lift and the correct rep surface. */
+  // v13.2.1 (F15): a double tap logs once
+  const _accLogBusy = new Set();
   async function saveAccessoryLog(id, source){
+    if (_accLogBusy.has(id)) return;
+    _accLogBusy.add(id);
+    try{ return await _saveAccessoryLogNow(id, source); }
+    finally{ _accLogBusy.delete(id); }
+  }
+  async function _saveAccessoryLogNow(id, source){
     const inline = source === 'inline';
     const liftId = inline ? inlineAccLiftId() : (el.accLiftSelect.value || 'squat');
     const item = findAccessory(liftId, id);
@@ -9363,7 +10135,8 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     if (!inline){
       item.name = String(document.querySelector('[data-acc-name="'+id+'"]')?.value||'').trim()||'Accessory';
       item.category = String(document.querySelector('[data-acc-category="'+id+'"]')?.value||'').trim()||'Accessory';
-      item.weight = Math.max(0, n(document.querySelector('[data-acc-weight="'+id+'"]')?.value)||0);
+      const typedWeight = Math.max(0, n(document.querySelector('[data-acc-weight="'+id+'"]')?.value)||0);
+      if (typedWeight !== item.weight){ item.weight = typedWeight; item.manualWeek = manualWeekKey(); }   // v13.2.1 (K3)
       item.increment = Math.max(0.5, n(document.querySelector('[data-acc-increment="'+id+'"]')?.value)||state.settings.rounding);
     }
 
@@ -9409,12 +10182,23 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       item.pendingProgression = false; item.suggestedWeight = null;
       item.lastOutcome = 'Hold until every set hits ' + item.repMax + '.';
     }
-    state.accessories.history.push({
-      id:'acclog_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8),
-      liftId, accessoryId:item.id, name:item.name, weight:item.weight, reps, completedAt:item.lastCompletedAt, outcome:item.lastOutcome
-    });
-    await saveState(); await enqueueSync('accessory-session', state.accessories.history.at(-1));
-    toast('Logged.', 'g'); render();
+    // v13.2.1 (F15): "Re-log" on the workout card corrects this session's entry instead of adding a second one
+    const anchor = inline ? currentSessionAnchorISO() : null;
+    let prevIdx = -1;
+    if (anchor && accessoryDoneThisSession(item.id)){
+      for (let i = state.accessories.history.length - 1; i >= 0; i--){
+        const h = state.accessories.history[i];
+        if (h && h.accessoryId === item.id && (h.completedAt || '') >= anchor){ prevIdx = i; break; }
+      }
+    }
+    const logEntry = {
+      id:(prevIdx >= 0 ? state.accessories.history[prevIdx].id : 'acclog_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8)),
+      liftId, accessoryId:item.id, name:item.name, weight:item.weight, reps, completedAt:item.lastCompletedAt, outcome:item.lastOutcome, units:unitLabel()
+    };
+    if (prevIdx >= 0) state.accessories.history[prevIdx] = logEntry;
+    else state.accessories.history.push(logEntry);
+    await saveState(); await enqueueSync('accessory-session', logEntry);
+    toast(prevIdx >= 0 ? 'Log updated.' : 'Logged.', 'g'); render();
   }
 
   // v13.0.2: same lift-resolution fix as saveAccessoryLog — "Apply ↑" on the inline
@@ -9434,11 +10218,12 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     const liftId = el.accLiftSelect.value || 'squat';
     const item = findAccessory(liftId, id); if (!item) return;
     if (!(item.weight > 0)){ toast('Bodyweight exercise — no weight to deload.', 'w'); return; }
-    const ok = await showConfirm('Deload this accessory?', 'Drop ' + escapeHtml(item.name) + ' from ' + formatWeight(item.weight) + ' to roughly 90% weight and reset progression. Use when stuck.', 'Deload', 'btn-w');
+    const ok = await showConfirm('Deload this accessory?', 'Drop ' + item.name + ' from ' + formatWeight(item.weight) + ' to roughly 90% weight and reset progression. Use when stuck.', 'Deload', 'btn-w');
     if (!ok) return;
     const target = roundToIncrement(item.weight * 0.9, item.increment || state.settings.rounding);
     // Never go below the increment itself
     item.weight = Math.max(item.increment || state.settings.rounding, target);
+    item.manualWeek = manualWeekKey();   // v13.2.1 (K3): a chosen weight, kept this week
     item.pendingProgression = false; item.suggestedWeight = null;
     item.lastOutcome = 'Deloaded — rebuild through the range.';
     await saveState(); toast('Deloaded to ' + formatWeight(item.weight) + '.', 'g'); render();
@@ -9457,8 +10242,15 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     const liftId = el.accLiftSelect.value || 'squat';
     const bucket = accessoryLiftState(liftId);
     const idx = bucket.templates.findIndex(x => x.id === id); if (idx === -1) return;
-    bucket.templates.splice(idx, 1);
-    await saveState(); toast('Removed.', 'w'); render();
+    const [removed] = bucket.templates.splice(idx, 1);
+    await saveState(); render();
+    // v13.2.1: one tap still removes it; Undo (6 s) puts it back where it was
+    toast('Removed ' + removed.name + '.', 'w', { label:'Undo', onClick: async () => {
+      const b = accessoryLiftState(liftId);
+      if (b.templates.some(x => x.id === removed.id)) return;
+      b.templates.splice(Math.min(idx, b.templates.length), 0, removed);
+      await saveState(); toast('Restored ' + removed.name + '.', 'g'); render();
+    } });
   }
 
   async function moveAccessory(id, direction){
@@ -9655,8 +10447,9 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     // RPE stepper
     // Continue to accessories in workout flow
     el.btnContinueAcc.addEventListener('click', () => {
-      const lastLiftId = state.history.length ? state.history[state.history.length - 1].liftId : state.settings.activeLiftIds[0];
       _sessionPhase = 'accessories';
+      ensureAccessoryPhaseRecorded();       // v13.2.1
+      const lastLiftId = inlineAccLiftId();
       el.btnContinueAcc.hidden = true;
       el.sessionCompleteOverlay.hidden = true;
       el.sessionSection.hidden = false;
@@ -9668,8 +10461,9 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
 
     // Overlay: Continue to Accessories
     el.btnContinueAcc2.addEventListener('click', () => {
-      const lastLiftId = state.history.length ? state.history[state.history.length - 1].liftId : state.settings.activeLiftIds[0];
       _sessionPhase = 'accessories';
+      ensureAccessoryPhaseRecorded();       // v13.2.1
+      const lastLiftId = inlineAccLiftId();
       el.sessionCompleteOverlay.hidden = true;
       el.sessionSection.hidden = false;
       el.inlineAccSection.hidden = false;
@@ -9683,6 +10477,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       _sessionPhase = 'idle';
       _sessionReadiness = null;
       el.sessionCompleteOverlay.hidden = true;
+      endAccessoryPhase().then(renderSafely);   // v13.2.1: skipping accessories closes the phase
       render();
     });
 
@@ -9696,6 +10491,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       el.inlineAccSection.hidden = true;
       el.btnFinishFull.hidden = true;
       toast('Full session complete — ' + logged + ' of ' + tpls.length + ' accessories logged.', 'g');
+      endAccessoryPhase().then(renderSafely);   // v13.2.1: runs the deferred Tier 1 sync
       render();
     });
 
@@ -9781,13 +10577,13 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         const pick = sel && sel.value;
         if (!pick){ toast('Pick a replacement first.', 'w'); return; }
         _openSwapDrawers.delete(swapGo);
-        await swapExercise(swapGo, pick, { recalibrate:true });
+        await swapExercise(swapGo, pick, { recalibrate:true, liftId:(sel && sel.getAttribute('data-swaplift')) || inlineAccLiftId() });
         return;
       }
       // Swap
       const swapAcc = t.getAttribute('data-swap-acc');
       const swapTo = t.getAttribute('data-swap-to');
-      if (swapAcc && swapTo){ await swapExercise(swapAcc, swapTo); return; }
+      if (swapAcc && swapTo){ await swapExercise(swapAcc, swapTo, { liftId:t.getAttribute('data-swap-lift') || inlineAccLiftId() }); return; }
     });
 
     // v13.2.0: live description as the swap picker changes
@@ -9840,7 +10636,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       const helpId2 = t.closest('[data-ex-help]');
       if (helpId2){ showExerciseHelp(helpId2.getAttribute('data-ex-help')); return; }
       const swapEl = t.closest('[data-swap-acc]');
-      if (swapEl){ await swapExercise(swapEl.getAttribute('data-swap-acc'), swapEl.getAttribute('data-swap-to')); return; }
+      if (swapEl){ await swapExercise(swapEl.getAttribute('data-swap-acc'), swapEl.getAttribute('data-swap-to'), { liftId:swapEl.getAttribute('data-swap-lift') || el.accLiftSelect.value || 'squat' }); return; }
       // Collapse toggle — walk up to find [data-acc-toggle]
       const toggleEl = t.closest('[data-acc-toggle]');
       if (toggleEl){
@@ -9889,7 +10685,10 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     });
 
     el.btnExport.addEventListener('click', exportData);
-    el.importFile.addEventListener('change', (e) => importData(e.target.files[0]));
+    el.importFile.addEventListener('change', (e) => { importData(e.target.files[0]); e.target.value = ''; });  // v13.2.1: the same file can be picked again
+    if (el.btnUndoImport) el.btnUndoImport.addEventListener('click', undoLastImport);            // v13.2.1
+    if (el.btnExportRecovery) el.btnExportRecovery.addEventListener('click', exportRecoveryCopies); // v13.2.1
+    if (el.units) el.units.addEventListener('change', onUnitsSelectChange);                         // v13.2.1 (F04)
     el.btnPurgeHistory.addEventListener('click', purgeHistory);
     el.btnSyncNow.addEventListener('click', flushOutbox);
     el.btnRequestPersist.addEventListener('click', requestPersistentStorage);
@@ -10060,7 +10859,10 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ writeLocalBackup(true); saveState(); }
-      else if (state.activeSession){ requestWakeLock(); } // iOS drops the lock when backgrounded — re-acquire
+      else {
+        if (state.activeSession) requestWakeLock(); // iOS drops the lock when backgrounded — re-acquire
+        adoptNewerSave('visible');                  // v13.2.1 (F07): another window may have saved meanwhile
+      }
     });
 
     // v11: Training profile — live preview of multiplier as user tweaks
@@ -10287,6 +11089,77 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     }
   }
 
+  /* ═══ v13.2.1: STARTUP RECOVERY + SAFE MODE ═══ */
+  // If the loaded data can't be displayed, try the backup copy, then the pre-import copy. If nothing
+  // renders, safe mode offers export / import / start fresh — the data is never discarded silently.
+  async function recoverAfterRenderFailure(){
+    const unreadable = state;
+    const candidates = [];
+    try{ const b = localStorage.getItem('juggernaut_v4_backup'); if (b) candidates.push({ label:'the backup copy', raw:JSON.parse(b) }); }catch(_){}
+    try{
+      const s = (idbAvailable && db) ? await idb.get('meta', 'recovery:preimport') : null;
+      if (s && s.state) candidates.push({ label:'the copy from before your last import', raw:s.state });
+    }catch(_){}
+    for (const c of candidates){
+      try{
+        state = mergeState(c.raw);
+        render();
+        await keepUnreadableCopy(unreadable, 'render');
+        await saveState();
+        _bootNotice = { kind:'recovered', label:c.label };
+        return true;
+      }catch(err){ console.error('Recovery candidate failed', err); }
+    }
+    state = unreadable;
+    return false;
+  }
+  function showBootNotice(){
+    const b = _bootNotice; _bootNotice = null;
+    if (!b) return;
+    const what = b.kind === 'recovered' ? 'couldn\u2019t be displayed' : 'couldn\u2019t be read';
+    showConfirm('Data recovered', 'Your saved data ' + what + ', so Juggernaut opened ' + (b.label || 'a fresh start') +
+      '.\n\nThe unreadable data was kept. To get it, use History → Export recovery copies.', 'OK', 'btn-p');
+  }
+  function showSafeMode(){
+    _safeMode = true;
+    if (document.getElementById('safeMode')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'safeMode';
+    wrap.setAttribute('role', 'alertdialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-labelledby', 'safeModeTitle');
+    // below .modal (z-index 90) so confirm dialogs still appear on top
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:89;background:var(--bg);color:var(--text);display:grid;place-items:center;' +
+      'padding:calc(24px + var(--safe-t)) 20px calc(24px + var(--safe-b));overflow:auto';
+    const card = document.createElement('div');
+    card.className = 'card'; card.style.cssText = 'max-width:420px;width:100%';
+    const h = document.createElement('h2'); h.id = 'safeModeTitle'; h.textContent = 'Juggernaut couldn\u2019t open your data';
+    const p = document.createElement('p'); p.style.cssText = 'margin:10px 0 18px;line-height:1.5;color:var(--text2);font-size:14px';
+    p.textContent = 'Your data is still on this device. Export it first, then import a backup or start fresh.';
+    const mk = (label, cls, fn) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = cls; b.textContent = label;
+      b.style.cssText = 'width:100%;margin-top:8px'; b.addEventListener('click', fn); return b;
+    };
+    card.append(h, p,
+      mk('Export raw data', 'btn-p', exportRawData),
+      mk('Import a backup', 'btn-s', () => { if (el.importFile) el.importFile.click(); }),
+      mk('Start fresh', 'btn-s', startFreshFromSafeMode));
+    wrap.appendChild(card);
+    document.body.appendChild(wrap);
+  }
+  async function exportRawData(){
+    let raw = null;
+    try{ raw = (idbAvailable && db) ? await idb.get('meta', 'state') : null; }catch(_){}
+    if (!raw){ try{ raw = JSON.parse(localStorage.getItem('juggernaut_v4_backup') || 'null'); }catch(_){ raw = null; } }
+    downloadJsonFile(_withoutKeys(raw || state), 'juggernaut-raw-' + new Date().toISOString().slice(0, 10) + '.json');
+  }
+  async function startFreshFromSafeMode(){
+    const ok = await showConfirm('Start fresh', 'Open Juggernaut with empty data? The data that couldn\u2019t open is kept as a recovery copy.', 'Start fresh', 'btn-d');
+    if (!ok) return;
+    await keepUnreadableCopy(state, 'safe-mode');
+    state = deepClone(DEFAULT_STATE);
+    await saveState();
+    location.reload();
+  }
+
   async function boot(){
     cacheEls();
     bindEvents();
@@ -10298,6 +11171,7 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
       console.error('IDB open failed — running degraded', err);
     }
     await loadState();
+    await loadRecoveryIndex();   // v13.2.1: History → Undo import / Export recovery copies when available
     pruneHistoryIfNeeded();
     updatePerformanceMode();
     registerPWA();
@@ -10320,7 +11194,14 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
         else { if (as.readiness){ _sessionReadiness = { ...as.readiness }; } requestWakeLock(); }
       }
     }catch(_){}
-    render();
+    // v13.2.1: a save that can't be displayed no longer bricks the app. Try the backup copy and the
+    // pre-import copy; if nothing renders, open safe mode (export / import / start fresh).
+    try{ render(); }
+    catch(err){
+      console.error('Render failed after load', err);
+      if (!(await recoverAfterRenderFailure())){ showSafeMode(); return; }
+    }
+    if (_bootNotice) showBootNotice();
     // v10: show onboarding for first-time users after initial render
     if (shouldShowOnboarding()) showOnboarding();
     // v13 C2: auto-weekly digest push (on-open semantics; silent failure, retried next open)
