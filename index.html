@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v13.2.1</title>
+<title>Juggernaut Method 2.0 — v13.2.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -1611,7 +1611,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
     <div class="hdr-row">
       <div>
         <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v13.2.1 — Data Safety</div>
+        <div class="hdr-sub">v13.2.2 — Accurate Records</div>
       </div>
       <div class="hdr-actions">
         <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
@@ -2638,6 +2638,7 @@ body.performance-mode *{animation:none!important;transition:none!important}
 
     <h3>Step 6 — AMRAP Set (Last Working Set)</h3>
     <p>The final working set is tagged <strong>AMRAP</strong> (As Many Reps As Possible). The hero card highlights it. Use the rep stepper to enter your actual reps. If RPE logging is enabled, a purple stepper appears to record how hard the set felt (8 = 2 reps left, 9 = 1 rep left, 10 = absolute max).</p>
+    <p>If you enter more than 8 reps over the set's target, tapping DONE asks you to confirm the number before it is logged. It is a check against slips on the stepper, not a limit: confirm and the reps are logged as entered; Cancel leaves the set open to fix.</p>
     <p>If your settings include a Goal 1RM, a panel shows how many reps you'd need at this weight to hit your target.</p>
 
     <h3>Step 7 — Realization Day (Week 3 of Each Wave)</h3>
@@ -2967,7 +2968,17 @@ body.performance-mode *{animation:none!important;transition:none!important}
 (() => {
   'use strict';
 
-  const APP_VERSION = '13.2.1';
+  // v13.2.2 "accurate records" — what changed (details in the release's CHANGELOG):
+  //   D6/D7  Train Full Volume Anyway adds back only the dropped sets; readiness, warmup adjustment, lifted
+  //          weights, entered reps and a logged AMRAP are kept, across a reload and into history.
+  //   D11/D12 an accessory swap keeps the earlier exercise's log and drops a staged Apply ↑; a logged entry
+  //          keeps its own reps (card steppers no longer edit it); an unsaved edit on a logged card survives
+  //          re-renders until Re-log (in memory, same session/slot/exercise only).
+  //   D8     the RPE-based 1RM formula setting persists.
+  //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
+  //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
+  //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
+  const APP_VERSION = '13.2.2';   // also names the export file and the service-worker cache
   // v12: longitudinal coaching tunables
   const COACH_WINDOW = 8;     // sessions per lift fed to the model
   const COACH_CHAT_MAX = 24;  // chat turns persisted
@@ -3947,7 +3958,7 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
   // through unchanged; invalid scalars fall back to defaults; a damaged list entry is skipped and a
   // copy kept in state.quarantine — never the whole save.
   const _NORM = {
-    units:['lb','kg'], maxFormula:['epley','brzycki'], programMode:['standard16','omit10s12','omitDeload12'],
+    units:['lb','kg'], maxFormula:['epley','brzycki','rpe'], programMode:['standard16','omit10s12','omitDeload12'],   // v13.2.2 (D8): 'rpe' = Settings' "RPE-based"
     tiers:['tier1','tier2','tier3'], ageBracket:['under25','25-34','35-44','45-54','55plus']
   };
   let _lastNormReport = { setAside:[] };
@@ -4042,6 +4053,39 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
       ? Object.fromEntries(Object.entries(a.prior).filter(([k, v]) => _isLift(k) && Number.isFinite(n(v))).map(([k, v]) => [k, n(v)]))
       : {};
     return o;
+  }
+  // v13.2.2: the per-lift TM-cut gate (see tmCutAllowed). A lift whose save has no tmCutGate field (v13.2.1 and
+  // earlier) takes it from its RETAINED action log: a cut still in force there becomes the gate, anything else
+  // null. A cut the log already dropped cannot be reconstructed. An unreadable or future-dated gate is never read
+  // as "no cut": it becomes a cut made now, so only a workout completed after this load re-opens the lift.
+  function _tmCutFromLog(liftId, acts){
+    for (let i = acts.length - 1; i >= 0; i--){
+      const a = acts[i];
+      if (!a || !Array.isArray(a.lifts) || !a.lifts.includes(liftId)) continue;
+      if (a.type === 'tm_reduce_revert') return null;
+      if (a.type === 'tm_reduce') return a.reverted ? null : { at:a.at, evidence:(_isObj(a.evidence) ? a.evidence[liftId] : undefined), cutId:a.id, src:'migrated' };
+    }
+    return null;
+  }
+  function _normTmCutGates(base, inLifts){
+    const now = Date.now();
+    for (const l of LIFTS){
+      const src = _isObj(inLifts[l.id]) ? inLifts[l.id] : {};
+      const raw = (Object.prototype.hasOwnProperty.call(src, 'tmCutGate') && src.tmCutGate !== undefined)
+        ? src.tmCutGate : _tmCutFromLog(l.id, base.coachActions);
+      if (raw === null){ base.lifts[l.id].tmCutGate = null; continue; }
+      const ok = _isObj(raw);
+      const t = ok ? Date.parse(raw.at) : NaN;
+      const ev = (ok && Array.isArray(raw.evidence)) ? raw.evidence.filter(v => typeof v === 'string' && v.length <= 120).slice(-64) : [];
+      const cutId = ok ? _safeId(raw.cutId, undefined) : undefined;
+      const g = (Number.isFinite(t) && t <= now)
+        ? { at:new Date(t).toISOString(), evidence:ev, src:(raw.src === 'migrated' || raw.src === 'repaired') ? raw.src : 'cut' }
+        : { at:new Date(now).toISOString(), src:'repaired',
+            evidence:ev.length ? ev : base.history.filter(h => h.liftId === l.id)
+              .sort((a, b) => (a.completedAt || '').localeCompare(b.completedAt || '')).slice(-COACH_WINDOW).map(h => String(h.id)) };
+      if (cutId) g.cutId = cutId;
+      base.lifts[l.id].tmCutGate = g;
+    }
   }
   function _normBlockSummary(s){
     const o = { ...s };
@@ -4192,6 +4236,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       .map(b => ({ ...b, weight:n(b.weight), date:(typeof b.date === 'string' ? b.date : '') }));
     // v13.2.1: settings/lifts/program are normalized before accessory defaults are built from them.
     _normSettingsAndLifts(base);
+    _normTmCutGates(base, inLifts);   // v13.2.2: after history and coachActions (migration reads both)
     const inAcc = (_isObj(parsed.accessories) && _isObj(parsed.accessories.byLift)) ? parsed.accessories.byLift : {};
     // v13.2.1 (F13): defaults are built against the state being loaded — its equipment, maxes and
     // week — not whatever happens to be live. The builders read the global `state`, so point it at
@@ -5578,25 +5623,52 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     toast(direction + formatWeight(Math.abs(rounded)), rounded > 0 ? 'g' : 'w');
   }
 
+  // v13.2.2 (D6/D7): "Train Full Volume Anyway" adds back only the sets fatigue management removed, in the
+  // session that is already running. Sets are matched by role (ramp / working / AMRAP / backoff) and order —
+  // never by array index — so every existing set stays whole: weight lifted, reps (logged or just entered),
+  // RPE and flags, and a logged AMRAP stays the AMRAP. Only the added sets get the session's stored warmup
+  // delta, exactly as applyWarmupAdjustmentToSession applies it (working sets and the AMRAP, not backoffs).
+  // The session keeps warmupAdjustment and its readiness (fatigue flags cleared), so both survive a reload
+  // and reach the history entry. Undo snapshots get the same sets added, so Undo can't bring the cut back.
+  function _setRole(s){ return s.isRamp ? 'ramp' : s.isAMRAP ? 'amrap' : s.isBackoff ? 'backoff' : 'work'; }
+  function _withFullVolume(sets, fullSets, delta){
+    const pool = {};
+    for (const s of sets){ (pool[_setRole(s)] = pool[_setRole(s)] || []).push(s); }
+    const out = fullSets.map(t => {
+      const role = _setRole(t);
+      if (pool[role]?.length) return pool[role].shift();
+      const add = { ...t };
+      if (delta && (role === 'work' || role === 'amrap')) add.weight = Math.max(0, add.weight + delta);
+      return add;
+    });
+    // anything the full prescription doesn't account for is kept, after the last set of its role
+    for (const role of Object.keys(pool)) for (const s of pool[role]){
+      let at = -1; out.forEach((x, i) => { if (_setRole(x) === role) at = i; });
+      if (at < 0) out.push(s); else out.splice(at + 1, 0, s);
+    }
+    out.forEach((s, i) => { s.index = i; });
+    return out;
+  }
   async function restoreFullVolume(){
     const session = state.activeSession;
     if (!session || !_sessionReadiness?.fatigueManaged) return;
-    // Rebuild the session from scratch with full volume
-    const liftId = session.liftId;
-    const newSession = buildSession(liftId);
-    if (!newSession){ toast('Could not rebuild session.', 'b'); return; }
-    // Preserve logged sets
-    newSession.sets.forEach((newSet, i) => {
-      const old = session.sets.find(s => s.index === i && s.done);
-      if (old){ newSet.performedReps = old.performedReps; newSet.done = true; if(old.rpe) newSet.rpe = old.rpe; }
-    });
-    newSession.id = session.id;
-    newSession.createdAt = session.createdAt;
-    newSession.undoStack = session.undoStack;
-    setSessionActiveIndexToNextOpen(newSession);
-    state.activeSession = newSession;
+    const full = buildSession(session.liftId);   // today's full prescription, used only as the template
+    if (!full || full.wave !== session.wave || full.phase !== session.phase){ toast('Could not rebuild session.', 'b'); return; }
+    const delta = Number.isFinite(session.warmupAdjustment?.delta) ? session.warmupAdjustment.delta : 0;
+    session.sets = _withFullVolume(session.sets, full.sets, delta);
+    for (const snap of (Array.isArray(session.undoStack) ? session.undoStack : [])){
+      if (!snap || !Array.isArray(snap.sets)) continue;
+      const cur = snap.sets[snap.activeSetIndex];
+      snap.sets = _withFullVolume(snap.sets, full.sets, delta);
+      const i = snap.sets.indexOf(cur);
+      if (i >= 0) snap.activeSetIndex = i;
+    }
+    setSessionActiveIndexToNextOpen(session);
+    session.updatedAt = nowISO();
     _sessionReadiness.fatigueManaged = false;
     _sessionReadiness.droppedSets = 0;
+    _sessionReadiness.adjustedSetCount = session.sets.filter(s => !s.isRamp && !s.isAMRAP).length;
+    session.readiness = { ..._sessionReadiness };
     el.badgeFatigue.style.display = 'none';
     await saveState();
     toast('Full volume restored.', 'g');
@@ -5956,6 +6028,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     item.increment = p.inc;
     item.pendingProgression = false; item.suggestedWeight = null;
     item.lastOutcome = 'Swapped in to target ' + plan.weakPoint + '.';
+    _accDrafts.delete(item.id);   // v13.2.2
     p.applied = true;
     // Block-hold: applying commits this wave to the chosen weak point
     if (!state.settings.weakTargetLock) state.settings.weakTargetLock = {};
@@ -6624,7 +6697,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     data.templates.forEach(item => {
       const effectiveSets = getEffectiveAccSets(item);
       const doneLog = accessoryDoneThisSession(item.id); // v13.0.2
-      const lastSets = (doneLog && Array.isArray(doneLog.reps) && doneLog.reps.length)
+      const draft = accDraftFor(item, doneLog);          // v13.2.2: an unsaved edit on a logged card
+      const lastSets = draft ? draft
+        : (doneLog && Array.isArray(doneLog.reps) && doneLog.reps.length)
         ? doneLog.reps
         : (Array.isArray(item.lastLoggedSets) && item.lastLoggedSets.length
             ? item.lastLoggedSets : Array(effectiveSets).fill(item.repMin||10));
@@ -6816,6 +6891,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
     // Otherwise preserve the user's current weight — within-tier swaps usually have similar strength
     item.increment = newExercise.increment || item.increment;
+    _accDrafts.delete(item.id);   // v13.2.2: a swapped slot drops an unsaved edit (also on A→B→A)
     // v13.2.0: a progression staged off the OLD movement's reps must not follow the
     // new one across. Apply ↑ was bumping a different exercise's weight.
     item.pendingProgression = false; item.suggestedWeight = null;
@@ -7673,6 +7749,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   async function endAccessoryPhase(){
     const had = !!state.accessoryPhase;
     state.accessoryPhase = null;
+    _accDrafts.clear();   // v13.2.2: leaving the accessory phase drops unsaved edits
     if (had){ try{ await maybeSyncFormulaAccessories('session'); }catch(_){} }
     await saveState();
   }
@@ -7724,6 +7801,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           target.category = ex.category;
           target.weight = calibratedSwapWeight(liftId, ex, tier);  // v13.0.8
           target.increment = ex.increment || 5;
+          // v13.2.2 (D12): a progression staged off the OLD exercise's reps (Apply ↑) and its outcome text must not
+          // follow the new one, as in the other swap paths (swapExercise, applySwapPair)
+          target.pendingProgression = false; target.suggestedWeight = null; target.lastOutcome = '';
+          _accDrafts.delete(target.id);   // v13.2.2
           await saveState();
           toast('Swapped to ' + ex.name + '.', 'g');
           render();  // v13.0.9: scroll-preserving path
@@ -8418,7 +8499,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
     if (entry.type === 'tm_reduce'){
       for (const [id, v] of Object.entries(entry.prior || {})){
-        if (state.lifts[id]) state.lifts[id].tmAdjustment = v;
+        if (state.lifts[id]){ state.lifts[id].tmAdjustment = v; state.lifts[id].tmCutGate = null; }   // v13.2.2: undone cut, evidence free again
       }
       entry.reverted = true;
       logCoachAction({ type:'tm_reduce_revert', lifts:Object.keys(entry.prior || {}) });
@@ -8443,18 +8524,65 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     await saveState(); toast('Deload pulled forward.', 'g'); render();
   }
 
+  // v13.2.2 (D14, Reese's decision): a TM cut uses up the evidence it was based on. Another cut for the same lift
+  // needs BOTH a workout of that lift completed after the cut — a history entry that is not one of the sessions
+  // the cut read and was completed after it — AND a current assessment that still flags the lift. Time passing,
+  // a reload, skipped weeks, a new calendar week, another lift's workout or the action log dropping old entries
+  // never re-open it; there is no fixed cooldown. The rule is checked where the banner is drawn and again inside
+  // the handler, per lift.
+  // The gate is a per-lift record, state.lifts[id].tmCutGate: null (no cut in force) or { at, evidence:[session
+  // ids], cutId, src }. actionReduceTm writes it and Revert clears it (Settings → action log puts the TM back and
+  // the offer with it). It is kept apart from the coach-action log, which keeps only its last 50 actions.
+  function tmCutEvidenceIds(liftId){   // the sessions the assessment reads for this lift (buildLiftDigest's window)
+    return (state.history || []).filter(h => h && h.liftId === liftId)
+      .sort((a, b) => (a.completedAt || '').localeCompare(b.completedAt || ''))
+      .slice(-COACH_WINDOW).map(h => String(h.id));
+  }
+  function tmCutAllowed(liftId){
+    const g = state.lifts?.[liftId]?.tmCutGate;
+    if (g === null || g === undefined) return true;                   // no cut in force for this lift
+    const cutAt = _isObj(g) ? Date.parse(g.at) : NaN;
+    if (!Number.isFinite(cutAt)) return false;                        // never read an unreadable gate as fresh evidence
+    const used = new Set(Array.isArray(g.evidence) ? g.evidence.map(String) : []);
+    return (state.history || []).some(h => h && h.liftId === liftId && !used.has(String(h.id))
+      && Date.parse(h.completedAt) > cutAt
+      && (h.sets || []).some(s => s && !s.isRamp && n(s.performedReps) > 0));
+  }
+  function tmCutEligibleLifts(a){
+    if (!a || (a.severity !== 'caution' && a.severity !== 'deload')) return [];
+    return (a.fatigueLifts || []).filter(id => state.lifts[id] && tmCutAllowed(id));
+  }
+
+  let _tmCutBusy = false;
   async function actionReduceTm(fatigueLiftIds){
-    const ids = (fatigueLiftIds || []).filter(id => state.lifts[id]);
-    if (!ids.length){ toast('No fatigued lifts identified.', 'w'); return; }
-    const names = ids.map(id => getLiftMeta(id).name).join(', ');
-    const ok = await showConfirm('Reduce training max',
-      'Drop TM multiplier 5% on: ' + names + '? Current values are saved to the action log for one-tap revert.',
-      'Reduce 5%', 'btn-w');
-    if (!ok) return;
-    const prior = applyTmReduce(ids);
-    logCoachAction({ type:'tm_reduce', lifts:ids, prior });
-    try{ await maybeSyncFormulaAccessories('tm'); }catch(_){}   // v13.2.1 (F06)
-    await saveState(); toast('TM reduced 5% on ' + names + '.', 'g'); render();
+    if (_tmCutBusy && !el.confirmModal.hidden) return;   // v13.2.2: a second tap while the first is open does nothing
+    _tmCutBusy = true;
+    try{
+      const want = (fatigueLiftIds || []).filter(id => state.lifts[id]);
+      const allowedNow = () => { const ok = tmCutEligibleLifts(computeDeloadAssessment()); return want.filter(id => ok.includes(id)); };
+      const ids = allowedNow();   // recomputed from current evidence, never taken from the rendered banner
+      if (!ids.length){
+        const gated = want.filter(id => !tmCutAllowed(id));
+        toast(gated.length ? 'TM already cut for ' + gated.map(id => getLiftMeta(id).name).join(', ') + ' — waiting for a new workout of that lift.'
+                           : 'No fatigued lifts identified.', 'w');
+        render(); return;
+      }
+      const names = ids.map(id => getLiftMeta(id).name).join(', ');
+      const ok = await showConfirm('Reduce training max',
+        'Drop TM multiplier 5% on: ' + names + '? Current values are saved to the action log for one-tap revert.',
+        'Reduce 5%', 'btn-w');
+      if (!ok) return;
+      const cut = allowedNow().filter(id => ids.includes(id));   // re-checked: the state may have changed while asking
+      if (!cut.length){ toast('TM already cut — nothing changed.', 'w'); render(); return; }
+      const evidence = {};
+      for (const id of cut) evidence[id] = tmCutEvidenceIds(id);
+      const prior = applyTmReduce(cut);
+      logCoachAction({ type:'tm_reduce', lifts:cut, prior, evidence });
+      const act = state.coachActions[state.coachActions.length - 1];
+      for (const id of cut) state.lifts[id].tmCutGate = { at:act.at, evidence:evidence[id], cutId:act.id, src:'cut' };
+      try{ await maybeSyncFormulaAccessories('tm'); }catch(_){}   // v13.2.1 (F06)
+      await saveState(); toast('TM reduced 5% on ' + cut.map(id => getLiftMeta(id).name).join(', ') + '.', 'g'); render();
+    } finally { _tmCutBusy = false; }
   }
 
   function renderDeloadBanner(){
@@ -8483,6 +8611,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       ? '<details style="margin-top:6px"><summary style="font-size:12px;color:var(--muted);cursor:pointer">Why?</summary>' + evid + '</details>'
       : '<div style="margin-top:6px">' + evid + '</div>';
     const canJump = isDeload && !state.activeSession && findNextDeloadIndex() >= 0;
+    const cutOk = tmCutEligibleLifts(a);   // v13.2.2 (D14): lifts whose current evidence was not already used by a cut
+    const cutWait = (a.fatigueLifts || []).filter(id => state.lifts[id] && !cutOk.includes(id));
     node.hidden = false;
     node.innerHTML =
       '<div class="card" style="border-color:' + color + ';background:' + dim + '">' +
@@ -8490,15 +8620,17 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         evidWrap +
         '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
           (canJump ? '<button class="btn-s" data-deload-act="jump" style="flex:1;min-width:140px">Pull deload forward</button>' : '') +
-          '<button class="btn-s" data-deload-act="tm" style="flex:1;min-width:120px">Reduce TM 5%</button>' +
+          (cutOk.length ? '<button class="btn-s" data-deload-act="tm" style="flex:1;min-width:120px">Reduce TM 5%</button>' : '') +
           '<button class="btn-s" data-deload-act="dismiss" style="flex:0 0 auto">Dismiss</button>' +
         '</div>' +
+        (cutWait.length ? '<div style="font-size:12px;color:var(--muted);margin-top:8px">TM already cut for ' + escapeHtml(cutWait.map(id => getLiftMeta(id).name).join(', ')) +
+          '. Another cut needs a new workout of the same lift that still shows fatigue.</div>' : '') +
       '</div>';
     node.onclick = (e) => {
       const b = e.target.closest('[data-deload-act]'); if (!b) return;
       const act = b.getAttribute('data-deload-act');
       if (act === 'jump') actionPullDeloadForward();
-      else if (act === 'tm') actionReduceTm(a.fatigueLifts);
+      else if (act === 'tm') actionReduceTm(cutOk);
       else if (act === 'dismiss'){ state.deloadUX.dismissedAtIndex = state.program.index; saveState(); renderDeloadBanner(); }
     };
   }
@@ -9011,6 +9143,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     _movementQuality = 'normal';
     _sessionWeakPoint = null;
     _sessionReadiness = null; // clear any stale readiness from prior session
+    _accDrafts.clear();       // v13.2.2: unsaved accessory edits belong to the session that is ending
     if (el.weakPointCard) el.weakPointCard.hidden = true;
     _previewWeekIdx = null;
     if (el.midCheck) el.midCheck.hidden = true;
@@ -9056,18 +9189,50 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const session = state.activeSession; if (!session) return;
     const set = currentSet(session); if (!set || set.done) return;
     pushUndoSnapshot();
+    const before = set.performedReps;
     set.performedReps = clamp(Math.floor(set.performedReps + delta), 0, 99);
+    if (set.performedReps !== before) delete set.confirmedReps;   // v13.2.2 (D13): an edited result needs a new confirmation
     session.updatedAt = nowISO();
     debouncedSave(); // FIX: debounced instead of immediate
     render();
   }
 
+  // v13.2.2 (D13, Reese's decision): an AMRAP entry MORE than 8 reps over the set's target (target + 9 or more;
+  // exactly target + 8 is not asked) is confirmed before it is logged — a guard against entry slips such as a held
+  // "+" (the stepper accelerates). It is not a cap: a confirmed result is logged as entered and the progression
+  // maths is unchanged. The confirmation is stored on the set as confirmedReps and holds only while performedReps
+  // equals it, so Complete Session doesn't ask again for the same result and any edit asks again.
+  const AMRAP_CONFIRM_ABOVE_TARGET = 8;
+  let _amrapAsking = false;
+  function amrapNeedsConfirm(set){
+    if (!set || !set.isAMRAP || set.isRamp) return false;
+    const reps = Math.floor(n(set.performedReps)), target = Math.floor(n(set.targetReps));
+    return Number.isFinite(reps) && Number.isFinite(target) && reps > target + AMRAP_CONFIRM_ABOVE_TARGET;
+  }
+  function amrapConfirmed(set){ return Number.isInteger(set.confirmedReps) && set.confirmedReps === Math.floor(n(set.performedReps)); }
+  async function askAmrapConfirm(set){
+    const reps = Math.floor(n(set.performedReps)), target = Math.floor(n(set.targetReps));
+    _amrapAsking = true;
+    try{
+      return await showConfirm('Check your AMRAP reps',
+        reps + ' reps is ' + (reps - target) + ' more than this set’s target of ' + target + '. Log ' + reps + ' reps?',
+        'Log ' + reps + ' reps', 'btn-p');
+    } finally { _amrapAsking = false; }
+  }
+
   async function markSetDone(){
     const session = state.activeSession; if (!session) return;
     const set = currentSet(session); if (!set || set.done) return;
+    if (_amrapAsking && !el.confirmModal.hidden) return;   // v13.2.2: a second tap while the confirmation is open does nothing
     const reps = Math.floor(n(set.performedReps));
     if (!Number.isFinite(reps) || reps < 0){ toast('Invalid reps.', 'b'); return; }
     if (reps > 99){ toast('Reps too high.', 'w'); return; }
+    if (amrapNeedsConfirm(set) && !amrapConfirmed(set)){
+      const ok = await askAmrapConfirm(set);
+      // the answer covers only the session, set and rep count it showed; Cancel leaves the entry unlogged and editable
+      if (!ok || state.activeSession !== session || currentSet(session) !== set || set.done || Math.floor(n(set.performedReps)) !== reps){ render(); return; }
+      set.confirmedReps = reps;
+    }
     pushUndoSnapshot();
     set.performedReps = reps; set.done = true; session.updatedAt = nowISO();
     // Capture RPE if panel was visible (AMRAP / realization top sets)
@@ -9295,6 +9460,26 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     try{
     const session = state.activeSession;
     if (!session || !sessionFinished(session)) return;
+    // v13.2.2 (D13): an AMRAP logged without that confirmation (e.g. by an older version before an update) is
+    // confirmed before anything reaches history or the max; Cancel reopens the set for editing.
+    const unchecked = session.sets.find(s => amrapNeedsConfirm(s) && !amrapConfirmed(s));
+    if (unchecked){
+      if (_amrapAsking && !el.confirmModal.hidden) return;
+      const reps = Math.floor(n(unchecked.performedReps));
+      const ok = await askAmrapConfirm(unchecked);
+      if (state.activeSession !== session || !sessionFinished(session) || Math.floor(n(unchecked.performedReps)) !== reps) return;
+      if (!ok){
+        pushUndoSnapshot();
+        unchecked.done = false;
+        session.activeSetIndex = session.sets.indexOf(unchecked);
+        session.updatedAt = nowISO();
+        await saveState();
+        toast('Not logged — check the reps, then tap Done.', 'w');
+        render();
+        return;
+      }
+      unchecked.confirmedReps = reps;
+    }
     const lift = state.lifts[session.liftId];
     const meta = getLiftMeta(session.liftId);
     const amrapSet = session.sets.find(s => s.isAMRAP);
@@ -10101,12 +10286,28 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     return last?.completedAt || null;
   }
 
+  // v13.2.2 (D11): "logged this session" means logged under the slot's CURRENT exercise — the slot id AND its
+  // name. A swap keeps the slot id, so the id alone matched the previous exercise's entry: the new exercise
+  // showed "Logged" and Re-log overwrote the earlier entry. Swapping back (A→B→A) finds A's entry again.
   function accessoryDoneThisSession(accId){
     const anchor = currentSessionAnchorISO();
     if (!anchor) return null;
+    const name = Object.values(state.accessories.byLift || {})
+      .flatMap(b => (b && Array.isArray(b.templates)) ? b.templates : []).find(t => t && t.id === accId)?.name;
     const logs = (state.accessories.history || [])
-      .filter(h => h.accessoryId === accId && (h.completedAt || '') >= anchor);
+      .filter(h => h.accessoryId === accId && (name === undefined || h.name === name) && (h.completedAt || '') >= anchor);
     return logs.length ? logs[logs.length - 1] : null;
+  }
+
+  // v13.2.2: unsaved reps on an inline card that is already logged this session. Its steppers edit this draft
+  // (in memory only, one per slot) so an ordinary re-render — e.g. logging another card — keeps the edit until
+  // Re-log saves it. A draft applies only to the same session, slot, exercise and logged entry; it is dropped on
+  // Re-log/Log, a swap of that slot, leaving the accessory phase or starting a workout, and is not kept over a reload.
+  const _accDrafts = new Map();   // slot id → { bind, reps }
+  function _accDraftBind(item, doneLog){ return JSON.stringify([currentSessionAnchorISO() || '', item.id, item.name, doneLog.id]); }
+  function accDraftFor(item, doneLog){
+    const d = doneLog ? _accDrafts.get(item.id) : null;
+    return (d && d.bind === _accDraftBind(item, doneLog)) ? d.reps : null;
   }
 
   /* v13.0.2 FIX — the in-session "Log" button was a silent no-op.
@@ -10188,15 +10389,18 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
     if (anchor && accessoryDoneThisSession(item.id)){
       for (let i = state.accessories.history.length - 1; i >= 0; i--){
         const h = state.accessories.history[i];
-        if (h && h.accessoryId === item.id && (h.completedAt || '') >= anchor){ prevIdx = i; break; }
+        if (h && h.accessoryId === item.id && h.name === item.name && (h.completedAt || '') >= anchor){ prevIdx = i; break; }   // v13.2.2 (D11)
       }
     }
     const logEntry = {
       id:(prevIdx >= 0 ? state.accessories.history[prevIdx].id : 'acclog_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8)),
-      liftId, accessoryId:item.id, name:item.name, weight:item.weight, reps, completedAt:item.lastCompletedAt, outcome:item.lastOutcome, units:unitLabel()
+      liftId, accessoryId:item.id, name:item.name, weight:item.weight,
+      reps:reps.slice(),   // v13.2.2: the entry's own copy — the card steppers edit item.lastLoggedSets (this same array) in place
+      completedAt:item.lastCompletedAt, outcome:item.lastOutcome, units:unitLabel()
     };
     if (prevIdx >= 0) state.accessories.history[prevIdx] = logEntry;
     else state.accessories.history.push(logEntry);
+    _accDrafts.delete(item.id);   // v13.2.2: the edit is saved now
     await saveState(); await enqueueSync('accessory-session', logEntry);
     toast(prevIdx >= 0 ? 'Log updated.' : 'Logged.', 'g'); render();
   }
@@ -10510,7 +10714,12 @@ readiness:_sessionReadiness ? deepClone(_sessionReadiness) : null,
           val = plusId ? val + 1 : Math.max(0, val - 1);
           span.textContent = String(val);
           const item = findAccessory(inlineAccLiftId(), accId); // v13.0.2
-          if (item && Array.isArray(item.lastLoggedSets)) item.lastLoggedSets[parseInt(si)] = val;
+          // v13.2.2: on a card already logged this session the edit is a draft until Re-log; history and the
+          // slot's last-logged reps stay as saved. An unlogged card keeps editing lastLoggedSets as before.
+          const doneLog = item ? accessoryDoneThisSession(item.id) : null;
+          if (item && doneLog) _accDrafts.set(item.id, { bind:_accDraftBind(item, doneLog),
+            reps:[...document.querySelectorAll('[data-ias-val="' + accId + '"]')].map(s => Math.max(0, Math.floor(n(s.textContent) || 0))) });
+          else if (item && Array.isArray(item.lastLoggedSets)) item.lastLoggedSets[parseInt(si)] = val;
         }
         return;
       }

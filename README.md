@@ -1,6 +1,6 @@
-# Juggernaut Method 2.0 — v13.2.1
+# Juggernaut Method 2.0 — v13.2.2
 
-Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline-capable via service worker, local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
+Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline launch remains a known limitation; local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
 **Canonical deployed file:** `index.html`  
 **Repository name:** `Juggernaut-V11.0.1` is intentionally historical to preserve the installed GitHub Pages / iOS Home Screen URL.
@@ -9,9 +9,18 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ## Current Version
 
-- Current canonical build: **v13.2.1**
+- Current canonical build: **v13.2.2**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
-- Final HTML SHA256: `16cd08d548f1da4c7086d7e33cedd931c68ee3887ed2b957fa9c8738b56dbd5b`
+- Final HTML SHA256: `bea609454fd3c1a08b62e7206c8cef084b154026c54f3e14beb4cafbb3f18189`
+
+## v13.2.2 — Accurate Records
+
+- Restores full volume without losing logged work or warmup adjustments.
+- Preserves accessory-swap history and in-session Re-log edits.
+- Persists RPE formula selection and confirms unusually high AMRAP entries.
+- Prevents repeat TM cuts from unchanged evidence, even after action-log eviction.
+- [Release notes, data changes, rollback and device checks](CHANGELOG-v13.2.2.md).
+- **Export a backup before opening the update. Use only one app window/tab. Offline launch and actual iPhone/Safari validation remain unresolved.**
 
 ## v13.2.1 — Data Safety (released with known limitations)
 
