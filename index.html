@@ -4759,6 +4759,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       return;
     }
     state = deepClone(DEFAULT_STATE);
+    ensureHistoryGeneration(state);
     _baseRev = headRev;
     await saveState();
   }
@@ -9553,6 +9554,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function _int0(v, lo, hi){ const x = Math.floor(n(v)); return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : lo; }
   function _w(v){ const x = n(v); return Number.isFinite(x) ? Math.min(2000, Math.max(0, _round2(x))) : 0; }
   function packetMeta(kind, test){
+    ensureHistoryGeneration(state);
     const t = nowISO();
     return { schema:'jm-coach-packet', schemaVersion:2, contract:HERMES_CONTRACT, packetId:newId('pkt'), kind, createdAt:t, sentAt:t,
       appVersion:APP_VERSION, installId:_device.installId, seq:_nextSeq(), historyGeneration:state.hermes.historyGeneration, units:'lb', test:!!test };
@@ -9817,6 +9819,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // else token_changed (same generation). Never 'reinstall' (Hermes's own).
   function hermesPairOnSave(){
     if (!hermesCanQueue()) return null;
+    ensureHistoryGeneration(state);   // before constructing adoption details, not only packet metadata
     const pp = _device.pendingPairing;
     const reason = pp ? pp.reason : (!state.hermes.everPaired ? 'first_pairing' : 'token_changed');
     state.hermes.superseded = false;
@@ -9984,6 +9987,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     _attention('Hermes is following a history this phone doesn\u2019t recognise (most likely another device). Open Settings \u2192 Hermes and tap Save & connect to pair this phone again.', 'superseded', id);
   }
   function _queueRecoveryAdoption(beforeItem, forcePairing){
+    ensureHistoryGeneration(state);
     const ev = state.hermes.lastAdoption;
     const gen = state.hermes.historyGeneration;
     let type = 'bridge_paired', details = { reason:'token_changed', historyGeneration:gen, installId:_device.installId, previousGeneration:null };
@@ -9998,6 +10002,55 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const item = _queuePacket(pkt, { eventType:type, recovery:true });
     if (beforeItem) item.order = beforeItem.order - 0.25;
     return item;
+  }
+
+  // Old fresh installs could persist an initial pairing with three null generations.
+  // Only the sole, first packet of this install is attributable without guessing. Null generations cannot
+  // have passed the bridge schema, so retaining its packetId/seq is safe, including after network retries.
+  // Other malformed packets stay intact: sending would turn a 422 into permanent outbox removal.
+  async function _prepareQueuedGenerations(){
+    const items = await outboxItems();
+    const valid = g => typeof g === 'string' && BRIDGE_ID_RE.test(g);
+    const malformed = items.filter(x => x.type === 'packet' && (!valid(x.gen) || !valid(x.body?.meta?.historyGeneration)
+      || x.gen !== x.body.meta.historyGeneration || (x.eventType === 'bridge_paired'
+        && (x.body?.event?.details?.historyGeneration !== x.gen || x.body?.event?.details?.installId !== x.body?.meta?.installId))));
+    if (!malformed.length) return true;
+    const item = malformed[0], m = item.body?.meta, ev = item.body?.event, d = ev?.details;
+    const h = state.hermes, ad = h.lastAdoption, gen = h.historyGeneration;
+    const expected = { reason:'first_pairing', historyGeneration:null, installId:_device?.installId, previousGeneration:null };
+    const matches = x => _isObj(x) && Object.keys(x).length === Object.keys(expected).length
+      && Object.keys(expected).every(k => x[k] === expected[k]);
+    const safe = items.length === 1 && malformed.length === 1 && !_inFlight.has(item.id)
+      && item.v === 14 && item.kind === 'event' && item.eventType === 'bridge_paired' && !item.recovery
+      && item.gen === null && m?.historyGeneration === null && ev?.type === 'bridge_paired'
+      && m.schema === 'jm-coach-packet' && m.schemaVersion === 2 && m.contract === HERMES_CONTRACT
+      && valid(item.id) && item.id === m.packetId && m.kind === 'event' && m.installId === _device?.installId
+      && item.seq === 1 && m.seq === 1 && _device.seq === 1 && !_device.pendingPairing
+      && item.createdAt === m.createdAt && ev.at === m.createdAt
+      && valid(gen) && h.ownGenerations.length === 1 && h.ownGenerations[0] === gen
+      && !h.everPaired && !h.superseded && (!_device.mirror || (_device.mirror.gen === gen && !_device.mirror.everPaired))
+      && matches(d) && ad?.type === 'bridge_paired' && ad.at === m.createdAt && matches(ad.details);
+    if (!safe){
+      if (!(h.attention || []).some(a => a.code === 'invalid_generation' && a.id === item.id)){
+        _attention('A queued packet has an ambiguous history generation. Sending is paused; the packet is preserved for recovery.', 'invalid_generation', item.id);
+        await saveState();
+      }
+      return false;
+    }
+    const repaired = deepClone(item);
+    repaired.gen = repaired.body.meta.historyGeneration = repaired.body.event.details.historyGeneration = gen;
+    h.lastAdoption = { ...ad, details:{ ...ad.details, historyGeneration:gen } };
+    const op = { op:'put', item:repaired };
+    _queueOp(op);   // persist adoption and packet together through the normal save transaction
+    await saveState();
+    if (_pendingOutboxOps.includes(op)){   // a revision conflict adopted another save before consuming this op
+      _pendingOutboxOps = _pendingOutboxOps.filter(x => x !== op);
+      return false;
+    }
+    // A conflicting save may have adopted another window's state. Recheck before allowing any transport.
+    return (await outboxItems()).every(x => x.type !== 'packet' || (valid(x.gen) && x.gen === x.body?.meta?.historyGeneration
+      && (x.eventType !== 'bridge_paired' || (x.body?.event?.details?.historyGeneration === x.gen
+        && x.body?.event?.details?.installId === x.body?.meta?.installId))));
   }
 
   /* ── the send loop (12) ── */
@@ -10018,6 +10071,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   async function _hermesFlushNow(why){
     if (!hermesConfigured() || !_device) return;
     if (_pendingOutboxOps.length) await saveState();          // persist what is queued before sending it
+    if (!(await _prepareQueuedGenerations())) return;
     await _trimOutbox();                                       // the 500-item cap holds while paused too
     if (!state.settings.hermes.send || !hermesUnitsOk()) return;   // paused: packets keep queuing
     if (state.hermes.superseded && why !== 'test') return;
@@ -10152,7 +10206,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     try{
       if (!hermesConfigured() || !state.settings.hermes.send || _versionBlocked || _authBlocked || state.hermes.superseded) return;
       if (Date.now() < _backoffUntil) return;            // Hermes asked to wait (Retry-After) or is unreachable
-      outboxItems().then(items => {
+      _prepareQueuedGenerations().then(async ready => {
+        if (!ready) return;
+        const items = await outboxItems();
         // v14.0.2 (re-audit R2): checked again after the read, right before sending
         if (_hermesWaiting() || state.hermes.superseded || _versionBlocked || _authBlocked || !state.settings.hermes.send) return;
         const item = items.find(x => !_inFlight.has(x.id) && x.type === 'packet' && !x.recovery);
@@ -10843,7 +10899,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const ok = await hermesHealth();
       const hh = state.hermes.health;
       if (ok){
-        const gen = hh.historyGeneration === state.hermes.historyGeneration ? 'history in sync' : (hh.historyGeneration ? 'history differs (will repair)' : 'not paired yet');
+        const gen = typeof hh.historyGeneration === 'string' && BRIDGE_ID_RE.test(hh.historyGeneration)
+          && hh.historyGeneration === state.hermes.historyGeneration ? 'history in sync' : (hh.historyGeneration ? 'history differs (will repair)' : 'not paired yet');
         toast('Hermes OK — contract ' + hh.contractVersion + ', ' + gen + '.', 'g');
         hermesFlush('test');
       } else if (_versionBlocked) toast('Hermes speaks contract ' + (hh?.contractVersion || '?') + ' — sending stopped.', 'b');
