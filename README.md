@@ -1,9 +1,11 @@
-# Juggernaut Method 2.0 — v16.0.0
+# Juggernaut Method 2.0 — v16.0.1
 
-Current release: **v16.0.0, revision 3**, approved November 14, 2026. `index.html` is the exact verified candidate; older version entries below are historical.
+Current release: **v16.0.1**, November 15, 2026. `index.html` is the exact verified supplied candidate; older version entries below are historical.
 
-- HTML SHA-256: `d587eac87a7e302ae742091581b91c6f277330639d48b677cd2464a9bbac47fc`
-- [v16 release notes and verification limitations](CHANGELOG-v16.0.0.md)
+- HTML SHA-256: `7f3162d21a632d5f92d119609174feb940ed123839aff926d7594b1d3b557813`
+- [v16.0.1 release notes, verification and known limitations](CHANGELOG-v16.0.1.md)
+- [Previous v16.0.0 release notes](CHANGELOG-v16.0.0.md)
+- Independent restart suite: 71 passed / 3 documented failed checks; see release notes. Do not interpret this release as every test passing.
 - The repository name and installed Home Screen URL remain unchanged.
 - Export a backup before upgrading. Actual iPhone/Safari, installed PWA, offline-first-load and real-bridge acceptance are not certified by this release's Chromium/stub tests.
 

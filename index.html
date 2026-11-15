@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://openrouter.ai https://api.anthropic.com https: http://127.0.0.1:* blob:; worker-src 'self' blob:; manifest-src 'self' blob:; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#191715">
+<meta name="theme-color" content="#070E0E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v16.0.0</title>
+<title>Juggernaut Method 2.0 — v16.0.1</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Sora:wght@800&display=swap');
 
 :root{
   /* surfaces */
@@ -1846,22 +1846,23 @@ button.cal-day{cursor:pointer}
   main:has(#sessionSection:not([hidden])) #sessionSection>.ws-main{grid-column:1;position:sticky;top:112px}
   main:has(#sessionSection:not([hidden])) #sessionSection>.ws-side{grid-column:2}
 }
-/* ═══════════════ v16.0.0 visual system: iron and chalk ═══════════════
-   Warm charcoal surfaces, chalk ink, wide heavy numerals. Colour is kept for meaning:
-   the four waves heat from straw to red, steel blue marks readiness and the coach.
+/* ═══════════════ v16.0.0 visual system: iron and chalk, teal edition (r4) ═══════════════
+   Near-black surfaces with a green cast, white ink, wide heavy numerals, one bright main colour (electric teal) for
+   the things you press and the thing that is selected. Colour is otherwise kept for meaning:
+   the four waves heat from yellow to red, blue marks readiness and the coach.
    Every v15 token name is kept and re-pointed, so script-set inline styles still resolve. */
 :root{
-  --bg:#191715;--bg2:#191715;--panel:#23201D;--panel2:#2D2925;--panel3:#39342F;
-  --text:#F6F2E9;--text2:#CEC6B8;--muted:#A49C8E;
-  --line:#39342F;--line2:#4A433C;--edge:#7C7368;
-  --accent:#F6F2E9;--accent-ink:#191715;--accent-dim:rgba(246,242,233,.07);--accent-mid:rgba(246,242,233,.38);
-  --blue:#9CC0EA;--blue-dim:rgba(156,192,234,.12);--blue-mid:rgba(156,192,234,.45);
-  --purple:#CEC6B8;--purple-dim:rgba(255,255,255,.05);
-  --warn:#F2BC4B;--warn-dim:rgba(242,188,75,.10);--warn-mid:rgba(242,188,75,.45);
-  --bad:#EE5F42;--bad-dim:rgba(238,95,66,.12);--bad-mid:rgba(238,95,66,.5);--bad-ink:#191715;--warn-ink:#191715;
-  --scrim:rgba(10,9,8,.7);--press:rgba(246,242,233,.07);
-  --wave-10s-soft:#EBDDAE;--wave-amber-soft:#F2BC4B;--wave-3s-soft:#EE5F42;
-  --w10:#EBDDAE;--w8:#F2BC4B;--w5:#F08B32;--w3:#EE5F42;--wdl:#8A9BAE;--heat:#EBDDAE;
+  --bg:#070E0E;--bg2:#070E0E;--panel:#101A1A;--panel2:#182626;--panel3:#223535;
+  --text:#FFFFFF;--text2:#D6ECE9;--muted:#9DBBB7;
+  --line:#223535;--line2:#2D4646;--edge:#78A09D;
+  --accent:#16E0C4;--accent-ink:#04201C;--accent-dim:rgba(22,224,196,.14);--accent-mid:rgba(22,224,196,.5);
+  --blue:#6FB7FF;--blue-dim:rgba(156,192,234,.12);--blue-mid:rgba(156,192,234,.45);
+  --purple:#D6ECE9;--purple-dim:rgba(255,255,255,.05);
+  --warn:#FFB703;--warn-dim:rgba(242,188,75,.10);--warn-mid:rgba(242,188,75,.45);
+  --bad:#FF3B4E;--bad-dim:rgba(238,95,66,.12);--bad-mid:rgba(238,95,66,.5);--bad-ink:#070E0E;--warn-ink:#070E0E;
+  --scrim:rgba(10,9,8,.7);--press:rgba(255,255,255,.07);
+  --wave-10s-soft:#FFE45C;--wave-amber-soft:#FFB703;--wave-3s-soft:#FF3B4E;
+  --w10:#FFE45C;--w8:#FFB703;--w5:#FF7A1A;--w3:#FF3B4E;--wdl:#8FA8FF;--heat:#FFE45C;
   --r:14px;--r-sm:10px;--r-lg:20px;
   --shadow:0 -12px 40px rgba(0,0,0,.55);
   --font:'Archivo','Helvetica Neue',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
@@ -1937,8 +1938,8 @@ input[type="number"],input[type="text"],input[type="url"],input[type="password"]
 .plate-svg .plate{stroke:none}
 .plate-svg .p45{fill:#F1ECE1}.plate-svg .p35{fill:#DDD6C9}.plate-svg .p25{fill:#CBC3B5}.plate-svg .p10{fill:#BAB2A4}
 .plate-svg .p5{fill:#ADA598}.plate-svg .p2_5{fill:#A29A8D}.plate-svg .p1_25{fill:#999184}
-.plate-svg .shade{fill:#191715;opacity:.16}.plate-svg .shine{fill:#fff;opacity:.16}
-.plate-svg text{font-family:var(--font);font-stretch:62%;font-weight:800;font-size:12px;fill:#191715;text-anchor:middle}
+.plate-svg .shade{fill:#070E0E;opacity:.16}.plate-svg .shine{fill:#fff;opacity:.16}
+.plate-svg text{font-family:var(--font);font-stretch:62%;font-weight:800;font-size:12px;fill:#070E0E;text-anchor:middle}
 /* colour-coded: 45 red, 35 yellow, 25 blue, 10 green, 5 grey; the two change plates in lighter greys */
 body[data-plates="color"] .plate-svg .p45{fill:#C8402F}body[data-plates="color"] .plate-svg .p35{fill:#F2C230}
 body[data-plates="color"] .plate-svg .p25{fill:#2B6FB8}body[data-plates="color"] .plate-svg .p10{fill:#23824A}
@@ -1946,7 +1947,7 @@ body[data-plates="color"] .plate-svg .p5{fill:#6F767C}body[data-plates="color"] 
 body[data-plates="color"] .plate-svg .p1_25{fill:#E4E6E8}
 body[data-plates="color"] .plate-svg text.tp45,body[data-plates="color"] .plate-svg text.tp25,
 body[data-plates="color"] .plate-svg text.tp10,body[data-plates="color"] .plate-svg text.tp5{fill:#fff}
-body[data-plates="iron"] .plate-svg text.tnew{fill:#191715 !important}
+body[data-plates="iron"] .plate-svg text.tnew{fill:#070E0E !important}
 body[data-plates="iron"] .plate-svg .plate.added{fill:var(--w5) !important}
 body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .plate-text{font-size:14px;font-weight:500;color:var(--text2)}
@@ -1967,7 +1968,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-rung-bar{height:10px;border-radius:5px;background:var(--panel3);width:8px;flex:none}
 .v16-rung.gain .v16-rung-bar{background:var(--heat)}
 .v16-rung-note{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
-.v16-flag{font-size:11px;font-weight:700;line-height:20px;padding:0 8px;border-radius:10px;background:var(--w10);color:#191715;white-space:nowrap}
+.v16-flag{font-size:11px;font-weight:700;line-height:20px;padding:0 8px;border-radius:10px;background:var(--w10);color:#070E0E;white-space:nowrap}
 .v16-rung-r{text-align:right;line-height:1.15}
 .v16-rung-r b{display:block;font-size:15px;font-weight:800;font-stretch:110%}
 .v16-rung-r span{font-size:12px;font-weight:600;color:var(--muted)}
@@ -1980,7 +1981,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-swap-row{display:flex;align-items:center;gap:6px;min-height:28px;font-size:13px;color:var(--text2);font-weight:500}
 .v16-swap-row b{width:64px;font-weight:500}
 .v16-pchip{font-size:13px;font-weight:700;line-height:24px;padding:0 10px;border-radius:12px;background:var(--panel3);color:var(--text2)}
-.v16-pchip.on{background:var(--w5);color:#191715}
+.v16-pchip.on{background:var(--w5);color:#070E0E}
 
 /* readiness zones */
 .v16-zones{margin:12px 0 4px}
@@ -2001,8 +2002,8 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-cell-t svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .v16-cell-m{font-size:15px;font-weight:800;font-stretch:88%;line-height:18px;white-space:nowrap}
 .v16-cell-s{font-size:12px;font-weight:600;line-height:14px;color:var(--muted);white-space:nowrap}
-.v16-cell.done,.v16-cell.cur{background:var(--wc);color:#191715}
-.v16-cell.done .v16-cell-t,.v16-cell.cur .v16-cell-t,.v16-cell.done .v16-cell-s,.v16-cell.cur .v16-cell-s{color:#191715}
+.v16-cell.done,.v16-cell.cur{background:var(--wc);color:#070E0E}
+.v16-cell.done .v16-cell-t,.v16-cell.cur .v16-cell-t,.v16-cell.done .v16-cell-s,.v16-cell.cur .v16-cell-s{color:#070E0E}
 .v16-cell.cur{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--text)}
 .v16-cell.sel:not(.cur){box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--blue)}
 .v16-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
@@ -2015,7 +2016,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-lrow b{font-size:15px;font-weight:800;font-stretch:110%}
 .v16-lrow b small{font-size:12px;margin-left:3px}
 .v16-chiprow{display:flex;gap:8px;flex-wrap:wrap}
-.v16-wchip{display:inline-block;min-width:40px;text-align:center;font-size:12px;font-weight:800;line-height:24px;padding:0 8px;border-radius:8px;color:#191715;background:var(--wc)}
+.v16-wchip{display:inline-block;min-width:40px;text-align:center;font-size:12px;font-weight:800;line-height:24px;padding:0 8px;border-radius:8px;color:#070E0E;background:var(--wc)}
 .v16-back{display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 10px 0 2px;margin:-4px 0 4px;border:none;background:transparent;color:var(--text2);font-size:15px;font-weight:600}
 .v16-back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
@@ -2046,9 +2047,9 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-run svg{display:block;width:100%;height:auto}
 .v16-best{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .v16-best>div{padding:12px;border-radius:16px;background:var(--panel2);display:flex;flex-direction:column;gap:10px}
-.v16-best>div.top{background:var(--w10);color:#191715}
+.v16-best>div.top{background:var(--w10);color:#070E0E}
 .v16-best-t{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--muted)}
-.v16-best>div.top .v16-best-t,.v16-best>div.top .v16-best-b small{color:#191715}
+.v16-best>div.top .v16-best-t,.v16-best>div.top .v16-best-b small{color:#070E0E}
 .v16-best-b{display:flex;justify-content:space-between;align-items:baseline;font-size:20px;font-weight:800;font-stretch:115%}
 .v16-best-b small{font-size:12px;font-weight:600;color:var(--muted);font-stretch:100%}
 .v16-plus{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;border-top:1px solid var(--line);font-size:14px;font-weight:600}
@@ -2057,7 +2058,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-plus-bars>i+i{background:var(--line2)}
 
 /* wave recap */
-.v16-recap-btn{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:0 14px;border:none;border-radius:14px;background:var(--wc);color:#191715;font-size:15px;font-weight:800;margin-top:8px}
+.v16-recap-btn{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:0 14px;border:none;border-radius:14px;background:var(--wc);color:#070E0E;font-size:15px;font-weight:800;margin-top:8px}
 .v16-recap-btn span{font-size:13px;font-weight:600}
 #recapCanvasWrap{border-radius:24px;overflow:hidden;margin:8px 0 14px}
 #recapCanvas{display:block;width:100%;height:auto}
@@ -2101,7 +2102,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .bsum-head,.block-sum-head{gap:8px}
 /* readiness and warm-up sheets */
 .rp{border-color:transparent;background:var(--panel3);border-radius:12px}
-.rp.selected,.rp[aria-checked="true"]{background:var(--blue);color:#191715;border-color:transparent}
+.rp.selected,.rp[aria-checked="true"]{background:var(--blue);color:#070E0E;border-color:transparent}
 .readiness-score{font-stretch:125%;font-weight:800}
 #warmupCurrentSet{background:transparent !important;padding:0 !important}
 #warmupWeight{font-family:var(--font) !important;font-stretch:125%;font-size:64px !important;letter-spacing:-.02em !important;line-height:1}
@@ -2125,13 +2126,13 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 #viewHistory>#blockSummaries{order:7}
 #viewHistory>.card:has(#btnExport){order:8}
 .weekly-card{border-color:transparent;border-radius:20px;background:var(--panel)}
-.cal-day.w-10s .cal-box,.cal-sw.w-10s{background:var(--w10);color:#191715}
+.cal-day.w-10s .cal-box,.cal-sw.w-10s{background:var(--w10);color:#070E0E}
 .cal-day.partial.w-10s .cal-box{border-color:var(--w10)}
 .v16-due{display:flex;flex-wrap:wrap;gap:8px}
 .v16-due button{min-height:44px;padding:0 16px;border-radius:22px;border:1.5px dashed var(--edge);background:transparent;color:var(--text);font-size:14px;font-weight:600}
 
 /* session recap */
-.v16-rhero{border-radius:24px;padding:18px;background:var(--heat);color:#191715;margin-bottom:12px}
+.v16-rhero{border-radius:24px;padding:18px;background:var(--heat);color:#070E0E;margin-bottom:12px}
 .v16-rhero-k{font-size:13px;font-weight:700}
 .v16-rhero-v{display:flex;align-items:baseline;gap:10px;margin:6px 0 8px;font-size:17px;font-weight:700}
 .v16-rhero-v b{font-size:64px;line-height:.9;font-weight:800;font-stretch:125%}
@@ -2172,14 +2173,14 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .v16-prog i.cur{background:var(--wc);box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--text)}
 .v16-cell{display:flex;flex-direction:column;justify-content:space-between}
 .v16-dots{display:flex;gap:3px}
-.v16-dots i{width:8px;height:8px;border-radius:50%;box-sizing:border-box;border:2px solid #191715}
-.v16-dots i.on{background:#191715}
+.v16-dots i{width:8px;height:8px;border-radius:50%;box-sizing:border-box;border:2px solid #070E0E}
+.v16-dots i.on{background:#070E0E}
 .v16-dots i.sk{border-style:dotted;opacity:.6}
 .v16-wkb{display:block;width:100%}
 .v16-wkb i{display:block;border-radius:2px;background:var(--wc)}
 .v16-wkb i.bv{height:6px;margin-bottom:3px}
 .v16-wkb i.bn{height:3px}
-.v16-cell.done .v16-wkb i,.v16-cell.cur .v16-wkb i{background:#191715}
+.v16-cell.done .v16-wkb i,.v16-cell.cur .v16-wkb i{background:#070E0E}
 .v16-grid-key{grid-column:2 / -1;margin:2px 0 0;font-size:12px;font-weight:600;color:var(--text2);display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;line-height:18px}
 .v16-grid-key i{display:inline-block;width:18px;border-radius:2px;background:var(--text2)}
 .v16-grid-key i.bv{height:6px}
@@ -2205,6 +2206,32 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
   .hero-weight{font-size:44px}
   .timeline{display:none}                                                 /* the Program tab has the same weeks */
 }
+
+/* r4: the main colour marks what is selected and what is pressed */
+.dash-lift.active,.dash-lift[aria-pressed="true"]{border-color:var(--accent) !important}
+.v16-cell.sel{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent) !important}
+.btn-p{box-shadow:0 6px 22px rgba(22,224,196,.35)}
+.btn-p:disabled,.btn-p[disabled]{box-shadow:none}
+
+/* 16.0.1: Restart with new maxes */
+#restartModal h2{font-size:22px;font-weight:800;font-stretch:112%;margin:6px 0 6px}
+.restart-sub{font-size:14px;line-height:20px;color:var(--text2);margin:0 0 14px}
+.restart-row{display:grid;grid-template-columns:1fr 120px;gap:4px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line2)}
+.restart-row label{font-size:15px;font-weight:700}
+.restart-row input{width:100%;min-height:48px;font-size:18px;font-weight:700;text-align:right}
+.restart-tm{grid-column:1 / -1;font-size:13px;color:var(--text2)}
+.restart-err{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--bad)}
+#restartModal .sheet-actions{margin-top:16px}
+
+/* 16.0.1: dialog messages keep their line breaks (lists in Start next cycle, Wipe history, Restart) */
+.confirm-msg{white-space:pre-line}
+
+/* 16.0.1 r2: dialog buttons never wrap their label; with three buttons the main choice takes its own row */
+.confirm-actions button{white-space:nowrap}
+.confirm-actions:has(#confirmAlt:not([hidden])) #confirmOk{flex:1 1 100%}
+
+/* 16.0.1 r3 (owner's choice 2026-11-15): the big weight on Today and in a session is set in Sora 800. Other numerals stay Archivo. */
+.dash-preview-weight,.hero-weight,.perf-mode .dash-preview-weight,.perf-mode .hero-weight{font-family:'Sora','Archivo',-apple-system,'Helvetica Neue',Arial,sans-serif;font-weight:800;font-stretch:normal;letter-spacing:-.03em}
 
 </style>
 </head>
@@ -2924,10 +2951,11 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
         <h2>Cycle and history</h2>
         <div class="row">
           <div class="tight"><button id="btnStartNextCycle" class="btn-w">Start next cycle</button></div>
+          <div class="tight"><button id="btnRestartMaxes" class="btn-w">Restart with new maxes</button></div>
           <div class="tight"><button id="btnWipeHistory" class="btn-d">Wipe history and start over</button></div>
           <div class="tight"><button id="btnResetAll" class="btn-d" title="Reset all data">Reset Everything</button></div>
         </div>
-        <div class="install-help">Start next cycle: back to week 1 with your current TMs; history, accessory weights and weak points are kept (Tier 1 lifts from the library are recalculated from your TM for week 1, as at every new week). Wipe history: erases training history and what was built from it, keeps your TMs, goals, Settings and exercise choices (you can export first). Reset Everything: erases all settings, history, program state and accessories; this cannot be undone.</div>
+        <div class="install-help">Restart with new maxes: for coming back after time off or a change in training. Type your current 1RM for each lift; the TM becomes 90% of it and you go back to week 1 of a new cycle. It asks whether to keep or wipe your history. Start next cycle: back to week 1 with your current TMs; history, accessory weights and weak points are kept (Tier 1 lifts from the library are recalculated from your TM for week 1, as at every new week). Wipe history: erases training history and what was built from it, keeps your TMs, goals, Settings and exercise choices (you can export first). Reset Everything: erases all settings, history, program state and accessories; this cannot be undone.</div>
       </div>
     </section>
 
@@ -3218,6 +3246,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
   <div class="section">
     <p><strong>Start next cycle</strong> (bottom of Settings, or the dashboard when a cycle is complete): back to week 1 with your current TMs carried into the next 10s wave. History is kept and every session keeps its cycle number, so "+" sets and tests compare with the same week of earlier cycles. Accessory weights, progress and weak points are kept. One exception, as at every new week: Tier 1 lifts from the library follow your TM and the wave, so they are recalculated for week 1 (a Tier 1 weight you set by hand lasts until the week turns over, and a new cycle counts as a new week, even when you start it from week 1). Exercises you added yourself and Tier 2 and 3 keep their weights.</p>
     <p><strong>Before a new cycle (app suggestion, not from the book):</strong> a week off or a light week of general fitness can help clear 16 weeks of fatigue. If you missed rep standards, the app's "Reduce TM 5%" (app rule, above) is the built-in way to restart lighter; you can also edit any TM in Settings.</p>
+    <p><strong>Restart with new maxes</strong> (bottom of Settings): for coming back after weeks off, or when a change in training has moved your maxes up or down. Type your current 1RM for each lift; the TM becomes 90% of it (the book's starting rule) and a lift you leave alone keeps its TM. Then choose: <em>Keep history</em> starts the next cycle at week 1, exactly as "Start next cycle" does, with the new TMs; <em>Wipe history</em> runs "Wipe history and start over" first. Hermes is told about each changed TM the same way as when you edit one in Settings.</p>
     <p><strong>Wipe history and start over:</strong> asks "Export first?", then erases sessions, accessory logs and progress, weak points, PR records, coach notes and chat, the coach action log, wave summaries and TM-cut blocks. It keeps your TMs (and the 1RM beside them), goals, everything in Settings and your accessory choices, and goes back to week 1, cycle 1. Accessory weights go back to the app's starting weights from your TM, also for a library exercise you renamed; exercises you added go back to the last weight you typed (0 if none). A library exercise renamed in v13.2.2 or earlier can't be matched to the library: the confirmation names it and its weight is kept.</p>
     <p><strong>Reset Everything</strong> (bottom of Settings, with the cycle buttons) also erases Settings, including the Hermes address and token. Enter them again to pair this phone with Hermes again.</p>
     <p>Nothing is deleted automatically any more: history is kept however long it gets. Only the smaller backup copy in the browser may be trimmed if storage is full.</p>
@@ -3390,6 +3419,19 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
       <button id="btnRecapShare" class="btn-p" type="button">Share</button>
     </div>
     <button id="btnRecapClose" class="btn-s" type="button" style="width:100%;margin-top:10px">Close</button>
+  </div>
+</div>
+<div id="restartModal" class="modal bottom-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="restartTitle">
+  <div class="modal-card" style="text-align:left">
+    <div class="sheet-handle"></div>
+    <h2 id="restartTitle">Restart with new maxes</h2>
+    <p class="restart-sub">Type your current 1RM for each lift. The training max (TM) becomes 90% of it. A lift you leave alone keeps its TM.</p>
+    <div id="restartRows"></div>
+    <p id="restartErr" class="restart-err" role="alert" hidden></p>
+    <div class="sheet-actions">
+      <button id="btnRestartCancel" class="btn-s" type="button">Cancel</button>
+      <button id="btnRestartNext" class="btn-p" type="button">Continue</button>
+    </div>
   </div>
 </div>
 <!-- ─── BOTTOM NAV ─── -->
@@ -3666,7 +3708,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '16.0.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '16.0.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -5949,7 +5991,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     else { paceLabel = '▲ Behind'; paceCls = 'behind'; }
     // Recommendation
     let rec = '', v16rest = false;
-    try{ v16rest = v16RestSuggested(); }catch(err){ console.error('v16 rest check failed', err); }
+    try{ v16rest = _previewWeekIdx === null && v16RestSuggested(); }catch(err){ console.error('v16 rest check failed', err); }   // 16.0.1: a previewed week keeps v15's wording
     const earlyCount = statuses.filter(s => s.status === 'done' && liftEndedEarlyInWeek(s.lift.id, micro)).length;   // v15 (round 9, E2)
     if (dueCount === 0) rec = earlyCount ? 'All lifts done this week, ' + earlyCount + ' ended early.' : 'All lifts completed this week. Nice work!';
     else if (doneCount === 0 && dueCount === active.length) rec = v16rest ? 'Rest day suggested. To train anyway, pick a lift: ' + nextName + ' is the closest fit.' : 'Pick a lift and get started. Next up: ' + nextName + '.';
@@ -6342,7 +6384,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'restMatrixGrid','maxFormula','barbellProfileEditor',
      'liftIntelCard',
      'weeklyPlanCard',
-     'btnRequestPersist','btnStartNextCycle','btnWipeHistory','btnSaveSettings','pwaNotes',
+     'btnRequestPersist','btnStartNextCycle','btnRestartMaxes','btnWipeHistory','btnSaveSettings','pwaNotes',
      'hermesUrl','hermesToken','hermesSave','hermesTest','hermesSend','hermesUseCoach','hermesCoachReason','hermesStatus','hermesAttention','hermesHeaderStatus',
      'propsNone','propsGrid',
 'rpePanel','rpeVal','rpeAnchor','btnRpeMinus','btnRpePlus','missedRepWrap','missedRepChk',
@@ -13153,6 +13195,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       '\n\nAs at every new week, Tier 1 lifts from the library are recalculated from your TM for week 1.';
     const ok = await showConfirm('Start next cycle', msg, 'Start cycle ' + (cur + 1), 'btn-w');
     if (!ok) return false;
+    await applyCycleStart(cur, done);
+    await saveState();
+    toast('Cycle ' + (cur + 1) + ' started — week 1.', 'g');
+    render();
+    return true;
+  }
+  // v16.0.1: the steps of a cycle start, moved here unchanged from startNextCycle so "Restart with new maxes" runs them too
+  async function applyCycleStart(cur, done){
     if (state.accessoryPhase){ state.accessoryPhase = null; _accDrafts.clear(); }
     state.program.cycle = cur + 1;
     state.program.index = 0;
@@ -13168,11 +13218,117 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // obsolete staging cleared); the stamp still spares ordinary renders and hand-set weights within a week.
     state.settings.accSyncStamp = null;
     try{ await maybeSyncFormulaAccessories('cycle'); }catch(_){}
+  }
+  /* ═══ v16.0.1: RESTART WITH NEW MAXES (owner request 2026-11-15) ═══
+     For a lifter who stopped mid-program, took weeks off or changed training, and whose maxes moved. They type a 1RM
+     per lift; the TM becomes 90% of it (the book's starting rule); the program goes back to week 1.
+     Nothing new is invented here: a changed TM is applied with setLiftTm and reported as the existing tm_edited
+     event, exactly as a TM typed in Settings; "keep history" then runs the same steps as "Start next cycle"
+     (applyCycleStart, the existing cycle_started event); "wipe history" runs the existing wipeHistoryAndStartOver.
+     No new event type, packet field or state field. */
+  function restartModalEl(){ return document.getElementById('restartModal'); }
+  function restartClose(){
+    const m = restartModalEl(); if (!m) return;
+    m.classList.remove('show'); setTimeout(() => { if (!m.classList.contains('show')) m.hidden = true; }, 220);
+  }
+  // Reads the sheet. Returns { edits:[{ liftId, from, to }] } for lifts whose 1RM was changed, or { error }.
+  function restartRead(){
+    const edits = [];
+    for (const id of (state.settings.activeLiftIds || [])){
+      const inp = document.getElementById('restart1rm_' + id); if (!inp) continue;
+      const raw = String(inp.value).trim(), v = n(raw), name = getLiftMeta(id).name;
+      if (raw === inp.getAttribute('data-was')) continue;                      // left alone: this lift keeps its TM
+      if (!Number.isFinite(v) || v <= 0) return { error:name + ': type a 1RM above 0.' };
+      const to = _round2(v * 0.9), from = trainingMax(state.lifts[id]);
+      if (to > 2000) return { error:name + ': that is above the largest training max the app accepts (2000).' };
+      if (Math.abs(to - from) >= 0.005) edits.push({ liftId:id, from, to });
+    }
+    return { edits };
+  }
+  function restartPreview(){
+    for (const id of (state.settings.activeLiftIds || [])){
+      const inp = document.getElementById('restart1rm_' + id), out = document.getElementById('restartTm_' + id); if (!inp || !out) continue;
+      const raw = String(inp.value).trim(), v = n(raw), from = trainingMax(state.lifts[id]);
+      if (raw === inp.getAttribute('data-was')) out.textContent = 'TM stays ' + formatWeight(from);
+      else if (!Number.isFinite(v) || v <= 0) out.textContent = 'Type a 1RM';
+      else out.textContent = 'TM ' + formatWeight(_round2(v * 0.9)) + ' (was ' + formatWeight(from) + ')';
+    }
+    const err = document.getElementById('restartErr'); if (err) err.hidden = true;
+  }
+  let _restartResolve = null;
+  function restartSettle(value){ const r = _restartResolve; _restartResolve = null; restartClose(); if (r) r(value); }
+  function restartCollect(){
+    return new Promise(resolve => {
+      const m = restartModalEl(), rows = document.getElementById('restartRows');
+      if (!m || !rows){ resolve(null); return; }
+      if (_restartResolve) _restartResolve(null);
+      _restartResolve = resolve;
+      rows.innerHTML = (state.settings.activeLiftIds || []).map(id => {
+        const was = String(impliedOneRm(state.lifts[id]));
+        return '<div class="restart-row"><label for="restart1rm_' + id + '">' + escapeHtml(getLiftMeta(id).name) + ' 1RM</label>' +
+          '<input id="restart1rm_' + id + '" type="number" inputmode="decimal" step="any" min="1" value="' + was + '" data-was="' + was + '" aria-describedby="restartTm_' + id + '">' +
+          '<span id="restartTm_' + id + '" class="restart-tm"></span></div>';
+      }).join('');
+      restartPreview();
+      m.hidden = false; requestAnimationFrame(() => m.classList.add('show'));
+    });
+  }
+  function restartNext(){
+    const r = restartRead();
+    if (r.error){ const err = document.getElementById('restartErr'); if (err){ err.textContent = r.error; err.hidden = false; } return; }
+    restartSettle(r.edits);
+  }
+  function restartEditLines(edits){
+    return (state.settings.activeLiftIds || []).map(id => {
+      const e = edits.find(x => x.liftId === id), nm = getLiftMeta(id).name;
+      return e ? '• ' + nm + ' TM ' + formatWeight(e.to) + ' (was ' + formatWeight(e.from) + ')' : '• ' + nm + ' TM ' + formatWeight(trainingMax(state.lifts[id])) + ' (unchanged)';
+    }).join('\n');
+  }
+  function restartApplyTms(edits){
+    for (const e of edits){
+      setLiftTm(state.lifts[e.liftId], e.to);
+      hermesQueueEvent('tm_edited', { liftId:e.liftId, from:e.from, to:trainingMax(state.lifts[e.liftId]) });
+    }
+  }
+  async function restartWithNewMaxes(){
+    if (state.activeSession){ toast('Finish or cancel the current workout first.', 'w'); return false; }
+    const edits = await restartCollect();
+    if (!edits) return false;
+    const pick = await showChoice('Keep your history?',
+      'Keep history: every logged session, record and chart stays, and each session keeps its cycle number.\n\n' +
+      'Wipe history: erases your logged sessions and what was built from them. The app asks about a backup and confirms before it erases anything.',
+      'Keep history', 'Wipe history');
+    if (pick === 'cancel') return false;
+    if (pick === 'alt'){
+      // The existing wipe, with its own export question and confirmation. The new maxes go in after it, so their
+      // tm_edited events belong to the new history generation.
+      const wiped = await wipeHistoryAndStartOver();
+      if (!wiped) return false;
+      restartApplyTms(edits);
+      state.settings.accSyncStamp = null;
+      try{ await maybeSyncFormulaAccessories('cycle'); }catch(_){}
+      await saveState();
+      toast(edits.length ? 'History wiped. New maxes set — week 1.' : 'History wiped — week 1.', 'g');
+      render();
+      return true;
+    }
+    const cur = state.program.cycle || 1;
+    const done = currentMicrocycle().index >= buildTimeline().length;
+    const ok = await showConfirm('Restart with new maxes',
+      (done ? 'Cycle ' + cur + ' is complete.' : 'You are in week ' + (state.program.index + 1) + ' of cycle ' + cur + '. The rest of it will be skipped.') +
+      '\n\nCycle ' + (cur + 1) + ' starts at week 1 (10s wave) with:\n' + restartEditLines(edits) +
+      '\n\nKept: history (every session keeps its cycle number), accessory weights and progress, weak points.' +
+      '\n\nAs at every new week, Tier 1 lifts from the library are recalculated from your TM for week 1.',
+      'Start cycle ' + (cur + 1), 'btn-w');
+    if (!ok) return false;
+    restartApplyTms(edits);
+    await applyCycleStart(cur, done);
     await saveState();
-    toast('Cycle ' + (cur + 1) + ' started — week 1.', 'g');
+    toast('Cycle ' + (cur + 1) + ' started — week 1' + (edits.length ? ' with new maxes.' : '.'), 'g');
     render();
     return true;
   }
+
   function lifts_tm_lines(){
     return (state.settings.activeLiftIds || []).map(id => '• ' + getLiftMeta(id).name + ' TM ' + formatWeight(trainingMax(state.lifts[id]))).join('\n');
   }
@@ -14517,6 +14673,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.btnRequestPersist.addEventListener('click', requestPersistentStorage);
     if (el.btnStartNextCycle) el.btnStartNextCycle.addEventListener('click', startNextCycle);          // v14
     if (el.btnWipeHistory) el.btnWipeHistory.addEventListener('click', wipeHistoryAndStartOver);     // v14
+    if (el.btnRestartMaxes) el.btnRestartMaxes.addEventListener('click', restartWithNewMaxes);       // v16.0.1
+    { const sb = document.getElementById('btnSettings'); if (sb) sb.addEventListener('click', () => setView('Settings')); }   // v16.0.1: bound here, not in v16Bind
+    { const g = id => document.getElementById(id), rm = g('restartModal');                             // v16.0.1: the restart sheet
+      if (g('btnRestartNext')) g('btnRestartNext').addEventListener('click', restartNext);
+      if (g('btnRestartCancel')) g('btnRestartCancel').addEventListener('click', () => restartSettle(null));
+      if (g('restartRows')) g('restartRows').addEventListener('input', restartPreview);
+      if (rm) rm.addEventListener('click', e => { if (e.target === rm) restartSettle(null); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && rm && !rm.hidden) restartSettle(null); }); }
     el.btnSaveSettings.addEventListener('click', saveSettings);
     bindHermesSettings();   // v14
 
@@ -14970,7 +15134,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   const V16_UI_KEY = 'juggernaut_ui_v16';          // display choices for this device; not part of the saved state or exports
   const V16_TAB_OF = { Accessories:'Program', Recovery:'Workout', Settings:null };
   const V16_TITLES = { Workout:'Today', Program:'Program', History:'History', Coach:'Coach', Tools:'Tools', Settings:'Settings', Accessories:'Accessories', Recovery:'Recovery' };
-  const V16_WAVE_COLOR = { '10s':'#EBDDAE', '8s':'#F2BC4B', '5s':'#F08B32', '3s':'#EE5F42' };
+  const V16_WAVE_COLOR = { '10s':'#FFE45C', '8s':'#FFB703', '5s':'#FF7A1A', '3s':'#FF3B4E' };
   const V16_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   let _v16View = 'Workout', _v16Week = null, _v16Recap = null, _v16RpeAuto = null;
   const v16$ = id => document.getElementById(id);
@@ -15018,7 +15182,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     s.textContent = _v16View === 'Workout' ? new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' })
       : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.0';
     const micro = currentMicrocycle();
-    document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8A9BAE' : (V16_WAVE_COLOR[micro.wave] || '#EBDDAE'));
+    document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8FA8FF' : (V16_WAVE_COLOR[micro.wave] || '#FFE45C'));
   }
   function v16OnView(name){
     _v16View = name;
@@ -15069,7 +15233,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (prog){
       const n = tl.length, left = Math.max(0, n - cur - 1);
       let segs = '';
-      tl.forEach((wk, idx) => { segs += '<i class="' + (idx < cur ? 'done' : idx === cur ? 'cur' : '') + '" style="--wc:' + (wk.phase === 'deload' ? '#8A9BAE' : V16_WAVE_COLOR[wk.wave]) + '"></i>'; });
+      tl.forEach((wk, idx) => { segs += '<i class="' + (idx < cur ? 'done' : idx === cur ? 'cur' : '') + '" style="--wc:' + (wk.phase === 'deload' ? '#8FA8FF' : V16_WAVE_COLOR[wk.wave]) + '"></i>'; });
       prog.innerHTML = '<div class="v16-h"><h3>' + (cur >= n ? 'Cycle ' + cycle + ' complete' : 'Week ' + (cur + 1) + ' of ' + n) + '</h3><span>Cycle ' + cycle
         + (cur >= n ? '' : left === 0 ? ', last week' : ', ' + left + ' more after this') + '</span></div><div class="v16-prog" aria-hidden="true">' + segs + '</div>';
     }
@@ -15092,7 +15256,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (comp){ act.forEach(l => { const st = comp[l.id]; if (st === 'done') nDone++; dots += '<i class="' + (st === 'done' ? 'on' : st === 'skipped' ? 'sk' : '') + '"></i>'; }); }
       const lv = Math.round(100 * load[idx].vol / maxVol), li = Math.round(100 * load[idx].top / maxTop);
       html += '<button type="button" class="v16-cell' + (done ? ' done' : '') + (isCur ? ' cur' : '') + (idx === _v16Week ? ' sel' : '') + '" data-v16-week="' + idx + '" style="--wc:'
-        + (wk.phase === 'deload' ? '#8A9BAE' : V16_WAVE_COLOR[wk.wave]) + '" aria-label="Week ' + (idx + 1) + ', ' + wk.wave + ' ' + wk.phase + (done ? ', done' : isCur ? ', this week, ' + nDone + ' of ' + act.length + ' lifts done' : '')
+        + (wk.phase === 'deload' ? '#8FA8FF' : V16_WAVE_COLOR[wk.wave]) + '" aria-label="Week ' + (idx + 1) + ', ' + wk.wave + ' ' + wk.phase + (done ? ', done' : isCur ? ', this week, ' + nDone + ' of ' + act.length + ' lifts done' : '')
         + (res ? ', test ' + res.reps + ' reps against a standard of ' + res.standard + ', ' + res.name : '')
         + ', volume ' + lv + ' percent of the biggest week, top set ' + formatPercent(load[idx].top) + '">'
         + '<span class="v16-cell-t"><span>' + (idx + 1) + '</span>' + (done ? V16_CHECK : isCur ? '<span class="v16-dots">' + dots + '</span>' : '') + '</span>'
@@ -15175,7 +15339,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const box = v16$('rcBody'); if (!box) return;
     const a = computeDeloadAssessment(), R = DELOAD_RULES;
     const label = { none:'Clear', watch:'Watch', caution:'Caution', deload:'Deload' }[a.severity] || 'Clear';
-    const col = { none:'#F6F2E9', watch:'#F2BC4B', caution:'#F08B32', deload:'#EE5F42' }[a.severity] || '#F6F2E9';
+    const col = { none:'#FFFFFF', watch:'#FFB703', caution:'#FF7A1A', deload:'#FF3B4E' }[a.severity] || '#FFFFFF';
     const edges = [0, R.watch, R.caution, R.deload, R.deload + (R.deload - R.caution) / 2];
     const names = ['Clear', 'Watch', 'Caution', 'Deload'];
     const segs = names.map((nm, i) => { const f = Math.max(0, Math.min(1, (a.score - edges[i]) / (edges[i + 1] - edges[i]))); return '<i><b style="width:' + Math.round(f * 100) + '%"></b></i>'; }).join('');
@@ -15292,17 +15456,17 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       // each edge runs from today toward the goal line; an arrival past the chart's right edge is cut at that edge
       const edge = wk => { const tx = now + wk * WEEK; if (tx <= t1) return [X(tx), gy]; const f = (t1 - now) / (tx - now); return [W, Math.round((cy + (gy - cy) * f) * 10) / 10]; };
       const a = edge(eta.lowWeeks), b = edge(eta.highWeeks);
-      cone = '<path d="M' + cx + ' ' + cy + ' L' + a[0] + ' ' + a[1] + (a[0] < W && b[0] >= W ? ' L' + W + ' ' + gy : '') + ' L' + b[0] + ' ' + b[1] + ' Z" fill="#F08B32" fill-opacity=".28"/>'
-        + '<path d="M' + cx + ' ' + cy + ' L' + a[0] + ' ' + a[1] + ' M' + cx + ' ' + cy + ' L' + b[0] + ' ' + b[1] + '" stroke="#F08B32" stroke-width="1.5" stroke-linecap="round" fill="none"/>';
+      cone = '<path d="M' + cx + ' ' + cy + ' L' + a[0] + ' ' + a[1] + (a[0] < W && b[0] >= W ? ' L' + W + ' ' + gy : '') + ' L' + b[0] + ' ' + b[1] + ' Z" fill="#FF7A1A" fill-opacity=".28"/>'
+        + '<path d="M' + cx + ' ' + cy + ' L' + a[0] + ' ' + a[1] + ' M' + cx + ' ' + cy + ' L' + b[0] + ' ' + b[1] + '" stroke="#FF7A1A" stroke-width="1.5" stroke-linecap="round" fill="none"/>';
     }
     const etaText = !eta ? 'An arrival estimate needs 3 test days under the book rule.' : eta.highWeeks === 0 ? 'Goal reached by implied 1RM.'
       : 'About ' + eta.lowWeeks + ' to ' + eta.highWeeks + (eta.highWeeks >= 104 ? '+' : '') + ' weeks at your test-day gains, from ' + eta.tests + ' tests.';
     return '<div class="lift-sec" id="liftRunway"><div class="v16-h"><h3>Goal ' + v16Wt(goal) + '</h3><span>' + (cur < goal ? v16Wt(Math.round((goal - cur) * 10) / 10) + ' to go' : 'Reached') + '</span></div>'
       + '<div class="v16-run"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Implied one-rep max over time against the goal of ' + escapeHtml(formatWeight(goal)) + '">'
-      + cone + '<path d="M0 ' + gy + ' H' + W + '" stroke="#EBDDAE" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'
-      + '<path d="' + d + '" stroke="#F6F2E9" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>'
-      + pts.slice(1).map((p, i) => '<circle cx="' + X(p.t) + '" cy="' + Y(p.v) + '" r="3.5" fill="#23201D" stroke="#F6F2E9" stroke-width="2"/>').join('')
-      + '<circle cx="' + cx + '" cy="' + cy + '" r="5.5" fill="#F6F2E9"/></svg></div>'
+      + cone + '<path d="M0 ' + gy + ' H' + W + '" stroke="#FFE45C" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'
+      + '<path d="' + d + '" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>'
+      + pts.slice(1).map((p, i) => '<circle cx="' + X(p.t) + '" cy="' + Y(p.v) + '" r="3.5" fill="#101A1A" stroke="#FFFFFF" stroke-width="2"/>').join('')
+      + '<circle cx="' + cx + '" cy="' + cy + '" r="5.5" fill="#FFFFFF"/></svg></div>'
       + '<p class="chart-note">Implied 1RM (TM ÷ 0.9) at each test day, and today. ' + etaText + '</p></div>';
   }
   function v16BestSets(id){
@@ -15337,9 +15501,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function v16DrawRecap(){
     const c = v16$('recapCanvas'); if (!c || !_v16Recap) return;
     if (_v16Recap.session){ v16DrawSession(c); return; }
-    const { wave, cycle, rows } = _v16Recap, W = 1080, H = 1350, ctx = c.getContext('2d'), INK = '#191715';
+    const { wave, cycle, rows } = _v16Recap, W = 1080, H = 1350, ctx = c.getContext('2d'), INK = '#070E0E';
     c.width = W; c.height = H;
-    ctx.fillStyle = V16_WAVE_COLOR[wave] || '#EBDDAE'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = V16_WAVE_COLOR[wave] || '#FFE45C'; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + (wide ? 'expanded ' : '') + px + 'px Archivo, "Helvetica Neue", Arial, sans-serif'; };
     const L = 80, R = W - 80;
@@ -15457,10 +15621,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     });
   }
   // Display only: draws the loaded bar for the share card from calculatePlates() output. No weights are computed here.
-  const V16_PLATE_DRAW = { '45':['#C8402F','#fff',34,124], '35':['#F2C230','#191715',30,112], '25':['#2B6FB8','#fff',28,98], '10':['#23824A','#fff',24,76],
-    '5':['#6F767C','#fff',22,60], '2.5':['#B9BEC2','#191715',20,48], '1.25':['#E4E6E8','#191715',18,42] };
+  const V16_PLATE_DRAW = { '45':['#C8402F','#fff',34,124], '35':['#F2C230','#070E0E',30,112], '25':['#2B6FB8','#fff',28,98], '10':['#23824A','#fff',24,76],
+    '5':['#6F767C','#fff',22,60], '2.5':['#B9BEC2','#070E0E',20,48], '1.25':['#E4E6E8','#070E0E',18,42] };
   function v16DrawBar(ctx, perSide, cx, cy, maxW, bg){
-    const INK = '#191715', iron = v16Ui().plates === 'iron', gapP = 4, half = maxW / 2, inner = 150, collar = 22;
+    const INK = '#070E0E', iron = v16Ui().plates === 'iron', gapP = 4, half = maxW / 2, inner = 150, collar = 22;
     const spec = perSide.map(p => { const d = V16_PLATE_DRAW[String(p)] || ['#8A8F94', '#fff', 22, 60]; return { p, fill:d[0], ink:d[1], w:d[2], h:d[3] }; });
     let need = spec.reduce((a, x) => a + x.w + gapP, 0);
     const room = half - inner - collar - 46, k = need > room ? room / need : 1;
@@ -15490,9 +15654,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   function v16DrawSession(c){
-    const r = _v16Recap, W = 1080, H = 1350, ctx = c.getContext('2d'), INK = '#191715', L = 80, R = W - 80;
+    const r = _v16Recap, W = 1080, H = 1350, ctx = c.getContext('2d'), INK = '#070E0E', L = 80, R = W - 80;
     c.width = W; c.height = H;
-    ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#EBDDAE'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#FFE45C'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + (wide ? 'expanded ' : '') + px + 'px Archivo, "Helvetica Neue", Arial, sans-serif'; };
     F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.0', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 130, true);
@@ -15510,7 +15674,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const words = r.line.split(' '); let line = '', y = hasBar ? 884 : 960;
     words.forEach(wd => { if (ctx.measureText(line + wd).width > R - L){ ctx.fillText(line.trim(), L, y); y += 54; line = ''; } line += wd + ' '; });
     if (line.trim()) ctx.fillText(line.trim(), L, y);
-    if (hasBar){ try { v16DrawBar(ctx, pd.perSide, W / 2, 1090, R - L, V16_WAVE_COLOR[r.wave] || '#EBDDAE'); } catch (e){} }
+    if (hasBar){ try { v16DrawBar(ctx, pd.perSide, W / 2, 1090, R - L, V16_WAVE_COLOR[r.wave] || '#FFE45C'); } catch (e){} }
     ctx.textAlign = 'left'; ctx.fillStyle = INK;
     ctx.globalAlpha = .3; ctx.fillRect(L, 1180, R - L, 3); ctx.globalAlpha = 1;
     F(700, 36); ctx.textAlign = 'left'; ctx.fillText(r.foot[0], L, 1250); ctx.textAlign = 'right'; ctx.fillText(r.foot[1], R, 1250);
@@ -15527,10 +15691,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // r3: a weight never wraps, words may. Watches the text so the class is right on every write (it was set one render late).
   function v16WeightClass(){ const e = el.dashWeight; if (e) e.classList.toggle('v16-wnum', /^[\d.,]+\s(lb|kg)$/.test(e.textContent || '')); }
   function v16Bind(){
+    // 16.0.1: every binding is contained on its own and none depends on v16$, so one failure cannot take the rest with it.
+    // The Settings button, the only way into Settings, is bound in bindEvents and does not depend on this function at all.
+    const on = (id, ev, fn) => { try{ const x = document.getElementById(id); if (x) x.addEventListener(ev, fn); }catch(err){ console.error('v16 bind ' + id + ' failed', err); } };
     v16Safe('weight class', () => { v16WeightClass(); if (el.dashWeight && typeof MutationObserver === 'function') new MutationObserver(() => v16Safe('weight class', v16WeightClass)).observe(el.dashWeight, { childList:true, characterData:true, subtree:true }); });
     v16Safe('plate style', v16ApplyPlateStyle);
-    const on = (id, ev, fn) => { const x = v16$(id); if (x) x.addEventListener(ev, fn); };
-    on('btnSettings', 'click', () => setView('Settings'));
     on('v16PlateStyle', 'change', e => { v16SetUi('plates', e.target.value === 'iron' ? 'iron' : 'color'); v16ApplyPlateStyle(); });
     on('btnAccSetup', 'click', () => setView('Accessories'));
     on('btnAccBack', 'click', () => setView('Program'));
@@ -15550,9 +15715,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (t.hasAttribute('data-v16-recap')){ v16OpenRecap(t.getAttribute('data-v16-recap')); return; }
       if (t.hasAttribute('data-v16-lift')) openLiftSheet(t.getAttribute('data-v16-lift'));
     });
-    const pw = v16$('calcPlateWeight');
+    const pw = document.getElementById('calcPlateWeight');
     if (pw) pw.addEventListener('input', () => {
-      const w = parseFloat(pw.value), box = v16$('toolPlateSvg'); if (!box) return;
+      const w = parseFloat(pw.value), box = document.getElementById('toolPlateSvg'); if (!box) return;
       if (!Number.isFinite(w) || w <= 0){ box.innerHTML = ''; return; }
       v16Safe('tool plates', () => renderPlateSVG(calculatePlates(w), box, null));
     });
