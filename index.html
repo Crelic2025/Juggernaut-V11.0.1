@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://openrouter.ai https://api.anthropic.com https: http://127.0.0.1:* blob:; worker-src 'self' blob:; manifest-src 'self' blob:; frame-ancestors 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#07090b">
+<meta name="theme-color" content="#191715">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut Method 2.0 — v15.0.0</title>
+<title>Juggernaut Method 2.0 — v16.0.0</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap');
 
 :root{
   /* surfaces */
@@ -1846,6 +1846,366 @@ button.cal-day{cursor:pointer}
   main:has(#sessionSection:not([hidden])) #sessionSection>.ws-main{grid-column:1;position:sticky;top:112px}
   main:has(#sessionSection:not([hidden])) #sessionSection>.ws-side{grid-column:2}
 }
+/* ═══════════════ v16.0.0 visual system: iron and chalk ═══════════════
+   Warm charcoal surfaces, chalk ink, wide heavy numerals. Colour is kept for meaning:
+   the four waves heat from straw to red, steel blue marks readiness and the coach.
+   Every v15 token name is kept and re-pointed, so script-set inline styles still resolve. */
+:root{
+  --bg:#191715;--bg2:#191715;--panel:#23201D;--panel2:#2D2925;--panel3:#39342F;
+  --text:#F6F2E9;--text2:#CEC6B8;--muted:#A49C8E;
+  --line:#39342F;--line2:#4A433C;--edge:#7C7368;
+  --accent:#F6F2E9;--accent-ink:#191715;--accent-dim:rgba(246,242,233,.07);--accent-mid:rgba(246,242,233,.38);
+  --blue:#9CC0EA;--blue-dim:rgba(156,192,234,.12);--blue-mid:rgba(156,192,234,.45);
+  --purple:#CEC6B8;--purple-dim:rgba(255,255,255,.05);
+  --warn:#F2BC4B;--warn-dim:rgba(242,188,75,.10);--warn-mid:rgba(242,188,75,.45);
+  --bad:#EE5F42;--bad-dim:rgba(238,95,66,.12);--bad-mid:rgba(238,95,66,.5);--bad-ink:#191715;--warn-ink:#191715;
+  --scrim:rgba(10,9,8,.7);--press:rgba(246,242,233,.07);
+  --wave-10s-soft:#EBDDAE;--wave-amber-soft:#F2BC4B;--wave-3s-soft:#EE5F42;
+  --w10:#EBDDAE;--w8:#F2BC4B;--w5:#F08B32;--w3:#EE5F42;--wdl:#8A9BAE;--heat:#EBDDAE;
+  --r:14px;--r-sm:10px;--r-lg:20px;
+  --shadow:0 -12px 40px rgba(0,0,0,.55);
+  --font:'Archivo','Helvetica Neue',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --mono:'Archivo','Helvetica Neue',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --wide:125%;
+}
+body{-webkit-font-smoothing:antialiased}
+.hdr-title,.card h2,h1,h2,.sheet-title,.dash-phase-title,.timer-label{font-stretch:118%;letter-spacing:-.01em}
+.hero-weight,.dash-preview-weight,.lift-hero-v,.timer-text,.rep-val,.rest-next-weight,.v16-num{
+  font-family:var(--font);font-stretch:var(--wide);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.perf-mode .hero-weight,.perf-mode .dash-preview-weight{font-stretch:normal}
+
+/* shell */
+header{background:var(--bg);border-bottom:none;padding-bottom:4px}
+.hdr-title{font-size:30px;line-height:1.15;font-weight:800}
+.hdr-sub{font-size:13px;font-weight:500;color:var(--muted)}
+.hdr-row{align-items:flex-end}
+.icon-btn{border-radius:50%;background:var(--panel2);color:var(--text)}
+.icon-btn svg{width:22px;height:22px}
+.hdr-actions{gap:8px}
+.hdr-badges{margin-top:10px}
+.badge{border-color:transparent;background:var(--panel2);padding:7px 11px}
+.badge.blue{color:var(--accent-ink);background:var(--heat);border-color:transparent;font-weight:700}
+.card{border-color:transparent}
+.hero-card{border-color:transparent}
+button{border-radius:var(--r)}
+.btn-p{min-height:52px;border-radius:16px;font-stretch:110%;font-size:16px}
+.btn-s{border-color:transparent;background:var(--panel2)}
+.card .btn-s,.hero-card .btn-s,.modal-card .btn-s{background:var(--panel3)}
+input[type="number"],input[type="text"],input[type="url"],input[type="password"],select,textarea{border-radius:12px}
+
+/* bottom tabs */
+.bottom-nav{background:var(--bg);border-top:1px solid var(--line)}
+.bottom-nav .tab{color:var(--muted);position:relative}
+.bottom-nav .tab.active{color:var(--text)}
+.bottom-nav .tab.active::before{content:"";position:absolute;top:0;left:50%;width:22px;height:3px;margin-left:-11px;border-radius:2px;background:var(--heat)}
+.bottom-nav .tab.active::after{display:none}
+.bottom-nav .tab svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* 16-week strip: one bar per week, height by phase, colour by wave */
+.timeline{display:flex;align-items:flex-end;gap:3px;padding:6px 2px 4px;overflow:visible;border:none;background:transparent;margin-bottom:14px}
+.timeline .tl-divider{width:9px;min-width:9px;height:1px;background:transparent;border:none;margin:0;flex:none}
+.timeline .tl-week{flex:1 1 0;min-width:0;width:auto;height:44px;min-height:44px;padding:0;border:none;border-radius:0;background:transparent;box-shadow:none;
+  font-size:0;color:transparent;position:relative;cursor:pointer;display:block;opacity:1}
+.timeline .tl-week::before{content:"";position:absolute;left:0;right:0;bottom:0;border-radius:4px;background:var(--wc);opacity:.26;height:22px}
+.timeline .tl-week.ph-intensification::before{height:29px}
+.timeline .tl-week.ph-realization::before{height:38px}
+.timeline .tl-week.ph-deload::before{height:12px;background:var(--wdl)}
+.timeline .tl-week.done::before,.timeline .tl-week.active::before,.timeline .tl-week.preview::before{opacity:1}
+.timeline .tl-week.active::before{box-shadow:0 0 0 1.5px var(--bg),0 0 0 3px var(--text)}
+.timeline .tl-week.preview::before{box-shadow:0 0 0 1.5px var(--bg),0 0 0 3px var(--blue)}
+.timeline .tl-week::after{display:none !important}
+.tl-week.wave-10s{--wc:var(--w10)}.tl-week.wave-8s{--wc:var(--w8)}.tl-week.wave-5s{--wc:var(--w5)}.tl-week.wave-3s{--wc:var(--w3)}
+
+/* today */
+.dash-preview-weight{font-size:clamp(46px,17.5vw,84px);line-height:.95}
+.dash-preview-weight.v16-wnum{white-space:nowrap}
+.dash-phase-title{font-size:20px;font-weight:800}
+.dash-start-row .btn-p{min-height:56px}
+.v16-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.v16-tile{display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:88px;padding:12px 14px;border-radius:20px;background:var(--panel);border:none;text-align:left;color:var(--text)}
+.v16-tile-k{font-size:13px;font-weight:500;color:var(--muted)}
+.v16-tile-v{font-size:26px;line-height:1;font-weight:800;font-stretch:115%}
+.v16-tile-v small{font-size:13px;font-weight:500;color:var(--muted);font-stretch:100%;margin-left:4px}
+.v16-tile-s{font-size:12px;color:var(--text2);font-weight:500}
+.v16-track{height:6px;border-radius:3px;background:var(--panel3);overflow:hidden}
+.v16-track>i{display:block;height:100%;border-radius:3px;background:var(--w10)}
+
+/* the bar */
+.plate-svg-wrap{margin-top:10px}
+.plate-svg{width:100%;height:auto;display:block;max-height:none}
+.plate-svg .bar{fill:#6E675E}.plate-svg .sleeve{fill:#8B8478}.plate-svg .collar{fill:#B5AE9F}
+.plate-svg .plate{stroke:none}
+.plate-svg .p45{fill:#F1ECE1}.plate-svg .p35{fill:#DDD6C9}.plate-svg .p25{fill:#CBC3B5}.plate-svg .p10{fill:#BAB2A4}
+.plate-svg .p5{fill:#ADA598}.plate-svg .p2_5{fill:#A29A8D}.plate-svg .p1_25{fill:#999184}
+.plate-svg .shade{fill:#191715;opacity:.16}.plate-svg .shine{fill:#fff;opacity:.16}
+.plate-svg text{font-family:var(--font);font-stretch:62%;font-weight:800;font-size:12px;fill:#191715;text-anchor:middle}
+/* colour-coded: 45 red, 35 yellow, 25 blue, 10 green, 5 grey; the two change plates in lighter greys */
+body[data-plates="color"] .plate-svg .p45{fill:#C8402F}body[data-plates="color"] .plate-svg .p35{fill:#F2C230}
+body[data-plates="color"] .plate-svg .p25{fill:#2B6FB8}body[data-plates="color"] .plate-svg .p10{fill:#23824A}
+body[data-plates="color"] .plate-svg .p5{fill:#6F767C}body[data-plates="color"] .plate-svg .p2_5{fill:#B9BEC2}
+body[data-plates="color"] .plate-svg .p1_25{fill:#E4E6E8}
+body[data-plates="color"] .plate-svg text.tp45,body[data-plates="color"] .plate-svg text.tp25,
+body[data-plates="color"] .plate-svg text.tp10,body[data-plates="color"] .plate-svg text.tp5{fill:#fff}
+body[data-plates="iron"] .plate-svg text.tnew{fill:#191715 !important}
+body[data-plates="iron"] .plate-svg .plate.added{fill:var(--w5) !important}
+body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
+.plate-text{font-size:14px;font-weight:500;color:var(--text2)}
+
+/* session */
+.hero-weight{font-size:clamp(46px,17.5vw,84px);line-height:.95;text-decoration:none;white-space:nowrap}
+.rep-btn{border-radius:50%;border-color:transparent;background:var(--panel3);width:60px;height:60px;min-width:60px}
+.rep-box{background:transparent;padding:8px 0}
+.rep-val{font-size:56px;line-height:1}
+#btnDone{min-height:60px;font-size:17px}
+.v16-ladder{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.v16-ladder-h{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.v16-rung{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:12px}
+.v16-rung.cur{background:var(--panel3);box-shadow:inset 0 0 0 1.5px var(--text)}
+.v16-rung-n{width:30px;font-size:19px;font-weight:800;font-stretch:115%;color:var(--text2)}
+.v16-rung.gain .v16-rung-n,.v16-rung.cur .v16-rung-n{color:var(--text)}
+.v16-rung-mid{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.v16-rung-bar{height:10px;border-radius:5px;background:var(--panel3);width:8px;flex:none}
+.v16-rung.gain .v16-rung-bar{background:var(--heat)}
+.v16-rung-note{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
+.v16-flag{font-size:11px;font-weight:700;line-height:20px;padding:0 8px;border-radius:10px;background:var(--w10);color:#191715;white-space:nowrap}
+.v16-rung-r{text-align:right;line-height:1.15}
+.v16-rung-r b{display:block;font-size:15px;font-weight:800;font-stretch:110%}
+.v16-rung-r span{font-size:12px;font-weight:600;color:var(--muted)}
+.v16-ladder-f{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* rest */
+.timer-text{font-size:64px}
+.timer-ring-fg{stroke:var(--blue)}
+.v16-swap{margin-top:10px;text-align:left}
+.v16-swap-row{display:flex;align-items:center;gap:6px;min-height:28px;font-size:13px;color:var(--text2);font-weight:500}
+.v16-swap-row b{width:64px;font-weight:500}
+.v16-pchip{font-size:13px;font-weight:700;line-height:24px;padding:0 10px;border-radius:12px;background:var(--panel3);color:var(--text2)}
+.v16-pchip.on{background:var(--w5);color:#191715}
+
+/* readiness zones */
+.v16-zones{margin:12px 0 4px}
+.v16-zone-track{position:relative;display:flex;gap:3px}
+.v16-zone-track>i{height:10px;border-radius:5px;background:var(--panel3)}
+.v16-zone-track>i.on{background:var(--blue)}
+.v16-zone-mark{position:absolute;top:-5px;width:4px;height:20px;margin-left:-2px;border-radius:2px;background:var(--text);box-shadow:0 0 0 2px var(--panel)}
+.v16-zone-labels{display:flex;gap:3px;margin-top:8px;font-size:11px;font-weight:600;color:var(--muted)}
+.v16-zone-labels>span.on{color:var(--text);font-weight:700}
+
+/* program grid */
+.v16-grid{display:grid;grid-template-columns:34px repeat(4,minmax(0,1fr));gap:6px;margin-bottom:14px}
+.v16-grid-h{font-size:12px;font-weight:600;color:var(--muted);line-height:16px}
+.v16-grid-w{align-self:center;font-size:15px;font-weight:800}
+.v16-cell{min-height:98px;height:98px;padding:9px 8px 9px 10px;border-radius:14px;border:none;background:var(--panel);color:var(--text2);text-align:left;
+  display:flex;flex-direction:column;justify-content:space-between;align-items:stretch}
+.v16-cell-t{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:var(--muted)}
+.v16-cell-t svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.v16-cell-m{font-size:15px;font-weight:800;font-stretch:88%;line-height:18px;white-space:nowrap}
+.v16-cell-s{font-size:12px;font-weight:600;line-height:14px;color:var(--muted);white-space:nowrap}
+.v16-cell.done,.v16-cell.cur{background:var(--wc);color:#191715}
+.v16-cell.done .v16-cell-t,.v16-cell.cur .v16-cell-t,.v16-cell.done .v16-cell-s,.v16-cell.cur .v16-cell-s{color:#191715}
+.v16-cell.cur{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--text)}
+.v16-cell.sel:not(.cur){box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--blue)}
+.v16-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.v16-h h3{font-size:15px;font-weight:700}
+.v16-h span{font-size:12px;font-weight:500;color:var(--muted)}
+.v16-sub{font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:10px}
+.v16-lrow{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;border:none;border-top:1px solid var(--line);border-radius:0;background:transparent;
+  width:100%;padding:0;text-align:left;font-size:14px;font-weight:600;color:var(--text)}
+.v16-lrow small{font-size:13px;font-weight:500;color:var(--muted);margin-left:8px}
+.v16-lrow b{font-size:15px;font-weight:800;font-stretch:110%}
+.v16-lrow b small{font-size:12px;margin-left:3px}
+.v16-chiprow{display:flex;gap:8px;flex-wrap:wrap}
+.v16-wchip{display:inline-block;min-width:40px;text-align:center;font-size:12px;font-weight:800;line-height:24px;padding:0 8px;border-radius:8px;color:#191715;background:var(--wc)}
+.v16-back{display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 10px 0 2px;margin:-4px 0 4px;border:none;background:transparent;color:var(--text2);font-size:15px;font-weight:600}
+.v16-back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* recovery */
+.v16-state{font-size:30px;font-weight:800;font-stretch:125%;line-height:1.1;margin:2px 0 12px}
+.v16-meter{display:flex;gap:3px}
+.v16-meter>i{flex:2 1 0;height:10px;border-radius:5px;background:var(--panel3);overflow:hidden}
+.v16-meter>i:last-child{flex:1 1 0}
+.v16-meter>i>b{display:block;height:100%;border-radius:5px;background:var(--mc)}
+.v16-meter-l{display:flex;gap:3px;margin:6px 0 12px;font-size:11px;font-weight:600;color:var(--muted)}
+.v16-meter-l>span{flex:2 1 0}.v16-meter-l>span:last-child{flex:1 1 0}.v16-meter-l>span.on{color:var(--text);font-weight:700}
+.v16-ev{padding:10px 0;border-top:1px solid var(--line);font-size:13px;color:var(--text2);line-height:1.35}
+.v16-bars{position:relative;height:64px;display:flex;align-items:flex-end;justify-content:space-between;padding-right:26px;margin-top:10px}
+.v16-bars>i{width:18px;border-radius:5px 5px 2px 2px;background:rgba(156,192,234,.42)}
+.v16-bars>i:last-of-type{background:var(--blue)}
+.v16-rule{position:absolute;left:0;right:0;border-top:1px dashed var(--line2)}
+.v16-rule>span{position:absolute;right:0;top:-15px;font-size:11px;font-weight:600;color:var(--muted)}
+.v16-lm{display:flex;align-items:center;gap:12px;height:34px;font-size:13px;font-weight:600}
+.v16-lm>span:first-child{width:108px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v16-lm>span:last-child{width:52px;text-align:right;font-weight:700}
+.v16-lm-t{position:relative;flex:1;height:8px;border-radius:4px;background:var(--panel3)}
+.v16-lm-t>i{position:absolute;top:0;height:8px;border-radius:4px;background:rgba(156,192,234,.5)}
+.v16-lm-t>b{position:absolute;top:-2px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--text);box-shadow:0 0 0 2px var(--panel)}
+
+/* lift page */
+.lift-hero-v{font-size:64px;line-height:1}
+.v16-run{position:relative;margin-top:8px}
+.v16-run svg{display:block;width:100%;height:auto}
+.v16-best{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.v16-best>div{padding:12px;border-radius:16px;background:var(--panel2);display:flex;flex-direction:column;gap:10px}
+.v16-best>div.top{background:var(--w10);color:#191715}
+.v16-best-t{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--muted)}
+.v16-best>div.top .v16-best-t,.v16-best>div.top .v16-best-b small{color:#191715}
+.v16-best-b{display:flex;justify-content:space-between;align-items:baseline;font-size:20px;font-weight:800;font-stretch:115%}
+.v16-best-b small{font-size:12px;font-weight:600;color:var(--muted);font-stretch:100%}
+.v16-plus{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;border-top:1px solid var(--line);font-size:14px;font-weight:600}
+.v16-plus-bars{flex:1;display:flex;flex-direction:column;gap:4px;max-width:130px}
+.v16-plus-bars>i{height:8px;border-radius:4px;background:var(--text)}
+.v16-plus-bars>i+i{background:var(--line2)}
+
+/* wave recap */
+.v16-recap-btn{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:0 14px;border:none;border-radius:14px;background:var(--wc);color:#191715;font-size:15px;font-weight:800;margin-top:8px}
+.v16-recap-btn span{font-size:13px;font-weight:600}
+#recapCanvasWrap{border-radius:24px;overflow:hidden;margin:8px 0 14px}
+#recapCanvas{display:block;width:100%;height:auto}
+
+/* tools */
+.v16-tool{background:var(--panel);border-radius:20px;padding:16px;margin-bottom:12px}
+.v16-tool .sheet-block{border:none;padding:0;margin:0}
+#calc1rmResult{color:var(--text) !important;font-stretch:115%;font-size:22px !important}
+
+/* today: the day's lift first, then tiles and the week, then notices */
+#viewWorkout.active{display:flex;flex-direction:column}
+#viewWorkout>*{order:5}
+#viewWorkout>#programTimeline{order:1}
+#viewWorkout>#tmConfirmCards{order:2}
+#viewWorkout>#dashboardCard{order:3}
+#viewWorkout>#todayTiles{order:4}
+#viewWorkout>#weeklyPlanCard{order:4}
+#viewWorkout>#sessionSection,#viewWorkout>#sessionCompleteOverlay,#viewWorkout>#sessionSummary{order:3}
+#dashboardCard{background:transparent;padding:4px 0 8px}
+#dashboardCard .dash-preview{background:transparent;border:none;padding:0}
+#dashboardCard{display:flex;flex-direction:column}
+#dashboardCard>*{order:6 !important}
+#dashboardCard>.dash-preview-banner{order:0 !important}
+#dashboardCard>.dash-phase{display:contents}
+#dashPhaseTitle{order:1 !important;margin-bottom:10px}
+#dashPhaseSub{order:8 !important;margin-top:12px;font-size:13px}
+#dashboardCard>#dashLifts{order:2 !important}
+#dashboardCard>#dashPreview{order:3 !important;margin:10px 0 14px}
+#dashboardCard>.dash-start-row{order:4 !important}
+#dashboardCard>#dashLast{order:7 !important}
+.dash-preview-row{flex-direction:column-reverse;align-items:flex-start;gap:2px}
+.dash-preview-scheme{font-size:15px;font-weight:500;color:var(--text2)}
+.dash-lift{border-color:transparent !important;background:var(--panel2)}
+.dash-lift.selected{background:transparent;box-shadow:inset 0 0 0 1.5px var(--text)}
+.plate-svg-wrap{height:auto;margin:10px 0 6px}
+.plate-svg{height:auto}
+.plate-svg .bar,.plate-svg .collar{opacity:1}
+.plate-svg .plate{rx:4;ry:4}
+.plate-svg .shine{display:none}
+.plate-svg .shade{display:none}
+.bsum-head,.block-sum-head{gap:8px}
+/* readiness and warm-up sheets */
+.rp{border-color:transparent;background:var(--panel3);border-radius:12px}
+.rp.selected,.rp[aria-checked="true"]{background:var(--blue);color:#191715;border-color:transparent}
+.readiness-score{font-stretch:125%;font-weight:800}
+#warmupCurrentSet{background:transparent !important;padding:0 !important}
+#warmupWeight{font-family:var(--font) !important;font-stretch:125%;font-size:64px !important;letter-spacing:-.02em !important;line-height:1}
+#warmupPoop,#warmupThumb,#warmupFire{min-height:72px !important;border-radius:18px;background:var(--panel3)}
+.set-row{border-color:transparent}
+#warmupWeight{font-size:52px !important;white-space:nowrap}
+.rest-next-weight{font-size:40px}
+#restSwap .plate-svg-wrap{margin:6px 0 4px}
+.rest-next{text-align:left}
+.rest-next:not([hidden]){display:block !important}   /* r2: never override the hidden attribute (after the last set there is no next set) */
+.rest-next-weight{white-space:nowrap;margin:2px 0}
+
+/* history: this week first, then due lifts, calendar, volume, log; backups last */
+#viewHistory.active{display:flex;flex-direction:column}
+#viewHistory>*{order:6}
+#viewHistory>#weeklySummaryCard{order:1}
+#viewHistory>#histDue{order:2}
+#viewHistory>#historyCalendar{order:3}
+#viewHistory>.card:has(#sparklineContainer){order:4}
+#viewHistory>.card:has(#historyList){order:5}
+#viewHistory>#blockSummaries{order:7}
+#viewHistory>.card:has(#btnExport){order:8}
+.weekly-card{border-color:transparent;border-radius:20px;background:var(--panel)}
+.cal-day.w-10s .cal-box,.cal-sw.w-10s{background:var(--w10);color:#191715}
+.cal-day.partial.w-10s .cal-box{border-color:var(--w10)}
+.v16-due{display:flex;flex-wrap:wrap;gap:8px}
+.v16-due button{min-height:44px;padding:0 16px;border-radius:22px;border:1.5px dashed var(--edge);background:transparent;color:var(--text);font-size:14px;font-weight:600}
+
+/* session recap */
+.v16-rhero{border-radius:24px;padding:18px;background:var(--heat);color:#191715;margin-bottom:12px}
+.v16-rhero-k{font-size:13px;font-weight:700}
+.v16-rhero-v{display:flex;align-items:baseline;gap:10px;margin:6px 0 8px;font-size:17px;font-weight:700}
+.v16-rhero-v b{font-size:64px;line-height:.9;font-weight:800;font-stretch:125%}
+.v16-rhero-s{font-size:14px;font-weight:600;line-height:1.35}
+.v16-rshare{display:flex;justify-content:flex-end;margin:-4px 0 8px}
+.v16-rshare button{min-height:44px;padding:0 16px;border:none;border-radius:14px;background:var(--panel3);font-size:14px}
+.summary-card{border:none !important;background:transparent !important;padding:0 !important;box-shadow:none !important}
+.summary-title{font-size:22px;font-stretch:118%}
+.summary-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.summary-stat{background:var(--panel2);border:none;border-radius:16px;padding:12px}
+.summary-stat .ss-k{font-size:12px;font-weight:500}
+.summary-stat .ss-v{font-size:16px;font-stretch:105%}
+
+/* short, wide windows (a phone on its side): keep Start above the tab bar */
+@media (max-height:520px) and (min-width:560px){
+  .hdr-badges{margin-top:4px}
+  #badgePhase,#badgeSession{display:none}   /* r3: the rest countdown, session timer and status badges stay */
+  .hdr-title{font-size:22px}
+  .timeline{display:none}
+  .dash-preview-weight{font-size:44px}
+  #dashboardCard .plate-svg-wrap{max-width:300px}
+  #dashboardCard>.dash-start-row{order:2 !important;margin-bottom:10px}
+  #dashboardCard>#dashLifts{order:1 !important}
+  #dashPhaseTitle{display:none}
+}
+
+.v16-rest{grid-column:1/-1;padding:12px 14px;border-radius:16px;background:var(--blue-dim);color:var(--text);font-size:14px;line-height:1.4}
+#dashboardCard .dash-preview.realization-mode{border:none !important;box-shadow:none !important;padding-left:0 !important}
+
+/* fourth pass: Program at a glance */
+#programChart{display:none!important}
+#pgProg{margin-bottom:14px}
+#pgProg .v16-h h3{white-space:nowrap;font-size:20px;font-weight:800;font-stretch:112%}
+.v16-prog{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px}
+.v16-prog i{height:8px;border-radius:3px;background:var(--panel3)}
+.v16-prog i:nth-child(4n):not(:last-child){margin-right:5px}
+.v16-prog i.done{background:var(--wc)}
+.v16-prog i.cur{background:var(--wc);box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--text)}
+.v16-cell{display:flex;flex-direction:column;justify-content:space-between}
+.v16-dots{display:flex;gap:3px}
+.v16-dots i{width:8px;height:8px;border-radius:50%;box-sizing:border-box;border:2px solid #191715}
+.v16-dots i.on{background:#191715}
+.v16-dots i.sk{border-style:dotted;opacity:.6}
+.v16-wkb{display:block;width:100%}
+.v16-wkb i{display:block;border-radius:2px;background:var(--wc)}
+.v16-wkb i.bv{height:6px;margin-bottom:3px}
+.v16-wkb i.bn{height:3px}
+.v16-cell.done .v16-wkb i,.v16-cell.cur .v16-wkb i{background:#191715}
+.v16-grid-key{grid-column:2 / -1;margin:2px 0 0;font-size:12px;font-weight:600;color:var(--text2);display:flex;flex-wrap:wrap;align-items:center;gap:0 6px;line-height:18px}
+.v16-grid-key i{display:inline-block;width:18px;border-radius:2px;background:var(--text2)}
+.v16-grid-key i.bv{height:6px}
+.v16-grid-key i.bn{height:3px;margin-left:8px}
+.v16-grid-key span{flex-basis:100%;color:var(--muted);font-weight:500}
+@media (max-width:359px){
+  .v16-grid-h{font-size:11px}
+  .v16-cell{padding-left:8px;padding-right:6px}
+  .v16-cell-m{font-size:14px;font-stretch:80%}
+  .v16-dots{gap:2px}.v16-dots i{width:7px;height:7px}
+}
+.v16-zone-off{font-size:13px;font-weight:600;color:var(--text2);line-height:18px}
+.v16-lrow small.lg{color:var(--muted)}
+
+/* r3: short phones held upright (iPhone SE and similar). Wider or taller screens are untouched. */
+@media (max-height:700px) and (max-width:559px){
+  #dashboardCard>.dash-start-row{order:3 !important;margin-top:10px}      /* Start above the weight preview, as in v15 */
+  #dashboardCard>#dashPreview{order:4 !important}
+  #activePlateMath{display:none}                                          /* the plate text line stays; Done clears the tab bar */
+}
+@media (max-height:600px) and (max-width:559px){
+  #readinessMini{display:none}
+  .hero-weight{font-size:44px}
+  .timeline{display:none}                                                 /* the Program tab has the same weeks */
+}
+
 </style>
 </head>
 <body>
@@ -1853,15 +2213,18 @@ button.cal-day{cursor:pointer}
   <header>
     <div class="hdr-row">
       <div>
-        <div class="hdr-title">Juggernaut 2.0</div>
-        <div class="hdr-sub">v15.0.0 — Book Rules + Hermes</div>
+        <div class="hdr-sub" id="hdrSub">Juggernaut 2.0</div>
+        <h1 class="hdr-title" id="hdrTitle">Today</h1>
       </div>
       <div class="hdr-actions">
-        <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools">
+        <button id="btnCalc" class="icon-btn" aria-label="Calculator tools" title="Calculator tools" hidden>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
         </button>
         <button id="btnHelp" class="icon-btn" aria-label="How to use" title="How to use">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+        <button id="btnSettings" class="icon-btn" aria-label="Settings" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9M19 7h1M4 17h3M13 17h7"/><circle cx="16" cy="7" r="2.5"/><circle cx="10" cy="17" r="2.5"/></svg>
         </button>
       </div>
     </div>
@@ -1890,24 +2253,6 @@ button.cal-day{cursor:pointer}
     <section id="viewWorkout" class="view active">
       <!-- TIMELINE (always visible) -->
       <div id="programTimeline" class="timeline"></div>
-
-      <!-- PROGRAM VOLUME CHART -->
-      <div id="programChart" class="program-chart" hidden>
-        <!-- v15 round 4 (C): closed by default; the container keeps its element type and id, the disclosure sits inside it -->
-        <details class="program-chart-disclosure">
-        <summary class="program-chart-header">
-          <h3>Program Overview</h3>
-          <svg class="sg-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </summary>
-          <div class="program-chart-legend">
-            <span><div class="dot" style="background:var(--blue)"></div>Volume</span>
-            <span><div class="dot" style="background:var(--warn)"></div>Strength</span>
-            <span><div class="dot" style="background:var(--bad)"></div>Peak</span>
-            <span><div class="dot" style="background:var(--muted);border-radius:0;height:2px;width:10px"></div>Intensity</span>
-          </div>
-        <svg id="programChartSVG" class="chart-svg" viewBox="0 0 320 80"></svg>
-        </details>
-      </div>
 
       <!-- v13: deload banner + backup nudge + insight cards (visible when no session active) -->
       <div id="tmConfirmCards" hidden></div>
@@ -1947,11 +2292,10 @@ button.cal-day{cursor:pointer}
         <span id="selectedLiftTM" hidden></span>
       </div>
 
+      <div id="todayTiles" class="v16-tiles" hidden></div>
+
       <!-- v15 round 8 (M): readiness card. Display only; filled by renderReadinessCard() -->
       <div id="readinessCard" class="card" hidden></div>
-
-      <!-- LIFT INTELLIGENCE -->
-      <div id="liftIntelCard" class="card" style="display:none"></div>
 
       <!-- WEEKLY PLAN -->
       <div id="weeklyPlanCard" class="card" style="display:none"></div>
@@ -2028,6 +2372,8 @@ button.cal-day{cursor:pointer}
               <button id="btnRepsPlus" class="rep-btn" aria-label="Increase reps">+</button>
             </div>
           </div>
+
+          <div id="repLadder" class="v16-ladder" hidden></div>
 
           <div id="rpePanel" class="rpe-box" hidden>
             <span class="rpe-box-label">RPE</span>
@@ -2110,6 +2456,7 @@ button.cal-day{cursor:pointer}
 
     <!-- ═══ ACCESSORIES VIEW ═══ -->
     <section id="viewAccessories" class="view">
+      <button id="btnAccBack" class="v16-back" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Program</button>
       <div class="card">
         <div class="row">
           <div>
@@ -2172,6 +2519,8 @@ button.cal-day{cursor:pointer}
         <div id="historySummary" class="sm mt" style="margin-top:10px">—</div>
       </div>
 
+      <div id="histDue" class="card" hidden></div>
+
       <!-- v15 round 8 (K): training calendar. Display only; filled by renderCalendar() -->
       <div id="historyCalendar" class="card cal-card"></div>
 
@@ -2231,6 +2580,11 @@ button.cal-day{cursor:pointer}
         </div>
         <div class="sg-body">
           <div class="sg-body-inner">
+            <div style="margin-top:10px">
+              <label for="v16PlateStyle">Plate drawing</label>
+              <select id="v16PlateStyle"><option value="color">Colour-coded, weight stamped on</option><option value="iron">Iron, weight stamped on</option></select>
+              <div class="xs mt" style="margin-top:6px">A display choice kept on this device. It is not part of backups.</div>
+            </div>
             <div class="row" style="margin-top:10px">
               <div>
                 <label for="units">Units</label>
@@ -2433,7 +2787,7 @@ button.cal-day{cursor:pointer}
             </div>
             <div id="hermesStatus" class="install-help" style="margin-top:10px;font-weight:700">Not set up</div>
             <div id="hermesAttention" class="install-help" hidden></div>
-            <div class="install-help">After every session (and once a week) the app sends Hermes a packet: your program position, TMs, test results and the session's sets, readiness, notes and accessories, and whether you ended the session early. API keys and the token are never in a packet. With no bridge set up the app sends nothing. The token stays on this device and is stripped from every export.</div>
+            <div class="install-help">After every session (and once a week) the app sends Hermes a packet: your program position, TMs, test results and the session's sets, readiness, notes and accessories, and whether and why you ended the session early. API keys and the token are never in a packet. With no bridge set up the app sends nothing. The token stays on this device and is stripped from every export.</div>
           </div>
         </div>
       </div>
@@ -2576,6 +2930,86 @@ button.cal-day{cursor:pointer}
         <div class="install-help">Start next cycle: back to week 1 with your current TMs; history, accessory weights and weak points are kept (Tier 1 lifts from the library are recalculated from your TM for week 1, as at every new week). Wipe history: erases training history and what was built from it, keeps your TMs, goals, Settings and exercise choices (you can export first). Reset Everything: erases all settings, history, program state and accessories; this cannot be undone.</div>
       </div>
     </section>
+
+    <!-- ═══ v16: PROGRAM VIEW ═══ -->
+    <section id="viewProgram" class="view">
+      <div id="pgProg"></div>
+      <div id="pgGrid" class="v16-grid"></div>
+      <div id="pgWeek" class="card"></div>
+      <div id="pgRecaps" class="card" hidden></div>
+      <!-- PROGRAM VOLUME CHART -->
+      <div id="programChart" class="program-chart" hidden>
+        <!-- v15 round 4 (C): closed by default; the container keeps its element type and id, the disclosure sits inside it -->
+        <details class="program-chart-disclosure">
+        <summary class="program-chart-header">
+          <h3>Program Overview</h3>
+          <svg class="sg-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+          <div class="program-chart-legend">
+            <span><div class="dot" style="background:var(--blue)"></div>Volume</span>
+            <span><div class="dot" style="background:var(--warn)"></div>Strength</span>
+            <span><div class="dot" style="background:var(--bad)"></div>Peak</span>
+            <span><div class="dot" style="background:var(--muted);border-radius:0;height:2px;width:10px"></div>Intensity</span>
+          </div>
+        <svg id="programChartSVG" class="chart-svg" viewBox="0 0 320 80"></svg>
+        </details>
+      </div>
+
+
+      <div class="card">
+        <div class="v16-h"><h3>Accessories</h3><span>Tiers, templates, calibration</span></div>
+        <button id="btnAccSetup" class="btn-s" type="button" style="width:100%">Set up accessories</button>
+      </div>
+    </section>
+
+    <!-- ═══ v16: RECOVERY VIEW ═══ -->
+    <section id="viewRecovery" class="view">
+      <button id="btnRcBack" class="v16-back" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Today</button>
+      <div id="rcBody"></div>
+      <!-- LIFT INTELLIGENCE -->
+      <div id="liftIntelCard" class="card" style="display:none"></div>
+
+
+    </section>
+
+    <!-- ═══ v16: TOOLS VIEW (the v15 calculator sheet, same fields) ═══ -->
+    <section id="viewTools" class="view">
+      <div class="v16-tool">
+    <div>
+      <h3 class="sheet-h3">Plate Calculator</h3>
+      <div class="row" style="gap:8px">
+        <div><label>Target Weight</label><input id="calcPlateWeight" type="number" step="0.5" min="0" placeholder="225"></div>
+      </div>
+      <div id="toolPlateSvg" class="plate-svg-wrap"></div>
+      <div id="calcPlateResult" style="font-family:var(--mono);font-size:14px;margin-top:8px">—</div>
+    </div>
+
+      </div>
+      <div class="v16-tool">
+    <div class="sheet-block">
+      <h3 class="sheet-h3">1RM Estimator</h3>
+      <div class="row" style="gap:8px">
+        <div><label>Weight</label><input id="calc1rmWeight" type="number" step="0.5" min="0" placeholder="225"></div>
+        <div><label>Reps</label><input id="calc1rmReps" type="number" step="1" min="1" placeholder="5"></div>
+      </div>
+      <div id="calc1rmResult" style="font-family:var(--mono);font-size:18px;font-weight:800;margin-top:8px;color:var(--accent)">—</div>
+      <div class="xs mt" style="color:var(--muted)">Uses your 1RM Formula from Settings. Change it there to switch between Epley, Brzycki, and RPE-based.</div>
+    </div>
+
+      </div>
+      <div class="v16-tool">
+    <div class="sheet-block">
+      <h3 class="sheet-h3">RPE to Weight Chart</h3>
+      <div class="row" style="gap:8px">
+        <div><label>Your 1RM</label><input id="calcRpe1rm" type="number" step="0.5" min="0" placeholder="315"></div>
+        <div><label>Target Reps</label><input id="calcRpeReps" type="number" step="1" min="1" max="12" placeholder="5"></div>
+      </div>
+      <div id="calcRpeChart" style="margin-top:8px"></div>
+    </div>
+
+      </div>
+      <button id="btnToolsGuide" class="btn-s" type="button" style="width:100%">Open the guide</button>
+    </section>
   </main>
 </div>
 
@@ -2702,7 +3136,7 @@ button.cal-day{cursor:pointer}
   <h2 id="guide-1rm">Estimating Your 1RM</h2>
   <div class="section">
     <p>On a fresh start the app asks for your <strong>1RM</strong> and sets each TM to 90% of it (book). If you've never tested a max:</p>
-    <p><strong>Option 1 — use a recent heavy set.</strong> If you can bench 185 lb for 5, open the calculator (header icon), enter 185 and 5, and use the estimate.</p>
+    <p><strong>Option 1 — use a recent heavy set.</strong> If you can bench 185 lb for 5, open the Tools tab, enter 185 and 5, and use the estimate.</p>
     <p><strong>Option 2 — be conservative.</strong> Use a weight you could do for 3 slow, controlled reps as your 1RM. Starting light is better than starting heavy; the first test day corrects it.</p>
     <p><strong>Don't inflate the numbers.</strong> Every prescribed weight comes from the TM. Too high and you grind reps, miss rep standards and the progression stops working.</p>
   </div>
@@ -2727,7 +3161,7 @@ button.cal-day{cursor:pointer}
   <h2 id="guide-schedule">Scheduling Your Training Week</h2>
   <div class="section">
     <p>You train <strong>4 sessions per week — one lift per session.</strong> Each session you pick one of your four lifts (Squat, Bench, Deadlift, OHP), do the main lift, then that lift's accessories. A typical split: <strong>Monday</strong> Squat · <strong>Tuesday</strong> Bench · <strong>Thursday</strong> Deadlift · <strong>Friday</strong> OHP.</p>
-    <p>Two habits help: <strong>avoid training two days in a row</strong>, and <strong>separate squat and deadlift by at least two days</strong>. A program week means <strong>completing all 4 lifts once</strong>; when every lift chip is checked, the program moves to the next week. Order within the week doesn't matter.</p>
+    <p>Two habits help: <strong>avoid training two days in a row</strong>, and <strong>separate squat and deadlift by at least two days</strong>. The Weekly Plan’s next-up suggestion follows this: after a session today or yesterday it offers a lift for the other half of the body (upper or lower) first, and when every lift left would break one of these it suggests a rest day instead, and you can still pick any lift. A program week means <strong>completing all 4 lifts once</strong>; when every lift chip is checked, the program moves to the next week. Order within the week doesn't matter.</p>
   </div>
 
   <h2 id="guide-dashboard">Dashboard</h2>
@@ -2736,7 +3170,7 @@ button.cal-day{cursor:pointer}
     <p><strong>Cards that can appear:</strong> a <strong>TM confirmation</strong> after a test lifted at a different weight than planned (Apply TM change / Keep TM); <strong>Hermes suggestion cards</strong> with Apply and Dismiss; the deload banner; goal ETA cards once a lift has 3 tests; and, at the end of a cycle, <strong>Start next cycle</strong>.</p>
     <p><strong>Readiness card:</strong> shown under the workout preview once you have a scored check-in and readiness is switched on. It shows your latest score out of 30, the change from the check-in before, your last seven scores, and what that check-in did to its session: working sets dropped, full volume restored by you, an extra set taken or not taken, or no change; on a test day it says readiness did not change the session. For an older check-in whose record does not say, it shows the rule for that score instead (below 8 two working sets are dropped, below 15 one, and at 23 and above an extra set is offered). A score that is not a whole number shows one decimal (7.5/30), wherever the score is shown. It only informs; nothing on it changes your training. Deload-week check-ins are left out, as in the Readiness Trend.</p>
     <h3>Timeline Bar</h3>
-    <p>The pills at the top show all 16 weeks. <strong>Tap any week</strong> to preview its weights for every lift; "Back to current" returns. The Program Overview chart bars do the same. The chart closes when a session starts.</p>
+    <p>The pills at the top show all 16 weeks. <strong>Tap any week</strong> to preview its weights for every lift; "Back to current" returns. The Program tab shows the same 16 weeks as a grid, with a volume bar and a top-set bar in every week.</p>
     <h3>Lift Intelligence</h3>
     <p>Per-lift weekly hard sets against the MEV/MRV targets for that phase (warm-up and ramp sets excluded). Your Tier 1 accessories are the volume lever.</p>
     <h3>Weekly Plan</h3>
@@ -2748,7 +3182,7 @@ button.cal-day{cursor:pointer}
     <h3>Readiness Check</h3>
     <p>Tap <strong>Start Workout</strong> and rate Sleep, Motivation, Nutrition, Soreness and Performance 1–5 (a "Same as Last" button fills them from your last session). The app turns them into a 0–30 score. <em>App rule:</em> below 15 drops one working set, below 8 drops two; "Train Full Volume Anyway" overrides. Never on test days or deloads.</p>
     <h3>Logging Sets</h3>
-    <p>Tap a set row to log it when the reps match the target, or use the hero card's stepper. The hero card shows the weight, a colour-coded plate diagram, target reps and % of TM.</p>
+    <p>Tap a set row to log it when the reps match the target, or use the hero card's stepper. The hero card shows the weight, a plate diagram with each plate’s weight on it (iron or colour-coded: Settings → Program → Plate drawing), target reps and % of TM.</p>
     <h3>Changing the Weight</h3>
     <p><strong>Tap a set's weight</strong> to change it. The app asks why with one tap — felt heavy, felt light, plates or equipment, pain, short on time, other — and keeps both the planned and the lifted weight. A change can apply to the rest of the work sets too.</p>
     <h3>RPE</h3>
@@ -2772,7 +3206,7 @@ button.cal-day{cursor:pointer}
     <ul style="margin-left:18px;line-height:1.6">
       <li><strong>Extra reps</strong> = reps − standard, at most 10. Zero or fewer extra reps: the TM is held.</li>
       <li><strong>Full step</strong> = extra × 5 lb (squat, deadlift) or extra × 2.5 lb (bench, OHP). <strong>Half step</strong> = extra × 2.5 lb (lower body) or extra × 1.25 lb (upper body).</li>
-      <li><strong>The book's 5% rule:</strong> projected max = weight × reps × 0.033 + weight. Use the full step if projected ÷ (TM + full step) ≥ 1.05; otherwise the half step if projected ÷ (TM + half step) ≥ 1.05; otherwise no increase.</li>
+      <li><strong>The book's 5% rule:</strong> projected max = weight × reps × 0.033 + weight. Use the full step if projected ÷ (TM + full step) ≥ 1.05; otherwise the half step if projected ÷ (TM + half step) ≥ 1.05; otherwise no increase. <em>The last step is an app rule: the book stops at the half step. In practice it usually takes 3 reps over the standard to earn a raise (2 on the 8s), and more at lower training maxes.</em></li>
       <li>The weight is the one you <strong>actually lifted</strong>. If it differs from the plan, the increase waits for your OK on the dashboard (Apply TM change / Keep TM). It applies only to the TM it was worked out from: if the TM changes first (a Settings edit, a later test, a cut), the card says so and offers Keep current TM instead.</li>
       <li>The <strong>deload</strong> that follows uses the TM from before the increase.</li>
     </ul>
@@ -2794,7 +3228,7 @@ button.cal-day{cursor:pointer}
     <p>After the main lift, tap <strong>"Continue to Accessories →"</strong> to log accessories inline.</p>
     <p><strong>3-Tier System:</strong> <strong>T1</strong> Supplemental (5–8 reps) · <strong>T2</strong> Hypertrophy (8–15) · <strong>T3</strong> Core/Prehab (10–20).</p>
     <p><strong>Double progression:</strong> hold the weight, build reps. All sets at the top of the range → green glow → Apply ↑. Deload weeks cut the sets.</p>
-    <p><strong>Exercises you added</strong> remember the last weight you typed for them (Add, Duplicate, an edit in the Accessories tab, or a swap into a custom slot). Apply ↑, deloads and recalibration don't change that remembered weight; Wipe history goes back to it. An exercise you added also has a <strong>Loaded on a barbell</strong> switch (off by default): when it is on, Deload lands on a weight you can load with that lift's bar, collars and plates, as it does for the library's barbell exercises.</p>
+    <p><strong>Exercises you added</strong> remember the last weight you typed for them (Add, Duplicate, an edit under Program → Set up accessories, or a swap into a custom slot). Apply ↑, deloads and recalibration don't change that remembered weight; Wipe history goes back to it. An exercise you added also has a <strong>Loaded on a barbell</strong> switch (off by default): when it is on, Deload lands on a weight you can load with that lift's bar, collars and plates, as it does for the library's barbell exercises.</p>
     <p>Tap <strong>?</strong> on an exercise for cues, a tutorial link and swap chips. Each inline card also has <strong>⇄ Swap</strong>, which lists the legal alternatives for that tier (filtered by equipment and props), with exercises for your weak point at the top. ▲/▼ reorder exercises.</p>
     <p><strong>Weak Point Targeting:</strong> after a session the app asks "Where did you struggle?" and suggests up to two targeted swaps.</p>
   </div>
@@ -2849,7 +3283,7 @@ button.cal-day{cursor:pointer}
   <h2 id="guide-walkthrough">Your Workout: Start to Finish</h2>
   <div class="section">
     <h3>Step 1 — Check the Dashboard</h3>
-    <p>The Workout tab shows the cycle, wave, phase and week (e.g. "5S · Intensification · Wk 10/16"), the lift chips (green check = done this week), the workout preview with plates, your last session, Lift Intelligence and the Weekly Plan. Any TM confirmation or Hermes card waits here.</p>
+    <p>Settings open from the sliders button in the header. The Today tab shows the cycle, wave, phase and week (e.g. "5S · Intensification · Wk 10/16"), the lift chips (green check = done this week), the workout preview with plates, your last session and the Weekly Plan. Lift Intelligence is on the Recovery screen (tap the Recovery tile). Any TM confirmation or Hermes card waits here.</p>
 
     <h3>Step 2 — Start Workout</h3>
     <p>Tap <strong>Start Workout</strong> and rate readiness. Below 15/30 the app drops a working set (app rule; not on test days or deloads); "Train Full Volume Anyway" overrides. 23+/30 offers a fire-day set (app rule).</p>
@@ -2943,57 +3377,42 @@ button.cal-day{cursor:pointer}
     <div class="sheet-handle"></div>
     <h2 style="margin-bottom:12px">Training Tools</h2>
 
-    <div class="sheet-block">
-      <h3 class="sheet-h3">1RM Estimator</h3>
-      <div class="row" style="gap:8px">
-        <div><label>Weight</label><input id="calc1rmWeight" type="number" step="0.5" min="0" placeholder="225"></div>
-        <div><label>Reps</label><input id="calc1rmReps" type="number" step="1" min="1" placeholder="5"></div>
-      </div>
-      <div id="calc1rmResult" style="font-family:var(--mono);font-size:18px;font-weight:800;margin-top:8px;color:var(--accent)">—</div>
-      <div class="xs mt" style="color:var(--muted)">Uses your 1RM Formula from Settings. Change it there to switch between Epley, Brzycki, and RPE-based.</div>
-    </div>
-
-    <div class="sheet-block">
-      <h3 class="sheet-h3">RPE to Weight Chart</h3>
-      <div class="row" style="gap:8px">
-        <div><label>Your 1RM</label><input id="calcRpe1rm" type="number" step="0.5" min="0" placeholder="315"></div>
-        <div><label>Target Reps</label><input id="calcRpeReps" type="number" step="1" min="1" max="12" placeholder="5"></div>
-      </div>
-      <div id="calcRpeChart" style="margin-top:8px"></div>
-    </div>
-
-    <div>
-      <h3 class="sheet-h3">Plate Calculator</h3>
-      <div class="row" style="gap:8px">
-        <div><label>Target Weight</label><input id="calcPlateWeight" type="number" step="0.5" min="0" placeholder="225"></div>
-      </div>
-      <div id="calcPlateResult" style="font-family:var(--mono);font-size:14px;margin-top:8px">—</div>
-    </div>
-
     <button id="btnCalcClose" class="btn-s" style="width:100%;margin-top:14px">Close</button>
+  </div>
+</div>
+<!-- ─── v16: WAVE RECAP ─── -->
+<div id="recapModal" class="modal bottom-sheet" hidden role="dialog" aria-modal="true" aria-label="Wave recap">
+  <div class="modal-card" style="text-align:left">
+    <div class="sheet-handle"></div>
+    <div id="recapCanvasWrap"><canvas id="recapCanvas" width="1080" height="1350" role="img" aria-label="Wave recap card"></canvas></div>
+    <div class="sheet-actions">
+      <button id="btnRecapSave" class="btn-s" type="button">Save image</button>
+      <button id="btnRecapShare" class="btn-p" type="button">Share</button>
+    </div>
+    <button id="btnRecapClose" class="btn-s" type="button" style="width:100%;margin-top:10px">Close</button>
   </div>
 </div>
 <!-- ─── BOTTOM NAV ─── -->
 <nav class="bottom-nav" aria-label="Navigation">
   <button class="tab active" data-tab="Workout">
-    <svg viewBox="0 0 24 24"><path d="M6.5 6.5h11M4 12h16M6.5 17.5h11"/><circle cx="4" cy="12" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="6.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="6.5" r="1.5"/><circle cx="6.5" cy="17.5" r="1.5"/><circle cx="17.5" cy="17.5" r="1.5"/></svg>
-    Workout
+    <svg viewBox="0 0 24 24"><path d="M2 12h20M6 6.5v11M9 8.5v7M18 6.5v11M15 8.5v7"/></svg>
+    Today
   </button>
-  <button class="tab" data-tab="Accessories">
-    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><circle cx="12" cy="12" r="9"/></svg>
-    Accessories
+  <button class="tab" data-tab="Program">
+    <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>
+    Program
   </button>
   <button class="tab" data-tab="History">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M4 17l5-5 4 3 7-8M15 7h5v5"/></svg>
     History
   </button>
   <button class="tab" data-tab="Coach">
-    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M5 5.5h14a2 2 0 0 1 2 2V15a2 2 0 0 1-2 2h-7l-4.5 3.5V17H5a2 2 0 0 1-2-2V7.5a2 2 0 0 1 2-2z"/></svg>
     Coach
   </button>
-  <button class="tab" data-tab="Settings">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    Settings
+  <button class="tab" data-tab="Tools">
+    <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg>
+    Tools
   </button>
 </nav>
 
@@ -3016,6 +3435,7 @@ button.cal-day{cursor:pointer}
       <div class="rest-next-label">Up next</div>
       <div id="restNextWeight" class="rest-next-weight">—</div>
       <div id="restNextDetail" class="rest-next-detail">—</div>
+      <div id="restSwap" class="v16-swap" hidden></div>
     </div>
     <div id="restSetsLeft" class="rest-sets-left" aria-live="polite" hidden>—</div>
     <div class="rest-actions">
@@ -3088,6 +3508,7 @@ button.cal-day{cursor:pointer}
       </div>
     </div>
     <div id="readinessScoreDisplay" class="readiness-score good">—</div>
+    <div id="readinessZones" class="v16-zones" hidden></div>
     <div id="readinessNote" class="readiness-note">Select all five to continue.</div>
     <div class="sheet-actions">
       <button id="readinessSkip" class="btn-s">Skip</button>
@@ -3108,6 +3529,7 @@ button.cal-day{cursor:pointer}
         <div id="warmupWeight" style="font-family:var(--mono);font-size:40px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums">—</div>
         <div style="font-size:16px;color:var(--text2)">× <span id="warmupReps">—</span> reps</div>
       </div>
+      <div id="warmupPlateSvg" class="plate-svg-wrap"></div>
       <div id="warmupPlates" style="font-size:13px;color:var(--text2);font-family:var(--mono)">—</div>
     </div>
     <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px">How did that feel?</div>
@@ -3244,7 +3666,7 @@ button.cal-day{cursor:pointer}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '15.0.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '16.0.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -3800,50 +4222,41 @@ button.cal-day{cursor:pointer}
     6.5: [0.878, 0.850, 0.824, 0.799, 0.774, 0.751, 0.723, 0.694, 0.667, 0.640, 0.613, 0.587]
   };
 
-  /* ═══ PLATE SVG RENDERER ═══ */
-  function renderPlateSVG(plateData, container, textEl){
+  /* ═══ PLATE RENDERER (v16) ═══
+     One sleeve, drawn large: the plates for one side, each stamped with its weight. The fill comes from the stylesheet:
+     iron by default, colour-coded when body[data-plates="color"] (a display choice kept on this device).
+     `added` (optional) marks plate positions that are new against the previous load. The text line is v15's. */
+  function renderPlateSVG(plateData, container, textEl, added){
     if (!container) return;
     if (!plateData.perSide.length){
       container.innerHTML = '';
       if (textEl) textEl.textContent = plateData.note || 'Bar only';
       return;
     }
-    const svgW = 300;
-    const svgH = 32;
-    const barY = 12; const barH = 8;
-    const collarW = 6;
-    const centerX = svgW / 2;
-    const plateGap = 1;
-
-    // Plate dimensions: height varies by weight, width fixed
-    const plateInfo = {
-      45:{ h:30, cls:'p45' }, 35:{ h:26, cls:'p35' }, 25:{ h:22, cls:'p25' },
-      10:{ h:18, cls:'p10' }, 5:{ h:14, cls:'p5' }, 2.5:{ h:10, cls:'p2_5' }, 1.25:{ h:8, cls:'p1_25' }
+    const svgW = 300, svgH = 78, mid = svgH / 2;
+    const info = {
+      45:{ h:74, w:27, cls:'p45', dark:1 }, 35:{ h:63, w:25, cls:'p35', dark:1 }, 25:{ h:53, w:24, cls:'p25', dark:1 },
+      10:{ h:43, w:22, cls:'p10' }, 5:{ h:35, w:21, cls:'p5', dark:1 }, 2.5:{ h:29, w:22, cls:'p2_5', dark:1 }, 1.25:{ h:25, w:24, cls:'p1_25' }
     };
-    const plateW = 8;
-
-    let parts = '';
-    // Bar
-    parts += '<rect class="bar" x="' + (centerX - 140) + '" y="' + barY + '" width="280" height="' + barH + '" rx="2"/>';
-
-    // Draw plates on both sides symmetrically
-    function drawSide(startX, dir){
-      let x = startX;
-      // Collar
-      parts += '<rect class="collar" x="' + (dir > 0 ? x : x - collarW) + '" y="' + (barY - 2) + '" width="' + collarW + '" height="' + (barH + 4) + '" rx="1"/>';
-      x += dir * (collarW + 2);
-      plateData.perSide.forEach(pw => {
-        const info = plateInfo[pw] || { h:14, cls:'p5' };
-        const py = (svgH - info.h) / 2;
-        const px = dir > 0 ? x : x - plateW;
-        parts += '<rect class="plate ' + info.cls + '" x="' + px + '" y="' + py + '" width="' + plateW + '" height="' + info.h + '"/>';
-        x += dir * (plateW + plateGap);
-      });
-    }
-    drawSide(centerX + 30, 1);  // right side
-    drawSide(centerX - 30, -1); // left side (mirrored)
-
-    container.innerHTML = '<svg class="plate-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '">' + parts + '</svg>';
+    const stub = 20, collarW = 10, gap = 2.5;
+    const list = plateData.perSide.map(pw => ({ pw, i:info[pw] || { h:35, w:22, cls:'p5', dark:1 } }));
+    const room = svgW - stub - collarW - gap - 10;
+    const need = list.reduce((s, p) => s + p.i.w + gap, 0);
+    const k = need > room ? room / need : 1;            // many plates: narrow them to fit, never clip
+    let parts = '<rect class="bar" x="0" y="' + (mid - 4) + '" width="' + (stub + 4) + '" height="8"/>'
+      + '<rect class="sleeve" x="' + stub + '" y="' + (mid - 7) + '" width="' + (svgW - stub) + '" height="14" rx="3"/>'
+      + '<rect class="collar" x="' + stub + '" y="' + (mid - 15) + '" width="' + collarW + '" height="30" rx="3"/>';
+    let x = stub + collarW + gap;
+    list.forEach((p, idx) => {
+      const w = Math.round(p.i.w * k * 10) / 10, y = mid - p.i.h / 2;
+      const isNew = added && added.has && added.has(idx);
+      parts += '<rect class="plate ' + p.i.cls + (isNew ? ' added' : '') + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + p.i.h + '" rx="4"/>'
+        + '<rect class="shine" x="' + x + '" y="' + (y + p.i.h * .1) + '" width="' + w + '" height="' + (p.i.h * .14) + '" rx="3"/>'
+        + '<rect class="shade" x="' + x + '" y="' + (y + p.i.h * .8) + '" width="' + w + '" height="' + (p.i.h * .2) + '" rx="4"/>';
+      if (w >= 13) parts += '<text class="t' + p.i.cls + (isNew ? ' tnew' : '') + '" x="' + (x + w / 2) + '" y="' + (mid + 4.2) + '"' + (w < 20 ? ' style="font-size:10px"' : '') + '>' + String(p.pw) + '</text>';
+      x += w + gap;
+    });
+    container.innerHTML = '<svg class="plate-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" role="img" aria-label="Each side: ' + plateData.perSide.join(', ') + '">' + parts + '</svg>';
     if (textEl){
       textEl.textContent = plateData.perSide.join(' + ') + ' /side' + (plateData.note ? ' · ' + plateData.note : '');
     }
@@ -5456,7 +5869,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const CONFLICT_PAIRS = { squat:'deadlift', deadlift:'squat' };
     const now = Date.now();
     const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
-    for (const candidate of due){
+    // v16 (owner decision 2026-11-14): no back-to-back sessions for the same half of the body. If the most recent
+    // session was today or yesterday, due lifts of the other chain (upper / lower) are tried first; the rest follow.
+    let lastChain = null;
+    try{ lastChain = v16LastChain(); }catch(err){ console.error('v16 last chain failed', err); }   // r3: on a fault this is v15's order (due)
+    const order = lastChain ? due.filter(l => l.chain !== lastChain).concat(due.filter(l => l.chain === lastChain)) : due;
+    for (const candidate of order){
       const conflictId = CONFLICT_PAIRS[candidate.id];
       if (!conflictId){ return candidate.id; } // bench/ohp have no conflict
       // Check when the conflicting lift was last done
@@ -5468,7 +5886,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       continue;
     }
     // All candidates have conflicts — just return the top one anyway (better than nothing)
-    return due[0].id;
+    return order[0].id;
   }
 
   // Check if a lift missed its most recent realization test (skipped or not completed).
@@ -5530,13 +5948,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     else if (dueCount <= daysLeft + 1){ paceLabel = '● Tight'; paceCls = 'tight'; }
     else { paceLabel = '▲ Behind'; paceCls = 'behind'; }
     // Recommendation
-    let rec = '';
+    let rec = '', v16rest = false;
+    try{ v16rest = v16RestSuggested(); }catch(err){ console.error('v16 rest check failed', err); }
     const earlyCount = statuses.filter(s => s.status === 'done' && liftEndedEarlyInWeek(s.lift.id, micro)).length;   // v15 (round 9, E2)
     if (dueCount === 0) rec = earlyCount ? 'All lifts done this week, ' + earlyCount + ' ended early.' : 'All lifts completed this week. Nice work!';
-    else if (doneCount === 0 && dueCount === active.length) rec = 'Pick a lift and get started. Next up: ' + nextName + '.';
-    else if (dueCount > daysLeft + 1) rec = 'Behind pace — prioritize ' + nextName + '.';
+    else if (doneCount === 0 && dueCount === active.length) rec = v16rest ? 'Rest day suggested. To train anyway, pick a lift: ' + nextName + ' is the closest fit.' : 'Pick a lift and get started. Next up: ' + nextName + '.';
+    else if (dueCount > daysLeft + 1) rec = (v16rest ? 'Rest day suggested, though you are behind pace. If you train, prioritize ' : 'Behind pace — prioritize ') + nextName + '.';
     else {
-      rec = 'Next up: ' + nextName + '. ' + dueCount + ' session' + (dueCount > 1 ? 's' : '') + ' left, ' + daysLeft + ' days remaining.';
+      rec = (v16rest ? 'Rest day suggested. To train anyway, pick a lift: ' + nextName + ' is the closest fit. ' : 'Next up: ' + nextName + '. ') + dueCount + ' session' + (dueCount > 1 ? 's' : '') + ' left, ' + daysLeft + ' days remaining.';
       // Add spacing note if squat/deadlift conflict affected the pick
       const CONFLICT_PAIRS = { squat:'deadlift', deadlift:'squat' };
       const conflictId = nextId ? CONFLICT_PAIRS[nextId] : null;
@@ -5947,7 +6366,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
      'confirmModal','confirmTitle','confirmMsg','confirmCancel','confirmOk',
      'weightModal','weightModalTitle','weightModalPlanned','weightMinus','weightPlus','weightInput','weightApplyRestWrap','weightApplyRest',
      'weightApplyRestText','weightReasons','weightTestNote','weightRestore','weightCancel',
-     'viewWorkout','viewAccessories','viewHistory','viewCoach','viewSettings'
+     'viewWorkout','viewAccessories','viewHistory','viewCoach','viewSettings','viewProgram','viewRecovery','viewTools'
     ].forEach(id => el[id] = $(id));
   }
 
@@ -6066,6 +6485,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function updateReadinessDisplay(){
     const score = calcReadinessScore(_readinessState);
+    v16Safe('zones', () => v16Zones(score));   // v16
     if (!Number.isFinite(score)){
       el.readinessScoreDisplay.textContent = '—';
       el.readinessNote.textContent = 'Select all five to continue.';
@@ -6083,6 +6503,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     else { cls = 'high'; note = '🔥 Exceptional — fire day offered.'; }
     el.readinessScoreDisplay.className = 'readiness-score ' + cls;
     el.readinessNote.textContent = note;
+    v16Safe('readiness note', v16ReadinessNote);   // v16: wording only, on days the set rules do not apply
   }
 
   function applyFatigueManagement(session, score){
@@ -6259,6 +6680,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
             ? plates.perSide.join(' + ') + ' /side'
             : (plates?.note || 'Bar only');
           el.warmupPlates.textContent = plateStr;
+          v16Safe('warmup plates', () => renderPlateSVG(plates, document.getElementById('warmupPlateSvg'), null));   // v16
         } catch(_){ el.warmupPlates.textContent = ''; }
         // Show running history of ratings
         el.warmupHistory.textContent = _warmupFeedbackLog.length
@@ -6584,6 +7006,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // v13.0.2: renders both the "Up Next" block and the glanceable sets-remaining line.
   function renderRestPreview(){
     const session = state.activeSession;
+    v16Safe('rest swap', () => v16RestSwap(null));
     if (!session){
       if (el.restSetsLeft) el.restSetsLeft.hidden = true;
       if (el.restNextPreview) el.restNextPreview.hidden = true;
@@ -6608,6 +7031,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const pm = calculatePlates(nextSet.weight, session.liftId);
       el.restNextDetail.textContent += ' · ' + (pm.perSide.length ? pm.perSide.join('+') + '/side' : 'Bar only');
     }
+    v16Safe('rest swap', () => v16RestSwap(session, prevDoneSet, nextSet));   // v16: plates to take off and put on
   }
 
   /* ═══ v13.0.2: REST TIMER — SETS REMAINING ═══
@@ -7090,6 +7514,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       });
     }
 
+    v16Safe('recap', () => v16RecapHero(entry, totalTonnage, duration));   // v16: the result first, and a share card
     // Coaching
     if (el.scoCoaching) el.scoCoaching.hidden = true;
     // Weak point
@@ -7875,8 +8300,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     el['view' + name].classList.add('active');
-    document.querySelector('.tab[data-tab="' + name + '"]').classList.add('active');
+    // v16: Accessories, Recovery and Settings are reached from inside a tab, so the tab they belong to stays lit
+    const tabName = Object.prototype.hasOwnProperty.call(V16_TAB_OF, name) ? V16_TAB_OF[name] : name;
+    const tabEl = tabName ? document.querySelector('.tab[data-tab="' + tabName + '"]') : null;
+    if (tabEl) tabEl.classList.add('active');
     if (name === 'Coach') renderCoachChat(); // v12
+    try{ v16OnView(name); }catch(err){ console.error('v16 view failed', err); }   // r3: a fault here must not stop the tab change
   }
 
   /* ═══ RENDER: Lift selects ═══ */
@@ -8043,7 +8472,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const isDone = idx < currentIdx;
       const isActive = idx === currentIdx;
       const isPreviewing = _previewWeekIdx === idx;
-      pill.className = 'tl-week wave-' + item.wave + (isDone ? ' done' : '') + (isActive && !isPreviewing ? ' active' : '') + (!isDone && !isActive && !isPreviewing ? ' future' : '') + (isPreviewing ? ' preview' : '');
+      pill.className = 'tl-week wave-' + item.wave + ' ph-' + item.phase + (isDone ? ' done' : '') + (isActive && !isPreviewing ? ' active' : '') + (!isDone && !isActive && !isPreviewing ? ' future' : '') + (isPreviewing ? ' preview' : '');
 
       // Label: wave initial + phase initial (e.g. "10A", "8I", "5R", "3D")
       const phaseInitial = item.phase === 'accumulation' ? 'A' : item.phase === 'intensification' ? 'I' : item.phase === 'realization' ? 'R' : 'D';
@@ -8230,6 +8659,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     renderBackupNudge();
     renderInsightCards();
     renderReadinessCard();   // v15 (round 8, M)
+    v16Safe('tiles', v16Tiles);   // v16: follows the selected lift
 
     const tl = buildTimeline();
     const realMicro = currentMicrocycle();
@@ -8499,6 +8929,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       }
       el.activeReps.textContent = String(set.performedReps);
     }
+    v16Safe('ladder', () => v16Ladder(session, set));   // v16: test set only
 
     // Show the RPE panel on the "+" set and the test set
     const showRPE = set && !set.done && set.isAMRAP;
@@ -9486,6 +9917,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const tags = liftPRs ? ['1RM', '3RM', '5RM', '8RM', '12RM', '15+RM'].filter(r => liftPRs[r]).map(r =>
       '<div class="pr-tag"><span>' + r + '</span> <strong>' + escapeHtml(formatWeight(liftPRs[r].weight)) + '</strong> × ' + numText(liftPRs[r].reps, '?') + '</div>').join('') : '';
     html += '<div class="lift-sec" id="liftPRs"><h3 class="sheet-h3">Rep-Max PRs</h3>' + (tags ? '<div class="pr-tags">' + tags + '</div>' : '<p class="chart-note" style="margin-top:0">No PRs recorded yet.</p>') + '</div>';
+    try{ html += v16LiftExtras(id); }catch(err){ console.error('v16 lift extras failed', err); }   // v16: goal runway, best test sets, + sets against last cycle
     body.innerHTML = html;
   }
 
@@ -12052,6 +12484,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // over every layout change this pass made. The rAF double-tap re-asserts it
     // right before the next paint, catching any late same-frame scroll (Safari
     // clamp timing) that lands after this synchronous pass returns.
+    try{ renderV16(); }catch(err){ console.error('v16 render failed', err); }   // v16: display-only additions (header, tiles, Program, Recovery)
     _scrollKeepY = _keepY;
     window.scrollTo(0, _scrollKeepY);
     if (typeof requestAnimationFrame === 'function'){
@@ -14529,9 +14962,606 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     location.reload();
   }
 
+  /* ═══════════════ v16.0.0: PRESENTATION LAYER ═══════════════
+     New tabs, the program grid, Recovery, the rep ladder, the goal runway and the wave recap. Display only: every
+     number here is read from the functions above (plannedSets, bookTmUpdate, goalEta, computeDeloadAssessment,
+     getLiftVolumeStatus, liftTests). Nothing in this block writes training state, the packet, or the bridge.
+     Each renderer is wrapped so a fault here can never stop the v15 core from rendering. */
+  const V16_UI_KEY = 'juggernaut_ui_v16';          // display choices for this device; not part of the saved state or exports
+  const V16_TAB_OF = { Accessories:'Program', Recovery:'Workout', Settings:null };
+  const V16_TITLES = { Workout:'Today', Program:'Program', History:'History', Coach:'Coach', Tools:'Tools', Settings:'Settings', Accessories:'Accessories', Recovery:'Recovery' };
+  const V16_WAVE_COLOR = { '10s':'#EBDDAE', '8s':'#F2BC4B', '5s':'#F08B32', '3s':'#EE5F42' };
+  const V16_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  let _v16View = 'Workout', _v16Week = null, _v16Recap = null, _v16RpeAuto = null;
+  const v16$ = id => document.getElementById(id);
+  function v16Ui(){ try{ const u = JSON.parse(localStorage.getItem(V16_UI_KEY) || '{}'); return (u && typeof u === 'object') ? u : {}; }catch(_){ return {}; } }
+  function v16SetUi(k, v){ const u = v16Ui(); u[k] = v; try{ localStorage.setItem(V16_UI_KEY, JSON.stringify(u)); }catch(_){} }
+  function v16ApplyPlateStyle(){
+    const style = v16Ui().plates === 'iron' ? 'iron' : 'color';   // colour-coded unless iron was chosen
+    document.body.setAttribute('data-plates', style);
+    const s = v16$('v16PlateStyle'); if (s && s.value !== style) s.value = style;
+  }
+  function v16Safe(name, fn){ try{ fn(); }catch(err){ console.error('v16 ' + name + ' failed', err); } }
+  function v16Day(iso){ const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }); }
+  function v16Wt(w){ return escapeHtml(formatWeight(w)); }
+  function v16Num(w){ return escapeHtml(String(formatWeight(w)).replace(/\s*(lb|kg)$/i, '')); }
+
+
+  /* ── Suggestion helpers (owner decisions 2026-11-14). They only shape what is suggested; any lift can be started. ── */
+  function v16DayDiff(iso){ const d = new Date(iso), n0 = new Date(); if (Number.isNaN(d.getTime())) return Infinity;
+    return Math.round((new Date(n0.getFullYear(), n0.getMonth(), n0.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5); }
+  // history entries with a readable date, newest first (r2: an unreadable date used to sort first and switch the rule off)
+  function v16Dated(){ return (state.history || []).filter(h => h && Number.isFinite(Date.parse(h.completedAt))).sort((x, y) => Date.parse(y.completedAt) - Date.parse(x.completedAt)); }
+  function v16LastChain(){   // the half of the body trained today or yesterday, else null
+    const last = v16Dated()[0];
+    return (last && v16DayDiff(last.completedAt) <= 1) ? ((getLiftMeta(last.liftId) || {}).chain || null) : null;
+  }
+  function v16LastSessionToday(){ const last = v16Dated()[0]; return !!last && v16DayDiff(last.completedAt) <= 0; }
+  function v16RestSuggested(){   // every lift still due would repeat yesterday's half of the body or sit inside the squat/deadlift two-day gap
+    if (state.activeSession) return false;
+    const micro = currentMicrocycle(); if (micro.phase === 'complete') return false;
+    const comp = state.program.completion[micro.wave + '_' + micro.phase] || {};
+    const due = LIFTS.filter(l => isActiveLift(l.id) && comp[l.id] !== 'done' && comp[l.id] !== 'skipped');
+    if (!due.length) return false;
+    const chain = v16LastChain(), PAIR = { squat:'deadlift', deadlift:'squat' }, now = Date.now();
+    const pairBlocked = id => { const o = PAIR[id]; if (!o) return false;
+      const h = v16Dated().find(x => x.liftId === o);
+      return !!h && (now - new Date(h.completedAt).getTime()) < 2 * 864e5; };
+    return due.every(l => (chain && l.chain === chain) || pairBlocked(l.id));
+  }
+
+  function v16Header(){
+    const t = v16$('hdrTitle'), s = v16$('hdrSub');
+    if (!t || !s) return;
+    const session = state.activeSession;
+    t.textContent = (_v16View === 'Workout' && session) ? ((getLiftMeta(session.liftId) || {}).name || 'Session') : (V16_TITLES[_v16View] || _v16View);
+    s.textContent = _v16View === 'Workout' ? new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' })
+      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.0';
+    const micro = currentMicrocycle();
+    document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8A9BAE' : (V16_WAVE_COLOR[micro.wave] || '#EBDDAE'));
+  }
+  function v16OnView(name){
+    _v16View = name;
+    if (name === 'Program') _v16Week = null;   // open on the current week every time
+    if (name === 'Tools'){
+      const liftData = state.lifts[el.liftSelect.value || 'squat'];
+      if (liftData && el.calcRpe1rm && (!el.calcRpe1rm.value || el.calcRpe1rm.value === _v16RpeAuto)){   // r2: refresh after a TM change; a typed number is left alone
+        _v16RpeAuto = String(impliedOneRm(liftData)); el.calcRpe1rm.value = _v16RpeAuto; el.calcRpe1rm.dispatchEvent(new Event('input')); }
+    }
+    renderV16();
+    if (!(name === 'Workout' && (state.activeSession || _sessionPhase !== 'idle'))) window.scrollTo(0, 0);   // r3: returning to a running session keeps its place
+  }
+
+  /* ── Program: 16 weeks as waves by phase ── */
+  function v16CellText(wave, phase){
+    const def = getPhaseDef(wave, phase);
+    if (phase === 'deload') return ['3 × 5', '40–60%'];
+    if (phase === 'realization') return ['AMRAP', 'at ' + formatPercent(def.testPctTM)];
+    return [def.sets + ' × ' + def.reps, 'at ' + formatPercent(def.pctTM)];
+  }
+  function v16WaveRecapData(wave, cycle){
+    const rows = [];
+    LIFTS.filter(l => isActiveLift(l.id)).forEach(l => {
+      const x = liftTests(l.id).filter(z => z.h.wave === wave && (z.h.cycle || 1) === cycle).pop();
+      if (!x || x.t.ruleVersion) return;
+      const tc = x.t.tmChange, held = !!tc.awaitingConfirmation;
+      rows.push({ id:l.id, name:l.name, weight:x.t.weight, reps:x.t.reps, standard:x.t.standard, from:tc.from, to:held ? tc.from : tc.to,
+        amount:held ? 0 : tc.amount, units:x.h.units, date:x.h.completedAt });
+    });
+    return rows;
+  }
+  function v16ProgramView(){
+    const grid = v16$('pgGrid'); if (!grid) return;
+    const tl = buildTimeline(), cur = currentMicrocycle().index, cycle = state.program.cycle || 1;
+    if (_v16Week === null || _v16Week >= tl.length) _v16Week = Math.min(cur, tl.length - 1);
+    // v16 fourth pass: at-a-glance layer. Display only: every number comes from plannedSets(), getPhaseDef(), completion and logged tests.
+    const act = LIFTS.filter(l => isActiveLift(l.id)), SHORT = { squat:'Squat', bench:'Bench', deadlift:'Deadlift', ohp:'Press' };
+    const load = tl.map(wk => {
+      let vol = 0, top = 0;
+      act.forEach(l => plannedSets(l.id, wk.wave, wk.phase, cycle).forEach(x => {
+        if (Number.isFinite(x.weight) && Number.isFinite(x.targetReps)) vol += x.weight * x.targetReps;
+        if (Number.isFinite(x.pctTM) && x.pctTM > top) top = x.pctTM;
+      }));
+      return { vol, top };
+    });
+    const maxVol = Math.max(1, ...load.map(x => x.vol)), maxTop = Math.max(.0001, ...load.map(x => x.top));
+    const prog = v16$('pgProg');
+    if (prog){
+      const n = tl.length, left = Math.max(0, n - cur - 1);
+      let segs = '';
+      tl.forEach((wk, idx) => { segs += '<i class="' + (idx < cur ? 'done' : idx === cur ? 'cur' : '') + '" style="--wc:' + (wk.phase === 'deload' ? '#8A9BAE' : V16_WAVE_COLOR[wk.wave]) + '"></i>'; });
+      prog.innerHTML = '<div class="v16-h"><h3>' + (cur >= n ? 'Cycle ' + cycle + ' complete' : 'Week ' + (cur + 1) + ' of ' + n) + '</h3><span>Cycle ' + cycle
+        + (cur >= n ? '' : left === 0 ? ', last week' : ', ' + left + ' more after this') + '</span></div><div class="v16-prog" aria-hidden="true">' + segs + '</div>';
+    }
+    const selLift = el.liftSelect ? el.liftSelect.value : '', testCache = {};
+    const testFor = wave => {
+      if (!(wave in testCache)){
+        const rows = v16WaveRecapData(wave, cycle);
+        testCache[wave] = rows.find(r => r.id === selLift) || rows.slice().sort((a, b) => (b.reps - b.standard) - (a.reps - a.standard))[0] || null;
+      }
+      return testCache[wave];
+    };
+    let html = '<span></span>' + ['Accumulate', 'Intensify', 'Test', 'Deload'].map(h => '<span class="v16-grid-h">' + h + '</span>').join('');
+    tl.forEach((wk, idx) => {
+      if (idx % 4 === 0) html += '<span class="v16-grid-w" style="color:' + V16_WAVE_COLOR[wk.wave] + '">' + wk.wave + '</span>';
+      let tx = v16CellText(wk.wave, wk.phase); const done = idx < cur, isCur = idx === cur;
+      const res = done && wk.phase === 'realization' ? testFor(wk.wave) : null;
+      if (res) tx = [res.reps + ' / ' + res.standard, SHORT[res.id] || res.name];
+      const comp = isCur ? (state.program.completion[wk.wave + '_' + wk.phase] || {}) : null;
+      let dots = '', nDone = 0;
+      if (comp){ act.forEach(l => { const st = comp[l.id]; if (st === 'done') nDone++; dots += '<i class="' + (st === 'done' ? 'on' : st === 'skipped' ? 'sk' : '') + '"></i>'; }); }
+      const lv = Math.round(100 * load[idx].vol / maxVol), li = Math.round(100 * load[idx].top / maxTop);
+      html += '<button type="button" class="v16-cell' + (done ? ' done' : '') + (isCur ? ' cur' : '') + (idx === _v16Week ? ' sel' : '') + '" data-v16-week="' + idx + '" style="--wc:'
+        + (wk.phase === 'deload' ? '#8A9BAE' : V16_WAVE_COLOR[wk.wave]) + '" aria-label="Week ' + (idx + 1) + ', ' + wk.wave + ' ' + wk.phase + (done ? ', done' : isCur ? ', this week, ' + nDone + ' of ' + act.length + ' lifts done' : '')
+        + (res ? ', test ' + res.reps + ' reps against a standard of ' + res.standard + ', ' + res.name : '')
+        + ', volume ' + lv + ' percent of the biggest week, top set ' + formatPercent(load[idx].top) + '">'
+        + '<span class="v16-cell-t"><span>' + (idx + 1) + '</span>' + (done ? V16_CHECK : isCur ? '<span class="v16-dots">' + dots + '</span>' : '') + '</span>'
+        + '<span><span class="v16-cell-m">' + tx[0] + '</span><br><span class="v16-cell-s">' + tx[1] + '</span></span>'
+        + '<span class="v16-wkb"><i class="bv" style="width:' + Math.max(4, lv) + '%"></i><i class="bn" style="width:' + Math.max(4, li) + '%"></i></span></button>';
+    });
+    grid.innerHTML = html + '<span></span><p class="v16-grid-key"><i class="bv"></i>Volume<i class="bn"></i>Top set weight<span>Planned, at today\'s training maxes</span></p>';
+    // the selected week: every active lift's top weight, from plannedSets()
+    const wkBox = v16$('pgWeek'), wk = tl[_v16Week];
+    if (wkBox && wk){
+      const def = getPhaseDef(wk.wave, wk.phase), comp = (_v16Week === cur ? state.program.completion[wk.wave + '_' + wk.phase] : null) || {};
+      const restKey = wk.wave + '_' + wk.phase, rmx = state.settings.restMatrix?.[restKey], rest = Number.isFinite(rmx) ? rmx : (PROGRAM.defaultRestMatrix[restKey] || 0);
+      const sub = wk.phase === 'deload' ? 'Three easy sets of 5 at 40, 50 and 60% of the training max from before the test.'
+        : wk.phase === 'realization' ? 'Ramp-up sets, then one test set for as many reps as you can. Standard ' + PROGRAM.waveTargetReps[wk.wave] + ' reps.'
+        : ((def.leadIns && def.leadIns.length ? 'Lead-ins, then ' : '') + def.sets + ' × ' + def.reps + ' at ' + formatPercent(def.pctTM) + '. The last set is a + set.' + (rest ? ' Rest ' + formatDuration(rest) + '.' : ''));
+      // r2: a finished week (and a finished lift in the current week) shows what was logged, not the plan at today's TM
+      const past = _v16Week < cur, logged = id => {
+        const h = (state.history || []).filter(x => x && x.liftId === id && x.wave === wk.wave && x.phase === wk.phase && (x.cycle || 1) === cycle).sort(_byCompleted).pop();
+        if (!h) return null;
+        const done = (h.sets || []).filter(x => x && x.done !== false && n(x.weight) > 0 && Number.isFinite(Math.floor(n(x.performedReps))));
+        const top = done.find(x => { const r = setRole(x, h.phase); return r === 'test' || r === 'plus'; }) || done[done.length - 1];
+        return top ? { w:formatWeightAs(top.weight, h.units), reps:Math.floor(n(top.performedReps)), early:h.partial === true } : null;
+      };
+      let rows = '', anyLogged = false;
+      LIFTS.filter(l => isActiveLift(l.id)).forEach(l => {
+        const sets = plannedSets(l.id, wk.wave, wk.phase, cycle); if (!sets.length) return;
+        const top = sets[sets.length - 1], st = comp[l.id], lg = (past || st === 'done') ? logged(l.id) : null;
+        if (lg) anyLogged = true;
+        rows += '<button type="button" class="v16-lrow" data-v16-lift="' + l.id + '"><span>' + escapeHtml(l.name)
+          + (lg ? '<small class="lg">' + (lg.early ? 'Ended early' : 'Logged') + '</small>' : past ? '<small class="lg">No session logged</small>' : st === 'skipped' ? '<small>Skipped</small>' : st === 'done' ? '<small>Done</small>' : '')
+          + '</span><b>' + (lg ? escapeHtml(lg.w) + ' × ' + lg.reps : past ? '—' : v16Wt(top.weight)) + '</b></button>';
+      });
+      wkBox.innerHTML = '<div class="v16-h"><h3>Week ' + (_v16Week + 1) + (_v16Week === cur ? ', this week' : _v16Week < cur ? ', done' : '') + '</h3><span>'
+        + escapeHtml(wk.wave + ' ' + wk.phase) + '</span></div><p class="v16-sub">' + escapeHtml(sub) + (past || anyLogged ? ' Logged rows show your top set as you lifted it.' : '') + '</p>' + rows;
+    }
+    // wave recaps: any wave of this cycle with a logged test
+    const rc = v16$('pgRecaps');
+    if (rc){
+      let out = '';
+      PROGRAM.waves.forEach(w => {
+        const rows = v16WaveRecapData(w, cycle);
+        if (rows.length) out += '<button type="button" class="v16-recap-btn" data-v16-recap="' + w + '" style="--wc:' + V16_WAVE_COLOR[w] + '">' + w + ' wave recap<span>'
+          + rows.length + ' test' + (rows.length === 1 ? '' : 's') + '</span></button>';
+      });
+      rc.hidden = !out;
+      rc.innerHTML = out ? '<div class="v16-h"><h3>Wave recaps</h3><span>Cycle ' + cycle + '</span></div>' + out : '';
+    }
+  }
+
+  /* ── Today tiles ── */
+  function v16LastReadiness(count){
+    return (state.history || []).filter(h => h && h.phase !== 'deload' && Number.isFinite(readinessScoreNormalized(h.readiness)))
+      .slice().sort(_byCompleted).slice(-count).map(h => ({ v:readinessScoreNormalized(h.readiness), at:h.completedAt }));
+  }
+  function v16Tiles(){
+    const box = v16$('todayTiles'); if (!box) return;
+    const idle = !state.activeSession && _sessionPhase === 'idle';   // also shown when the cycle is complete, so Recovery stays reachable
+    box.hidden = !idle; if (!idle) return;
+    const a = computeDeloadAssessment(), last = v16LastReadiness(1)[0];
+    const sevText = { none:'Clear', watch:'Watch', caution:'Caution', deload:'Deload suggested' }[a.severity] || 'Clear';
+    const liftId = selectedLiftId(), meta = getLiftMeta(liftId) || { name:liftId }, goal = state.settings.goals?.[liftId];
+    const implied = impliedOneRm(state.lifts[liftId]);
+    let g;
+    if (Number.isFinite(goal) && goal > 0){
+      const eta = goalEta(liftId), pct = Math.max(0, Math.min(100, Math.round(implied / goal * 100)));
+      g = '<span class="v16-tile-k">' + escapeHtml(meta.name) + ' goal</span><span class="v16-tile-v">' + v16Num(implied) + '<small>of ' + v16Wt(goal) + '</small></span>'
+        + '<span class="v16-track"><i style="width:' + pct + '%"></i></span>'
+        + '<span class="v16-tile-s">' + (eta ? (eta.highWeeks === 0 ? 'Goal reached' : 'About ' + eta.lowWeeks + '–' + eta.highWeeks + (eta.highWeeks >= 104 ? '+' : '') + ' weeks') : 'Estimate after 3 tests') + '</span>';
+    } else {
+      g = '<span class="v16-tile-k">' + escapeHtml(meta.name) + '</span><span class="v16-tile-v">' + v16Num(implied) + '<small>1RM</small></span><span class="v16-tile-s">Set a goal in Settings</span>';
+    }
+    const rest = v16RestSuggested() ? '<div class="v16-rest"><strong>Rest day suggested.</strong> Every lift left would repeat the half of the body you trained ' + (v16LastSessionToday() ? 'today' : 'yesterday') + ', or sit too close to squat or deadlift. To train anyway, pick a lift and start.</div>' : '';
+    box.innerHTML = rest + '<button type="button" class="v16-tile" id="tileRecovery"><span class="v16-tile-k">Recovery</span><span class="v16-tile-v">'
+      + (last ? readinessScoreText(last.v) + '<small>of 30</small>' : '—') + '</span><span class="v16-tile-s">Deload signals: ' + sevText + '</span></button>'
+      + '<button type="button" class="v16-tile" id="tileGoal" data-v16-lift="' + liftId + '">' + g + '</button>';
+  }
+
+  /* ── Recovery ── */
+  function v16Recovery(){
+    const box = v16$('rcBody'); if (!box) return;
+    const a = computeDeloadAssessment(), R = DELOAD_RULES;
+    const label = { none:'Clear', watch:'Watch', caution:'Caution', deload:'Deload' }[a.severity] || 'Clear';
+    const col = { none:'#F6F2E9', watch:'#F2BC4B', caution:'#F08B32', deload:'#EE5F42' }[a.severity] || '#F6F2E9';
+    const edges = [0, R.watch, R.caution, R.deload, R.deload + (R.deload - R.caution) / 2];
+    const names = ['Clear', 'Watch', 'Caution', 'Deload'];
+    const segs = names.map((nm, i) => { const f = Math.max(0, Math.min(1, (a.score - edges[i]) / (edges[i + 1] - edges[i]))); return '<i><b style="width:' + Math.round(f * 100) + '%"></b></i>'; }).join('');
+    let html = '<div class="card"><div class="v16-h"><h3>Deload signals</h3><span>Score ' + a.score + ', deload at ' + R.deload + '</span></div>'
+      + '<div class="v16-state" style="color:' + col + '">' + label + '</div><div class="v16-meter" style="--mc:' + col + '" role="img" aria-label="Deload score ' + a.score + ', deload suggested at ' + R.deload + '">' + segs + '</div>'
+      + '<div class="v16-meter-l">' + names.map(nm => '<span' + (nm === label ? ' class="on"' : '') + '>' + nm + '</span>').join('') + '</div>'
+      + (a.evidence.length ? a.evidence.map(e => '<div class="v16-ev">' + escapeHtml(e) + '</div>').join('') : '<div class="v16-ev">No signals right now.</div>')
+      + '<div class="v16-ev">At ' + R.deload + ' the app offers to pull the deload forward. You decide.</div></div>';
+    const pts = v16LastReadiness(10);
+    if (pts.length){
+      const avg = pts.reduce((s, p) => s + p.v, 0) / pts.length, y = v => Math.round(64 - v / 30 * 64);
+      html += '<div class="card"><div class="v16-h"><h3>Readiness</h3><span>Average ' + readinessScoreText(avg) + ' of 30, last ' + pts.length + '</span></div>'
+        + '<div class="v16-bars" role="img" aria-label="Readiness for the last ' + pts.length + ' check-ins">'
+        + '<div class="v16-rule" style="top:' + y(23) + 'px"><span>23</span></div><div class="v16-rule" style="top:' + y(15) + 'px"><span>15</span></div>'
+        + pts.map(p => '<i style="height:' + Math.max(3, Math.round(p.v / 30 * 64)) + 'px"></i>').join('') + '</div>'
+        + '<p class="v16-sub" style="margin:10px 0 0">Under 15 trims a set. 23 or more offers one extra. Deload weeks are left out.</p></div>';
+    }
+    const micro = currentMicrocycle();
+    if (micro.phase !== 'complete'){
+      let rows = '';
+      LIFTS.filter(l => isActiveLift(l.id)).forEach(l => {
+        const v = getLiftVolumeStatus(l.id, micro.phase); if (!v.max) return;
+        const scale = Math.max(20, v.max + 4, v.sets + 2), pc = x => Math.round(x / scale * 1000) / 10;
+        rows += '<div class="v16-lm"><span>' + escapeHtml(l.name) + '</span><span class="v16-lm-t" role="img" aria-label="' + v.sets + ' hard sets, range ' + v.min + ' to ' + v.max + '">'
+          + '<i style="left:' + pc(v.min) + '%;width:' + pc(v.max - v.min) + '%"></i><b style="left:' + pc(v.sets) + '%"></b></span><span>' + v.sets + (v.sets === 1 ? ' set' : ' sets') + '</span></div>';
+      });
+      if (rows) html += '<div class="card"><div class="v16-h"><h3>Hard sets this week</h3><span>Minimum to maximum</span></div>' + rows + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  /* ── Test day: what each rep is worth ── */
+  function v16Ladder(session, set){
+    const box = v16$('repLadder'); if (!box) return;
+    const role = set ? setRole(set, session.phase) : null;
+    if (!set || set.done || role !== 'test'){ box.hidden = true; box.innerHTML = ''; return; }
+    const lift = state.lifts[session.liftId], tm = trainingMax(lift), std = PROGRAM.waveTargetReps[session.wave], lower = isLowerBody(session.liftId);
+    if (!std || !(tm > 0)){ box.hidden = true; return; }
+    const cur = Math.floor(n(set.performedReps)), goal = state.settings.goals?.[session.liftId];
+    const top = Math.min(std + TM_RULE.maxExtraReps, Math.max(std + 6, cur + 1));
+    const res = []; for (let r = top; r >= std; r--) res.push({ r, x:bookTmUpdate(tm, n(set.weight), r, std, lower) });
+    const maxAmt = Math.max(1, ...res.map(z => z.x.amount));
+    let flagged = false;
+    const asc = res.slice().reverse(); let flagAt = null;
+    if (Number.isFinite(goal) && goal > 0 && tm / 0.9 < goal){ const f = asc.find(z => z.x.tm / 0.9 >= goal); if (f) flagAt = f.r; }
+    box.innerHTML = '<div class="v16-ladder-h"><span>What each rep is worth</span><span>New training max</span></div>' + res.map(z => {
+      const gain = z.x.amount > 0;
+      return '<div class="v16-rung' + (gain ? ' gain' : '') + (z.r === cur ? ' cur' : '') + '"><span class="v16-rung-n">' + z.r + '</span><span class="v16-rung-mid">'
+        + '<span class="v16-rung-bar"' + (gain ? ' style="width:' + Math.max(10, Math.round(z.x.amount / maxAmt * 104)) + 'px"' : '') + '></span>'
+        + (z.r === flagAt ? '<span class="v16-flag">Passes ' + v16Num(goal) + '</span>' : '') + (z.r === std ? '<span class="v16-rung-note">The standard</span>' : '') + '</span>'
+        + '<span class="v16-rung-r"><b>' + v16Num(z.x.tm) + '</b><span>' + (gain ? '+' + v16Num(z.x.amount) : 'holds') + '</span></span></div>';
+    }).join('') + '<div class="v16-ladder-f">Steps follow the book’s 5% rule, from the weight on the bar.'
+      + (Number.isFinite(set.plannedWeight) && Math.abs(set.plannedWeight - set.weight) > 1e-9 ? ' The weight differs from the plan, so any change will wait for your OK.' : '')
+      + (cur < std ? ' Under ' + std + ' reps the training max holds.' : '') + '</div>';
+    box.hidden = false;
+  }
+
+  /* ── Rest: what to take off and put on ── */
+  function v16RestSwap(session, prevSet, nextSet){
+    const box = v16$('restSwap'); if (!box) return;
+    if (!session || !prevSet || !nextSet || prevSet.weight === nextSet.weight){ box.hidden = true; box.innerHTML = ''; return; }
+    const a = calculatePlates(prevSet.weight, session.liftId).perSide, pm = calculatePlates(nextSet.weight, session.liftId), b = pm.perSide;
+    let keep = 0; while (keep < a.length && keep < b.length && a[keep] === b[keep]) keep++;
+    const off = a.slice(keep), on = b.slice(keep), added = new Set(on.map((_, i) => keep + i));
+    const chips = (xs, cls) => xs.map(p => '<span class="v16-pchip' + cls + '">' + p + '</span>').join('');
+    box.innerHTML = '<div id="restSwapSvg"></div>'
+      + (off.length ? '<div class="v16-swap-row"><b>Take off</b>' + chips(off, '') + '</div>' : '')
+      + (on.length ? '<div class="v16-swap-row"><b>Put on</b>' + chips(on, ' on') + '</div>' : '');
+    renderPlateSVG(pm, v16$('restSwapSvg'), null, added);
+    box.hidden = false;
+  }
+
+  /* ── Readiness: the score on the rule it triggers ── */
+  function v16Zones(score){
+    const box = v16$('readinessZones'); if (!box) return;
+    if (!Number.isFinite(score)){ box.hidden = true; return; }
+    const ph = currentMicrocycle().phase;
+    if (ph === 'realization' || ph === 'deload'){   // applyFatigueManagement and the extra set both skip these days
+      box.innerHTML = '<div class="v16-zone-off">' + (ph === 'deload' ? 'Deload week' : 'Test day') + ': readiness is recorded but does not change the sets.</div>';
+      box.hidden = false; return;
+    }
+    const z = [['2 sets cut', 0, 8], ['1 set cut', 8, 15], ['Full volume', 15, 23], ['Extra set', 23, 30]];
+    const at = z.findIndex(q => score < q[2]), on = at < 0 ? 3 : at;
+    box.innerHTML = '<div class="v16-zone-track">' + z.map((q, i) => '<i class="' + (i === on ? 'on' : '') + '" style="flex:' + (q[2] - q[1]) + ' 1 0"></i>').join('')
+      + '<span class="v16-zone-mark" style="left:' + Math.max(1, Math.min(99, score / 30 * 100)) + '%"></span></div>'
+      + '<div class="v16-zone-labels">' + z.map((q, i) => '<span class="' + (i === on ? 'on' : '') + '" style="flex:' + (q[2] - q[1]) + ' 1 0">' + q[0] + '</span>').join('') + '</div>';
+    box.hidden = false;
+  }
+
+  // v15's note promises a set cut or an extra set from the score alone. On test days and deload weeks neither happens
+  // (applyFatigueManagement, shouldOfferFireDayExtension), so the note says that instead. Wording only.
+  function v16ReadinessNote(){
+    const ph = currentMicrocycle().phase;
+    if ((ph === 'realization' || ph === 'deload') && el.readinessNote) el.readinessNote.textContent = 'Recorded with the session. Sets stay as planned today.';
+  }
+
+  /* ── Lift page: goal runway, best sets, + sets against last cycle ── */
+  function v16Runway(id){
+    const goal = state.settings.goals?.[id], tests = liftTests(id).filter(x => !x.t.ruleVersion);
+    if (!Number.isFinite(goal) || goal <= 0 || !tests.length) return '';
+    const eta = goalEta(id), now = Date.now(), WEEK = 7 * 864e5, cur = trainingMax(state.lifts[id]) / 0.9;
+    const pts = tests.map(x => ({ t:Date.parse(x.h.completedAt), v:x.t.tmChange.from / 0.9 })).filter(p => Number.isFinite(p.t) && p.v > 0);
+    if (!pts.length) return '';
+    const far = eta && eta.highWeeks > 0 ? Math.max(4, Math.min(eta.highWeeks, 26)) : 8;
+    const t0 = pts[0].t, t1 = now + far * WEEK * 1.12, W = 320, H = 150;
+    const vs = pts.map(p => p.v).concat([cur, goal]), vmin = Math.min(...vs), vmax = Math.max(...vs), pad = Math.max(5, (vmax - vmin) * .12);
+    const X = t => Math.round((t - t0) / (t1 - t0) * W * 10) / 10, Y = v => Math.round((H - 8 - (v - (vmin - pad)) / ((vmax + pad) - (vmin - pad)) * (H - 16)) * 10) / 10;
+    let d = 'M' + X(pts[0].t) + ' ' + Y(pts[0].v);
+    for (let i = 1; i < pts.length; i++) d += ' H' + X(pts[i].t) + ' V' + Y(pts[i].v);
+    d += ' H' + X(pts[pts.length - 1].t) + ' V' + Y(cur) + ' H' + X(now);   // r3: pts holds readable dates only
+    const gy = Y(goal), cx = X(now), cy = Y(cur);
+    let cone = '';
+    if (eta && eta.highWeeks > 0 && cur < goal){
+      // each edge runs from today toward the goal line; an arrival past the chart's right edge is cut at that edge
+      const edge = wk => { const tx = now + wk * WEEK; if (tx <= t1) return [X(tx), gy]; const f = (t1 - now) / (tx - now); return [W, Math.round((cy + (gy - cy) * f) * 10) / 10]; };
+      const a = edge(eta.lowWeeks), b = edge(eta.highWeeks);
+      cone = '<path d="M' + cx + ' ' + cy + ' L' + a[0] + ' ' + a[1] + (a[0] < W && b[0] >= W ? ' L' + W + ' ' + gy : '') + ' L' + b[0] + ' ' + b[1] + ' Z" fill="#F08B32" fill-opacity=".28"/>'
+        + '<path d="M' + cx + ' ' + cy + ' L' + a[0] + ' ' + a[1] + ' M' + cx + ' ' + cy + ' L' + b[0] + ' ' + b[1] + '" stroke="#F08B32" stroke-width="1.5" stroke-linecap="round" fill="none"/>';
+    }
+    const etaText = !eta ? 'An arrival estimate needs 3 test days under the book rule.' : eta.highWeeks === 0 ? 'Goal reached by implied 1RM.'
+      : 'About ' + eta.lowWeeks + ' to ' + eta.highWeeks + (eta.highWeeks >= 104 ? '+' : '') + ' weeks at your test-day gains, from ' + eta.tests + ' tests.';
+    return '<div class="lift-sec" id="liftRunway"><div class="v16-h"><h3>Goal ' + v16Wt(goal) + '</h3><span>' + (cur < goal ? v16Wt(Math.round((goal - cur) * 10) / 10) + ' to go' : 'Reached') + '</span></div>'
+      + '<div class="v16-run"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Implied one-rep max over time against the goal of ' + escapeHtml(formatWeight(goal)) + '">'
+      + cone + '<path d="M0 ' + gy + ' H' + W + '" stroke="#EBDDAE" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'
+      + '<path d="' + d + '" stroke="#F6F2E9" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>'
+      + pts.slice(1).map((p, i) => '<circle cx="' + X(p.t) + '" cy="' + Y(p.v) + '" r="3.5" fill="#23201D" stroke="#F6F2E9" stroke-width="2"/>').join('')
+      + '<circle cx="' + cx + '" cy="' + cy + '" r="5.5" fill="#F6F2E9"/></svg></div>'
+      + '<p class="chart-note">Implied 1RM (TM ÷ 0.9) at each test day, and today. ' + etaText + '</p></div>';
+  }
+  function v16BestSets(id){
+    const tests = liftTests(id).filter(x => Number.isFinite(x.t.projectedMax) && x.t.reps > 0);
+    if (!tests.length) return '';
+    const best = tests.slice().sort((a, b) => b.t.projectedMax - a.t.projectedMax).slice(0, 4), top = best[0];
+    return '<div class="lift-sec" id="liftBest"><div class="v16-h"><h3>Best test sets</h3><span>Highest projection in yellow</span></div><div class="v16-best">' + best.map(x =>
+      '<div' + (x === top ? ' class="top"' : '') + '><span class="v16-best-t"><span>' + x.t.reps + ' reps</span><span>' + escapeHtml(v16Day(x.h.completedAt)) + '</span></span>'
+      + '<span class="v16-best-b"><span>' + escapeHtml(formatWeightAs(x.t.weight, x.h.units)) + '</span><small>proj. ' + Math.round(x.t.projectedMax) + '</small></span></div>').join('') + '</div>'
+      + '<p class="chart-note">Projection is the book’s: weight × reps × 0.033 + weight.</p></div>';
+  }
+  function v16PlusRows(id){
+    const hs = (state.history || []).filter(h => h && h.liftId === id && (h.phase === 'accumulation' || h.phase === 'intensification')).slice().sort(_byCompleted).reverse();
+    const rows = [];
+    for (const h of hs){
+      if (rows.length >= 3) break;
+      const a = _sessionAmrap(h); if (!a || a.role !== 'plus') continue;
+      const prev = sameWeekLastCycle(id, weekIndexOf(h.wave, h.phase), h.cycle || 1, 'plus'); if (!prev) continue;
+      const now = Math.floor(n(a.reps)), mx = Math.max(now, prev.reps, 1);
+      rows.push('<div class="v16-plus"><span>' + escapeHtml(h.wave + ' ' + (h.phase === 'accumulation' ? 'acc.' : 'int.')) + '</span><span class="v16-plus-bars"><i style="width:' + Math.round(now / mx * 100)
+        + '%"></i><i style="width:' + Math.round(prev.reps / mx * 100) + '%"></i></span><span>' + now + ' vs ' + prev.reps + '</span></div>');
+    }
+    return rows.length ? '<div class="lift-sec" id="liftPlus"><div class="v16-h"><h3>+ sets against last cycle</h3><span>Reps, same week</span></div>' + rows.join('') + '</div>' : '';
+  }
+  function v16LiftExtras(id){
+    let out = '';
+    [v16Runway, v16BestSets, v16PlusRows].forEach(f => { try{ out += f(id); }catch(err){ console.error('v16 lift page section failed', err); } });
+    return out;
+  }
+
+  /* ── Wave recap: a card you can save or share ── */
+  function v16DrawRecap(){
+    const c = v16$('recapCanvas'); if (!c || !_v16Recap) return;
+    if (_v16Recap.session){ v16DrawSession(c); return; }
+    const { wave, cycle, rows } = _v16Recap, W = 1080, H = 1350, ctx = c.getContext('2d'), INK = '#191715';
+    c.width = W; c.height = H;
+    ctx.fillStyle = V16_WAVE_COLOR[wave] || '#EBDDAE'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
+    const F = (wt, px, wide) => { ctx.font = wt + ' ' + (wide ? 'expanded ' : '') + px + 'px Archivo, "Helvetica Neue", Arial, sans-serif'; };
+    const L = 80, R = W - 80;
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.0', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
+    ctx.textAlign = 'left'; F(800, 150, true); ctx.fillText(wave + ' wave', L - 6, 300);
+    const ds = rows.map(r => Date.parse(r.date)).filter(Number.isFinite), passed = rows.filter(r => r.reps >= r.standard).length;
+    F(600, 38);
+    if (ds.length) ctx.fillText('Tested ' + v16Day(Math.min(...ds)) + ' to ' + v16Day(Math.max(...ds)), L, 366);
+    ctx.fillText(rows.length + ' test' + (rows.length === 1 ? '' : 's') + ', ' + passed + ' at or over the standard', L, 416);
+    const top = 470, rh = Math.min(190, (H - top - 150) / Math.max(rows.length, 1));
+    let total = 0;
+    rows.forEach((r, i) => {
+      const y = top + i * rh; total += r.amount;
+      ctx.globalAlpha = .3; ctx.fillRect(L, y, R - L, 3); ctx.globalAlpha = 1;
+      F(700, 38); ctx.textAlign = 'left'; ctx.fillText(r.name, L, y + 62);
+      F(800, 84, true); const wtxt = String(formatWeightAs(r.weight, r.units)).replace(/\s*(lb|kg)$/i, ''); ctx.fillText(wtxt, L - 3, y + 150);
+      const ww = ctx.measureText(wtxt).width; F(800, 52); ctx.fillText('× ' + r.reps, L + ww + 22, y + 150);
+      ctx.textAlign = 'right'; F(800, 64, true); ctx.fillText(r.amount > 0 ? '+' + String(formatWeightAs(r.amount, r.units)).replace(/\s*(lb|kg)$/i, '') : 'Held', R, y + 96);
+      F(600, 32); ctx.fillText('TM ' + formatWeightAs(r.from, r.units) + (r.amount > 0 ? ' to ' + formatWeightAs(r.to, r.units) : ''), R, y + 150);
+    });
+    const fy = top + rows.length * rh;
+    ctx.globalAlpha = .3; ctx.fillRect(L, fy, R - L, 3); ctx.globalAlpha = 1;
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Standard ' + PROGRAM.waveTargetReps[wave] + ' reps', L, fy + 70);
+    ctx.textAlign = 'right'; ctx.fillText(total > 0 ? '+' + String(Math.round(total * 100) / 100) + ' ' + unitLabel() + ' of training max' : 'Training maxes held', R, fy + 70);
+  }
+  function v16OpenRecap(wave){
+    const cycle = state.program.cycle || 1, rows = v16WaveRecapData(wave, cycle), modal = v16$('recapModal');
+    if (!rows.length || !modal) return;
+    _v16Recap = { wave, cycle, rows };
+    modal.hidden = false; requestAnimationFrame(() => modal.classList.add('show'));
+    v16DrawRecap();
+    try{ if (document.fonts && document.fonts.load) document.fonts.load('800 80px Archivo').then(v16DrawRecap).catch(() => {}); }catch(_){}
+  }
+  function v16CloseRecap(){
+    const modal = v16$('recapModal'); if (!modal) return;
+    modal.classList.remove('show'); setTimeout(() => { if (!modal.classList.contains('show')) modal.hidden = true; }, 220);
+  }
+  function v16RecapBlob(){ return new Promise(res => { const c = v16$('recapCanvas'); if (!c || !c.toBlob) return res(null); c.toBlob(b => res(b), 'image/png'); }); }
+  function v16RecapName(){ return 'juggernaut-' + (!_v16Recap ? 'recap' : _v16Recap.session ? String(_v16Recap.title).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-session' : _v16Recap.wave + '-wave-cycle-' + _v16Recap.cycle) + '.png'; }
+  async function v16SaveRecap(){
+    const blob = await v16RecapBlob(); if (!blob){ toast('Couldn’t make the image on this device.', 'b'); return; }
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = v16RecapName(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  async function v16ShareRecap(){
+    const blob = await v16RecapBlob(); if (!blob){ toast('Couldn’t make the image on this device.', 'b'); return; }
+    try{
+      const file = new File([blob], v16RecapName(), { type:'image/png' });
+      if (navigator.canShare && navigator.canShare({ files:[file] })){ await navigator.share({ files:[file], title:(_v16Recap && _v16Recap.session) ? 'Juggernaut session' : 'Juggernaut wave recap' }); return; }
+    }catch(err){ if (err && err.name === 'AbortError') return; }
+    v16SaveRecap();   // no share sheet here: save the image instead
+  }
+
+
+  /* ── History: lifts still due this week (no dates: the app has no training-day rule) ── */
+  function v16HistDue(){
+    const box = v16$('histDue'); if (!box) return;
+    const micro = currentMicrocycle();
+    const comp = micro.phase === 'complete' ? null : (state.program.completion[micro.wave + '_' + micro.phase] || {});
+    const due = comp ? LIFTS.filter(l => isActiveLift(l.id) && comp[l.id] !== 'done' && comp[l.id] !== 'skipped') : [];
+    box.hidden = !due.length;
+    box.innerHTML = due.length ? '<div class="v16-h"><h3>Due this week</h3><span>Week ' + (micro.index + 1) + ', no set days</span></div><div class="v16-due">'
+      + due.map(l => '<button type="button" data-v16-due="' + l.id + '">' + escapeHtml(l.name) + '</button>').join('') + '</div>' : '';
+  }
+
+  /* ── Today: when the selected lift is finished for the week, move to the suggested one ──
+     Runs once per change of the week's completion (and at start-up), never on a tap, so any lift you pick stays picked. */
+  let _v16AutoKey = null;
+  function v16AutoSelect(){
+    if (state.activeSession || _sessionPhase !== 'idle' || _previewWeekIdx !== null) return;
+    const micro = currentMicrocycle(); if (micro.phase === 'complete') return;
+    const key = micro.index + ':' + JSON.stringify(state.program.completion[micro.wave + '_' + micro.phase] || {});
+    if (key === _v16AutoKey) return;
+    _v16AutoKey = key;
+    if (getWeeklyLiftPlanStatus(el.liftSelect.value) === 'due') return;
+    const next = getNextPriorityLift();
+    if (next && next !== el.liftSelect.value && [...el.liftSelect.options].some(o => o.value === next)){ el.liftSelect.value = next; renderDashboard(); }
+  }
+
+  /* ── Session recap: the result first ── */
+  function v16RecapHero(entry, tonnage, duration){
+    const box = el.scoSummary; if (!box || !entry) return;
+    const old = box.querySelector('.v16-rhero'); if (old) old.remove();
+    const t = entry.test, p = entry.plusSet; let k = '', v = '', s = '';
+    if (t){
+      const tc = t.tmChange;
+      k = 'Test set, standard ' + t.standard; v = '<b>' + t.reps + '</b><span>reps at ' + v16Wt(t.weight) + '</span>';
+      s = tc.awaitingConfirmation ? 'The weight differed from the plan, so the training max change waits for your OK.'
+        : tc.amount > 0 ? 'Training max ' + v16Wt(tc.from) + ' to ' + v16Wt(tc.to) + ' (' + tc.step + ' step).'
+        : t.reps < t.standard ? 'Under the standard. Training max holds at ' + v16Wt(tc.from) + '.' : 'Training max holds at ' + v16Wt(tc.from) + '.';
+    } else if (p){
+      const prev = p.sameWeekLastCycle, d = prev ? p.reps - prev.reps : 0;
+      k = 'The + set'; v = '<b>' + p.reps + '</b><span>reps at ' + v16Wt(p.weight) + '</span>';
+      s = !prev ? 'First cycle at this week, so there is nothing to compare yet.'
+        : (d > 0 ? d + ' more than' : d < 0 ? (-d) + ' fewer than' : 'Level with') + ' cycle ' + prev.cycle + ' (' + prev.reps + ' at ' + v16Wt(prev.weight) + ').';
+    } else return;
+    const hero = document.createElement('div');
+    hero.className = 'v16-rhero';
+    hero.innerHTML = '<div class="v16-rhero-k">' + escapeHtml(k) + '</div><div class="v16-rhero-v">' + v + '</div><div class="v16-rhero-s">' + escapeHtml(s) + '</div>';
+    const card = box.querySelector('.summary-card') || box, title = card.querySelector('.summary-title');
+    if (title && title.nextSibling) card.insertBefore(hero, title.nextSibling); else card.insertBefore(hero, card.firstChild);
+    let sh = box.querySelector('.v16-rshare'); if (sh) sh.remove();
+    sh = document.createElement('div'); sh.className = 'v16-rshare';
+    sh.innerHTML = '<button type="button" id="btnSessionShare">Share this session</button>';
+    card.insertBefore(sh, hero.nextSibling);
+    sh.firstChild.addEventListener('click', () => {
+      const meta = getLiftMeta(entry.liftId) || { name:entry.liftId }, modal = v16$('recapModal'); if (!modal) return;
+      _v16Recap = { session:true, wave:entry.wave, cycle:entry.cycle || state.program.cycle || 1, title:meta.name, sub:entry.wave + ' wave, ' + entry.phase + ', ' + v16Day(entry.completedAt),
+        k, big:String(t ? t.reps : p.reps), bigSub:'reps at ' + formatWeight(t ? t.weight : p.weight), line:s,
+        barWeight:(t ? t.weight : p.weight), liftId:entry.liftId,
+        foot:[formatWeight(roundToIncrement(tonnage, 5)) + ' volume', Math.max(1, Math.round(duration / 60)) + ' min'] };
+      modal.hidden = false; requestAnimationFrame(() => modal.classList.add('show'));
+      v16DrawRecap();
+      try{ if (document.fonts && document.fonts.load) document.fonts.load('800 80px Archivo').then(v16DrawRecap).catch(() => {}); }catch(_){}
+    });
+  }
+  // Display only: draws the loaded bar for the share card from calculatePlates() output. No weights are computed here.
+  const V16_PLATE_DRAW = { '45':['#C8402F','#fff',34,124], '35':['#F2C230','#191715',30,112], '25':['#2B6FB8','#fff',28,98], '10':['#23824A','#fff',24,76],
+    '5':['#6F767C','#fff',22,60], '2.5':['#B9BEC2','#191715',20,48], '1.25':['#E4E6E8','#191715',18,42] };
+  function v16DrawBar(ctx, perSide, cx, cy, maxW, bg){
+    const INK = '#191715', iron = v16Ui().plates === 'iron', gapP = 4, half = maxW / 2, inner = 150, collar = 22;
+    const spec = perSide.map(p => { const d = V16_PLATE_DRAW[String(p)] || ['#8A8F94', '#fff', 22, 60]; return { p, fill:d[0], ink:d[1], w:d[2], h:d[3] }; });
+    let need = spec.reduce((a, x) => a + x.w + gapP, 0);
+    const room = half - inner - collar - 46, k = need > room ? room / need : 1;
+    ctx.save();
+    ctx.fillStyle = INK;
+    ctx.fillRect(cx - half, cy - 7, maxW, 14);                                   // shaft and sleeves
+    ctx.fillRect(cx - half, cy - 11, half - inner, 22); ctx.fillRect(cx + inner, cy - 11, half - inner, 22);
+    ctx.fillRect(cx - inner - collar, cy - 26, collar, 52); ctx.fillRect(cx + inner, cy - 26, collar, 52);   // collars
+    [-1, 1].forEach(dir => {
+      let x = inner + collar + gapP;
+      spec.forEach(pl => {
+        const w = Math.max(10, pl.w * k), x0 = dir > 0 ? cx + x : cx - x - w;
+        ctx.fillStyle = iron ? INK : pl.fill; ctx.strokeStyle = INK; ctx.lineWidth = 3;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x0, cy - pl.h / 2, w, pl.h, 5); else ctx.rect(x0, cy - pl.h / 2, w, pl.h);
+        ctx.fill(); if (!iron) ctx.stroke();
+        if (w >= 15){
+          ctx.save(); ctx.translate(x0 + w / 2, cy); ctx.rotate(-Math.PI / 2);
+          ctx.fillStyle = iron ? bg : pl.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.font = '800 ' + Math.min(20, Math.round(w * .7)) + 'px Archivo, "Helvetica Neue", Arial, sans-serif';
+          ctx.fillText(String(pl.p), 0, 1); ctx.restore();
+        }
+        x += w + gapP * k;
+      });
+    });
+    ctx.restore(); ctx.textBaseline = 'alphabetic';
+  }
+
+  function v16DrawSession(c){
+    const r = _v16Recap, W = 1080, H = 1350, ctx = c.getContext('2d'), INK = '#191715', L = 80, R = W - 80;
+    c.width = W; c.height = H;
+    ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#EBDDAE'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
+    const F = (wt, px, wide) => { ctx.font = wt + ' ' + (wide ? 'expanded ' : '') + px + 'px Archivo, "Helvetica Neue", Arial, sans-serif'; };
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.0', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
+    ctx.textAlign = 'left'; F(800, 130, true);
+    let size = 130; while (ctx.measureText(r.title).width > R - L && size > 60){ size -= 6; F(800, size, true); }
+    ctx.fillText(r.title, L - 5, 300);
+    F(600, 38); ctx.fillText(r.sub, L, 366);
+    ctx.globalAlpha = .3; ctx.fillRect(L, 430, R - L, 3); ctx.globalAlpha = 1;
+    F(700, 40); ctx.fillText(r.k, L, 520);
+    let hasBar = false, pd = null;
+    try { pd = Number.isFinite(r.barWeight) ? calculatePlates(r.barWeight, r.liftId) : null; hasBar = !!(pd && Array.isArray(pd.perSide)); } catch (e){ hasBar = false; }
+    const bigPx = hasBar ? 320 : 380, bigY = hasBar ? 800 : 850;
+    F(800, bigPx, true); ctx.fillText(r.big, L - 14, bigY);
+    const bw = ctx.measureText(r.big).width; F(700, 52); ctx.fillText(r.bigSub, Math.min(L + bw + 30, R - ctx.measureText(r.bigSub).width), bigY);
+    F(600, 40);
+    const words = r.line.split(' '); let line = '', y = hasBar ? 884 : 960;
+    words.forEach(wd => { if (ctx.measureText(line + wd).width > R - L){ ctx.fillText(line.trim(), L, y); y += 54; line = ''; } line += wd + ' '; });
+    if (line.trim()) ctx.fillText(line.trim(), L, y);
+    if (hasBar){ try { v16DrawBar(ctx, pd.perSide, W / 2, 1090, R - L, V16_WAVE_COLOR[r.wave] || '#EBDDAE'); } catch (e){} }
+    ctx.textAlign = 'left'; ctx.fillStyle = INK;
+    ctx.globalAlpha = .3; ctx.fillRect(L, 1180, R - L, 3); ctx.globalAlpha = 1;
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText(r.foot[0], L, 1250); ctx.textAlign = 'right'; ctx.fillText(r.foot[1], R, 1250);
+  }
+
+  function renderV16(){
+    v16Safe('header', v16Header);
+    v16Safe('auto select', v16AutoSelect);
+    v16Safe('tiles', v16Tiles);
+    if (_v16View === 'History') v16Safe('due', v16HistDue);
+    if (_v16View === 'Program') v16Safe('program', v16ProgramView);
+    if (_v16View === 'Recovery') v16Safe('recovery', v16Recovery);
+  }
+  // r3: a weight never wraps, words may. Watches the text so the class is right on every write (it was set one render late).
+  function v16WeightClass(){ const e = el.dashWeight; if (e) e.classList.toggle('v16-wnum', /^[\d.,]+\s(lb|kg)$/.test(e.textContent || '')); }
+  function v16Bind(){
+    v16Safe('weight class', () => { v16WeightClass(); if (el.dashWeight && typeof MutationObserver === 'function') new MutationObserver(() => v16Safe('weight class', v16WeightClass)).observe(el.dashWeight, { childList:true, characterData:true, subtree:true }); });
+    v16Safe('plate style', v16ApplyPlateStyle);
+    const on = (id, ev, fn) => { const x = v16$(id); if (x) x.addEventListener(ev, fn); };
+    on('btnSettings', 'click', () => setView('Settings'));
+    on('v16PlateStyle', 'change', e => { v16SetUi('plates', e.target.value === 'iron' ? 'iron' : 'color'); v16ApplyPlateStyle(); });
+    on('btnAccSetup', 'click', () => setView('Accessories'));
+    on('btnAccBack', 'click', () => setView('Program'));
+    on('btnRcBack', 'click', () => setView('Workout'));
+    on('btnToolsGuide', 'click', () => { if (el.btnHelp) el.btnHelp.click(); });
+    on('btnRecapClose', 'click', v16CloseRecap);
+    on('btnRecapShare', 'click', v16ShareRecap);
+    on('btnRecapSave', 'click', v16SaveRecap);
+    on('recapModal', 'click', e => { if (e.target === v16$('recapModal')) v16CloseRecap(); });
+    document.addEventListener('keydown', e => { const m = v16$('recapModal'); if (e.key === 'Escape' && m && !m.hidden) v16CloseRecap(); });
+    document.addEventListener('click', e => {
+      const t = e.target.closest ? e.target.closest('[data-v16-week],[data-v16-lift],[data-v16-recap],[data-v16-due],#tileRecovery') : null;
+      if (!t) return;
+      if (t.id === 'tileRecovery'){ setView('Recovery'); return; }
+      if (t.hasAttribute('data-v16-due')){ if (!state.activeSession){ el.liftSelect.value = t.getAttribute('data-v16-due'); renderDashboard(); } setView('Workout'); return; }
+      if (t.hasAttribute('data-v16-week')){ _v16Week = Number(t.getAttribute('data-v16-week')); v16Safe('program', v16ProgramView); return; }
+      if (t.hasAttribute('data-v16-recap')){ v16OpenRecap(t.getAttribute('data-v16-recap')); return; }
+      if (t.hasAttribute('data-v16-lift')) openLiftSheet(t.getAttribute('data-v16-lift'));
+    });
+    const pw = v16$('calcPlateWeight');
+    if (pw) pw.addEventListener('input', () => {
+      const w = parseFloat(pw.value), box = v16$('toolPlateSvg'); if (!box) return;
+      if (!Number.isFinite(w) || w <= 0){ box.innerHTML = ''; return; }
+      v16Safe('tool plates', () => renderPlateSVG(calculatePlates(w), box, null));
+    });
+  }
+
   async function boot(){
     cacheEls();
     bindEvents();
+    try{ v16Bind(); }catch(err){ console.error('v16 bind failed', err); }   // r3: boot continues
     setupModalA11y(); // v11.0.2: dialog roles + Escape-to-close
     wireOnboarding(); // v10: attach onboarding modal handlers
     try{ db = await idb.open(); }

@@ -1,4 +1,13 @@
-# Juggernaut Method 2.0 — v13.2.2
+# Juggernaut Method 2.0 — v16.0.0
+
+Current release: **v16.0.0, revision 3**, approved November 14, 2026. `index.html` is the exact verified candidate; older version entries below are historical.
+
+- HTML SHA-256: `d587eac87a7e302ae742091581b91c6f277330639d48b677cd2464a9bbac47fc`
+- [v16 release notes and verification limitations](CHANGELOG-v16.0.0.md)
+- The repository name and installed Home Screen URL remain unchanged.
+- Export a backup before upgrading. Actual iPhone/Safari, installed PWA, offline-first-load and real-bridge acceptance are not certified by this release's Chromium/stub tests.
+
+## Historical release notes
 
 Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.0. iPhone/iPad Safari and Add-to-Home-Screen are primary targets. Offline launch remains a known limitation; local IndexedDB storage with localStorage degraded fallback, optional OpenRouter AI coaching.
 
@@ -7,9 +16,9 @@ Single-file HTML powerlifting PWA implementing the Inverted Juggernaut Method 2.
 
 ---
 
-## Current Version
+## Historical v13.2.2 snapshot — superseded
 
-- Current canonical build: **v13.2.2**
+- Former canonical build: **v13.2.2**
 - Public/Home Screen URL: `https://crelic2025.github.io/Juggernaut-V11.0.1/`
 - Final HTML SHA256: `bea609454fd3c1a08b62e7206c8cef084b154026c54f3e14beb4cafbb3f18189`
 
