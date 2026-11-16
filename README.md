@@ -1,13 +1,15 @@
-# Juggernaut Method 2.0 — v16.0.1
+# Juggernaut 2.2
 
-Current release: **v16.0.1**, November 15, 2026. `index.html` is the exact verified supplied candidate; older version entries below are historical.
+Current release: **Juggernaut 2.2 (internal build 17.2.0)**, November 16, 2026. `index.html` and `sw.js` are the exact verified supplied artifacts. Older entries below are historical, including their former single-file/offline constraints.
 
-- HTML SHA-256: `7f3162d21a632d5f92d119609174feb940ed123839aff926d7594b1d3b557813`
-- [v16.0.1 release notes, verification and known limitations](CHANGELOG-v16.0.1.md)
-- [Previous v16.0.0 release notes](CHANGELOG-v16.0.0.md)
-- Independent restart suite: 71 passed / 3 documented failed checks; see release notes. Do not interpret this release as every test passing.
-- The repository name and installed Home Screen URL remain unchanged.
-- Export a backup before upgrading. Actual iPhone/Safari, installed PWA, offline-first-load and real-bridge acceptance are not certified by this release's Chromium/stub tests.
+- HTML SHA-256: `05df8d24563bc060a4f4e7960a6e1de4b05d1e7d7dde093d2845c72dad0294b4`
+- Worker SHA-256: `6523411a5fc5aedc09a17b3ddd813ca5907ee040304dab479638e93f8705169f`
+- [Juggernaut 2.2 release notes, verification and known limitations](CHANGELOG-Juggernaut-2.2.md)
+- [Previous v16.0.1 release notes](CHANGELOG-v16.0.1.md)
+- Independent release suite: **110 passed / 1 retained comparison failure / 9 classified**. The failure records intentional number-format/calculator differences; see release notes. Not every test passes.
+- Same-origin upgrade/data preservation and offline reopening passed in isolated Chromium; physical iPhone/Safari, installed-PWA and real-workout bridge delivery remain unverified.
+- Publish **both files together**. The worker is scoped to this repository's Pages folder; do not put it at an unrelated shared server root.
+- Existing repository name and Home Screen URL are unchanged. Keep one app tab/window and export a personal backup when possible. Do not clear app storage or reinstall for this update.
 
 ## Historical release notes
 
