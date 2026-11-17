@@ -1,12 +1,12 @@
-# Juggernaut 2.2
+# Juggernaut 2.4
 
-Current release: **Juggernaut 2.2 (internal build 17.2.0)**, November 16, 2026. `index.html` and `sw.js` are the exact verified supplied artifacts. Older entries below are historical, including their former single-file/offline constraints.
+Current release: **Juggernaut 2.4 (internal build 17.4.0, r3)**, November 16, 2026. `index.html` and `sw.js` are the exact verified supplied artifacts. Upgrade baseline is published 2.2; the intermediate 2.3 changes are included. Older entries below are historical.
 
-- HTML SHA-256: `05df8d24563bc060a4f4e7960a6e1de4b05d1e7d7dde093d2845c72dad0294b4`
+- HTML SHA-256: `d39596b2a324ccf86c553339f8bfaf6e68b77c8575aea572c663f2e99557a7c9`
 - Worker SHA-256: `6523411a5fc5aedc09a17b3ddd813ca5907ee040304dab479638e93f8705169f`
-- [Juggernaut 2.2 release notes, verification and known limitations](CHANGELOG-Juggernaut-2.2.md)
-- [Previous v16.0.1 release notes](CHANGELOG-v16.0.1.md)
-- Independent release suite: **110 passed / 1 retained comparison failure / 9 classified**. The failure records intentional number-format/calculator differences; see release notes. Not every test passes.
+- [Juggernaut 2.4 release notes, verification and known limitations](CHANGELOG-Juggernaut-2.4.md)
+- [Previous Juggernaut 2.2 release notes](CHANGELOG-Juggernaut-2.2.md)
+- Verdict: **ship with limitations**. Verifier: 219/219. Operator: original 213/219 with six test-proxy failures; all affected tests subsequently passed in a 13/13 rerun after a harness-only repair. Original failure evidence retained. Reset-defect characterization passes do not mean the defects are fixed; see release notes.
 - Same-origin upgrade/data preservation and offline reopening passed in isolated Chromium; physical iPhone/Safari, installed-PWA and real-workout bridge delivery remain unverified.
 - Publish **both files together**. The worker is scoped to this repository's Pages folder; do not put it at an unrelated shared server root.
 - Existing repository name and Home Screen URL are unchanged. Keep one app tab/window and export a personal backup when possible. Do not clear app storage or reinstall for this update.

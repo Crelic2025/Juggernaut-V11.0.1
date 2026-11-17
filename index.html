@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut 2.2 — v17.2.0</title>
+<title>Juggernaut 2.4 — v17.4.0</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -2991,6 +2991,134 @@ body.v17-precheck .v171-back{display:none}
 .v17m-test.next{stroke-width:2.2}
 .v17m-peak.next{font-weight:800;fill:#fff}
 .v17-next-t em + em{color:var(--muted)}
+
+/* ═══ v17.3 "2.3": the Accessories screen, plan first ═══
+   Nothing here shows, and nothing of 2.2 is hidden, until the 2.3 layer has finished drawing (.v173-on on the view). */
+#viewAccessories:not(.v173-on) .v173-only{display:none !important}
+#viewAccessories.v173-on .v173-old,#viewAccessories.v173-on #accAuthorityNote{display:none !important}
+#v173Top{display:flex;flex-direction:column;gap:12px;margin:0 0 12px}
+.v173-tabs button{font-size:14px}
+.v173-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:var(--lav);margin-left:6px;vertical-align:1px}
+.v173-status{gap:12px;padding:16px 14px 4px}
+.v173-st{display:flex;gap:12px;align-items:flex-start;padding:0 2px}
+.v173-st-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(62,224,161,.14);color:var(--mint)}
+.v173-st-ic.mine{background:var(--panel3);color:var(--text2)}
+.v173-st h2{margin:0;font-size:18px;line-height:24px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.v173-st p{margin:2px 0 0;font-size:14px;line-height:20px;font-weight:500;color:var(--text2)}
+.v173-reset{width:100%;min-height:48px;border-radius:24px}
+.v173-gymline{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:0 2px;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;color:var(--text2);font-family:inherit;font-size:14px;line-height:20px;font-weight:600;text-align:left}
+.v173-gymline span{flex:1;min-width:0}
+.v173-gymline b{flex:none;color:var(--sky);font-weight:700}
+.v173-gymline svg{flex:none;color:var(--muted)}
+.v173-coach{gap:10px;padding:16px 14px;box-shadow:inset 0 0 0 1px rgba(183,166,255,.4)}
+.v173-coach-h{display:flex;align-items:center;gap:10px;font-size:13px;line-height:18px;font-weight:700;color:var(--lav)}
+.v173-coach-h i{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(183,166,255,.14)}
+.v173-coach-h b{flex:1;min-width:0;font-weight:700}
+.v173-coach-h em{flex:none;font-style:normal;font-weight:600;color:var(--muted)}
+.v173-coach h3{margin:0;font-size:18px;line-height:24px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.v173-coach p,.v173-coach ul{margin:0;font-size:14px;line-height:20px;font-weight:500;color:var(--text2)}
+.v173-coach ul{padding-left:18px;color:var(--muted);font-size:13px;line-height:18px}
+.v173-coach p.n{font-size:13px;line-height:18px;color:var(--muted)}
+.v173-coach p.w{color:var(--warn);font-weight:600}
+.v173-coach-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.v173-coach-b button{flex:1 1 150px;min-height:48px;border-radius:24px;font-size:15px;padding:0 14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v173-coach-more{display:flex;flex-direction:column;border-top:1px solid var(--line);margin:4px 0 -8px}
+.v173-coach-more button{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 2px;border:0;border-radius:0;background:transparent;color:var(--text2);font-family:inherit;font-size:14px;font-weight:600;text-align:left}
+.v173-coach-more button+button{border-top:1px solid var(--line)}
+.v173-coach-more span{flex:1;min-width:0;padding:8px 0;line-height:20px}
+.v173-coach-more svg{flex:none;color:var(--muted)}
+#viewAccessories.v173-on #accOverMainWarn{margin:0 0 12px}
+/* the list: one slab, one soft card per exercise */
+#viewAccessories.v173-on .v173-list{margin:0 -4px;padding:2px 14px 14px;border:0;border-radius:28px;background:var(--panel);box-shadow:inset 0 1px 0 var(--line)}
+#viewAccessories.v173-on .v173-list>h2{display:none}
+.v173-grp{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:2px 12px;margin:16px 2px 8px}
+.v173-grp h3{margin:0;font-size:17px;line-height:22px;font-weight:800;color:var(--text)}
+.v173-grp span{font-size:13px;line-height:18px;font-weight:500;color:var(--muted)}
+#viewAccessories.v173-on .acc-card,#viewAccessories.v173-on .acc-card:first-child{margin:8px 0 0;padding:0 14px;border:0;border-radius:18px;background:var(--panel2);box-shadow:none}
+#viewAccessories.v173-on .acc-card.v173-flag{box-shadow:inset 0 0 0 1.5px var(--lav)}
+#viewAccessories.v173-on .acc-header{padding:14px 0;min-height:64px;align-items:center;border-radius:12px}
+#viewAccessories.v173-on .acc-header:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+#viewAccessories.v173-on .acc-header-left,#viewAccessories.v173-on .acc-header-right>span{display:none}
+.v173-row{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.v173-row>b{font-size:16px;line-height:22px;font-weight:800;color:var(--text)}
+.v173-row-p{font-size:14px;line-height:19px;font-weight:500;color:var(--muted)}
+.v173-row-m{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin-top:3px;font-size:14px;line-height:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.v173-tag{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:12px;font-size:12px;line-height:16px;font-weight:700;white-space:nowrap;vertical-align:2px}
+.v173-tag.top{background:rgba(62,224,161,.14);color:var(--mint)}
+.v173-tag.gym{background:rgba(127,170,255,.16);color:var(--sky)}
+.v173-tag.yours{background:var(--panel4);color:var(--text2)}
+.v173-tag.coach{background:rgba(183,166,255,.18);color:var(--lav)}
+.v173-up{color:var(--mint)}
+.v173-row-n{display:flex;align-items:flex-start;gap:6px;margin-top:2px;font-size:13px;line-height:18px;font-weight:500;color:var(--muted)}
+.v173-row-n svg{flex:none;margin-top:1px}
+.v173-row-n.warn{color:var(--warn);font-weight:600}
+.v173-acts{display:flex;gap:8px;margin:0 0 6px}
+.v173-acts button{flex:1 1 0;min-width:0;min-height:48px;border-radius:24px;font-size:15px}
+#v173Foot{margin:14px 2px 0}
+#v173Foot .v173-status{margin:0 -6px 8px}
+.v173-links{display:flex;flex-wrap:wrap;gap:0 22px}
+.v173-links button,.v173-link{min-height:44px;padding:0;border:0;border-radius:0;background:transparent;color:var(--sky);font-family:inherit;font-size:15px;line-height:20px;font-weight:700;text-align:left}
+.v173-addrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px;font-size:14px;line-height:20px;font-weight:500;color:var(--text2)}
+.v173-addrow span{flex:1 0 100%}
+.v173-addrow button{min-height:44px;padding:0 16px;border-radius:22px}
+#viewAccessories.v173-on .v173-hist{display:none}
+#viewAccessories.v173-on.v173-hist-on .v173-hist{display:block;margin-top:12px}
+/* Your gym */
+#viewAccessories.v173-on.v173-gym>*:not(#v173Gym){display:none !important}
+#viewAccessories:not(.v173-gym) #v173Gym{display:none}
+#v173Gym{display:flex;flex-direction:column;gap:12px}
+.v173-gym-h{margin:0 2px 2px;font-size:24px;line-height:30px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.v173-gym-n{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 10px;padding:0 2px}
+.v173-gym-n b{font-size:40px;line-height:46px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.v173-gym-n span{font-size:16px;line-height:22px;font-weight:600;color:var(--text2)}
+.v173-gym-p{margin:-6px 2px 4px;font-size:14px;line-height:20px;font-weight:500;color:var(--muted)}
+.v173-gym-list{gap:8px;padding:14px}
+.v173-sw,.v173-extras{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px;border-radius:18px;background:var(--panel2)}
+.v173-extras{width:100%;border:0;color:var(--text);font-family:inherit;text-align:left}
+.v173-extras svg{flex:none;color:var(--muted)}
+.v173-sw>div,.v173-extras>div{flex:1;min-width:0}
+.v173-sw b,.v173-extras b{display:block;font-size:16px;line-height:22px;font-weight:700;color:var(--text)}
+.v173-sw em,.v173-extras em{display:block;font-style:normal;font-size:13px;line-height:18px;font-weight:500;color:var(--muted)}
+.v173-sw em.off{color:var(--warn)}
+.v173-sw.dim{opacity:.55}
+.v173-always{flex:none;font-size:14px;font-weight:600;color:var(--muted)}
+.v173-switch{flex:none;position:relative;width:52px;height:32px;min-height:32px;padding:0;border:0;border-radius:16px;background:var(--panel4)}
+.v173-switch::after{content:'';position:absolute;inset:-8px -6px}
+.v173-switch i{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:13px;background:#fff}
+.v173-switch[aria-checked="true"]{background:var(--accent)}
+.v173-switch[aria-checked="true"] i{left:23px}
+.v173-switch:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){ .v173-switch i{transition:left .15s ease} }
+/* the swap sheet (the confirm sheet, with a list in it) */
+.confirm-card.v173-sheet{text-align:left;padding-bottom:0}
+.confirm-card.v173-sheet .confirm-title{font-size:22px;line-height:28px;margin-bottom:2px}
+.confirm-card.v173-sheet .confirm-msg{white-space:normal;margin-bottom:0}
+.confirm-card.v173-sheet .confirm-actions{position:sticky;bottom:0;flex-wrap:nowrap;margin-top:10px;padding:12px 0 calc(16px + var(--safe-b));background:var(--panel)}
+.confirm-card.v173-sheet .confirm-actions button{min-height:52px;border-radius:26px}
+.confirm-card.v173-sheet #confirmCancel{flex:0 0 auto;min-width:92px}
+.confirm-card.v173-sheet #confirmOk{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.confirm-card.v173-sheet #confirmOk:disabled{opacity:.5}
+.v173-sh-sub{margin:0 0 12px;font-size:14px;line-height:20px;color:var(--muted)}
+.v173-sh-h{margin:16px 2px 0;font-size:13px;line-height:18px;font-weight:700;color:var(--muted)}
+.v173-sh-none{margin:12px 2px 0;font-size:14px;line-height:20px;color:var(--text2)}
+.v173-opt{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;margin-top:8px;padding:10px 14px;border:0;border-radius:18px;background:var(--panel2);color:var(--text);font-family:inherit;text-align:left}
+.v173-opt>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.v173-opt b{font-size:16px;line-height:24px;font-weight:700;color:var(--text)}
+.v173-opt b .v173-tag{margin-left:8px}
+.v173-opt em{font-style:normal;font-size:13px;line-height:18px;font-weight:500;color:var(--muted)}
+.v173-opt[aria-checked="true"]{background:var(--blue-d);box-shadow:inset 0 0 0 1.5px var(--sky)}
+.v173-opt[aria-checked="true"] em{color:var(--text2)}
+.v173-opt:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.v173-radio{flex:none;width:24px;height:24px;border-radius:12px;box-shadow:inset 0 0 0 2px var(--edge)}
+.v173-opt[aria-checked="true"] .v173-radio{background:#fff;box-shadow:inset 0 0 0 7px var(--sky)}
+.v173-opt.cur{background:transparent;box-shadow:inset 0 0 0 1px var(--line2);margin-top:0}
+.v173-opt.lock b{color:var(--text2)}
+.v173-opt.lock svg{flex:none;width:20px;height:20px;color:var(--muted)}
+.v173-sh-more[hidden]{display:none}
+.v173-sh .v173-link{display:block;margin-top:6px}
+.v173-sh-note{margin:8px 2px 0;font-size:13px;line-height:18px;color:var(--muted)}
+.v173-extras[aria-expanded="true"] .v173-chev{transform:rotate(180deg)}
+.confirm-card.v173-help .help-body>div:has(>.ex-swap-list){display:none}
 </style>
 </head>
 <body>
@@ -2998,7 +3126,7 @@ body.v17-precheck .v171-back{display:none}
   <header>
     <div class="hdr-row">
       <div>
-        <div class="hdr-sub" id="hdrSub">Juggernaut 2.2</div>
+        <div class="hdr-sub" id="hdrSub">Juggernaut 2.4</div>
         <h1 class="hdr-title" id="hdrTitle">Today</h1>
       </div>
       <div class="hdr-actions">
@@ -3713,7 +3841,7 @@ body.v17-precheck .v171-back{display:none}
           <div class="tight"><button id="btnWipeHistory" class="btn-d">Wipe history and start over</button></div>
           <div class="tight"><button id="btnResetAll" class="btn-d" title="Reset all data">Reset Everything</button></div>
         </div>
-        <div class="install-help">Restart with new maxes: for coming back after time off or a change in training. Type your current 1RM for each lift; the TM becomes 90% of it and you go back to week 1 of a new cycle. It asks whether to keep or wipe your history. Start next cycle: back to week 1 with your current TMs; history, accessory weights and weak points are kept (Tier 1 lifts from the library are recalculated from your TM for week 1, as at every new week). Wipe history: erases training history and what was built from it, keeps your TMs, goals, Settings and exercise choices (you can export first). Reset Everything: erases all settings, history, program state and accessories; this cannot be undone.</div>
+        <div class="install-help">Restart with new maxes: for coming back after time off or a change in training. Type your current 1RM for each lift; the TM becomes 90% of it and you go back to week 1 of a new cycle. It asks whether to keep or wipe your history. Start next cycle: back to week 1 with your current TMs; history, accessory weights and weak points are kept (Strength lifts from the library are recalculated from your TM for week 1, as at every new week). Wipe history: erases training history and what was built from it, keeps your TMs, goals, Settings and exercise choices (you can export first). Reset Everything: erases all settings, history, program state, accessories and the recovery copies on this phone; this cannot be undone.</div>
       </div>
     </section>
 
@@ -3743,8 +3871,8 @@ body.v17-precheck .v171-back{display:none}
 
 
       <div class="card">
-        <div class="v16-h"><h3>Accessories</h3><span>Tiers, templates, calibration</span></div>
-        <button id="btnAccSetup" class="btn-s" type="button" style="width:100%">Set up accessories</button>
+        <div class="v16-h"><h3>Accessories</h3><span>Your plan, swaps and your gym</span></div>
+        <button id="btnAccSetup" class="btn-s" type="button" style="width:100%">Open accessories</button>
       </div>
     </section>
 
@@ -3811,6 +3939,8 @@ body.v17-precheck .v171-back{display:none}
     <div class="guide-toc-title">Jump to Section</div>
     <div class="toc-grid">
       <div class="toc-group"><div class="toc-group-label">Getting Started</div>
+        <a href="#guide-v24" class="toc-link">What Changed in 2.4</a>
+        <a href="#guide-v23" class="toc-link">What Changed in 2.3</a>
         <a href="#guide-v22" class="toc-link">What Changed in 2.2</a>
         <a href="#guide-v21" class="toc-link">What Changed in 2.1</a>
         <a href="#guide-v2" class="toc-link">What Changed in 2.0</a>
@@ -3847,6 +3977,31 @@ body.v17-precheck .v171-back{display:none}
         <a href="#guide-terms" class="toc-link">Key Terms</a>
       </div>
     </div>
+  </div>
+
+  <h2 id="guide-v24">What Changed in 2.4</h2>
+  <div class="section">
+    <p>Five changes. The weights and how they progress, the program, and what goes to Hermes are the same.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Weak points are remembered.</strong> The answer you give after a lift is kept when the app is closed and reopened. Before, most answers were forgotten on reopening, so the stars in the session's accessory list went away. A lift with no stored answer uses the newest answer saved on one of its sessions. Wipe history and Reset Everything erase them all, as before.</li>
+      <li><strong>One set of names.</strong> The session's accessory list, its ? sheet and its swap list now say Strength, Muscle, and Core and joints, the names the Accessories screen uses. So do the low-readiness note, the Recovery volume tips, the new-cycle messages and the Recalibrate sheet. They are Tier 1, 2 and 3 of the 3-Tier system this guide describes.</li>
+      <li><strong>Reset Everything leaves nothing behind.</strong> It now also deletes the recovery copies on this phone (the copies the app keeps before an update or an import), so no session or answer from before the reset is left and History no longer offers them. Export a backup first if you might want your data back. Wipe history still keeps them; it now replaces the phone's backup copy at once, as Reset Everything does, so the wiped sessions do not linger in it.</li>
+      <li><strong>A hold ends with its cycle.</strong> When you take a swap for a weak point, the app holds that target for the wave. A hold from one cycle no longer applies when the same wave comes round in the next cycle. While a hold is on, the session's accessory list stars what the hold targets, as the Accessories screen does. If you mark a different weak point the recap asks Keep or Switch, and Switch moves the hold to the new one at once.</li>
+      <li><strong>Four notes corrected.</strong> The ? sheet of a Strength lift from the library says it follows your training max (it said to add weight at the top of the rep range). The stalled-exercise hint points to Program → Open accessories (it said "the Accessories tab"). When no swap can be offered for a weak point, the recap says so and tells you when your gym setting is the reason (it said the library had no such movement). A Strength lift from the library with no log yet says "Load follows the wave." in its open row on Accessories.</li>
+    </ul>
+  </div>
+
+  <h2 id="guide-v23">What Changed in 2.3</h2>
+  <div class="section">
+    <p>The Accessories screen is new. The weights and how they progress, the program, and what goes to Hermes are the same.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Plan first.</strong> Your exercises come first, in three sections: Strength, Muscle, Core and joints. Each shows what it is for, its sets, reps, weight and equipment, and a label: Top pick, Best for your gym or Your pick.</li>
+      <li><strong>Coach suggestion.</strong> One card, only when there is a reason, with Swap and Keep. It carries the app's own rules (equipment you switched off, the weak point you marked) and any accessory card Hermes has sent for that lift.</li>
+      <li><strong>Swap sheet.</strong> Open an exercise and tap Swap exercise: the same purpose first, then other purposes, then what your gym rules out and what each needs.</li>
+      <li><strong>Your gym.</strong> The equipment switches, each with the number of exercises it covers. They are the same switches as Settings → Gym Equipment.</li>
+      <li><strong>Recommended plan (rule change).</strong> A new plan takes the best exercise you can do for each purpose. With all equipment on it is the same six as before. The plan you have is kept until you tap Reset to recommended.</li>
+      <li><strong>Weak-point swaps (rule change).</strong> A Muscle swap is skipped when it would take out your only exercise for a muscle group.</li>
+    </ul>
   </div>
 
   <h2 id="guide-v22">What Changed in 2.2</h2>
@@ -3960,7 +4115,7 @@ body.v17-precheck .v171-back{display:none}
     <p><strong>Hermes:</strong> the bridge address and token (Save &amp; connect), "Send to Hermes" (off pauses sending; packets keep queuing), "Use Hermes for the in-app coach" (disabled, with the reason, until Hermes reports its coach is available) and the status line: Synced, Pending, Paused or Needs attention.</p>
     <p><strong>Storage:</strong> "Persistent Storage" asks the browser to keep this app's data on the device. Where the browser supports it, "Set auto-backup file" picks a file the app keeps a backup in. A note shows whether offline support is active.</p>
     <p><strong>UI &amp; Performance:</strong> Performance Mode turns off blur and animations on older phones.</p>
-    <p><strong>Gym Equipment:</strong> six toggles (Barbell, Dumbbells, Cables, Bands, Machines, Pull-up Bar). Swap lists only show what you can do; an exercise that needs equipment you've switched off gets an amber warning instead of disappearing. Props &amp; Implements are inside this group too: boards, blocks, box, adjustable bench, pins, ab wheel, dip bars, foot anchor, SSB, push-up handles. Switch one off and the exercises that need it drop out of swaps and suggestions. "No prop-assisted exercises" switches them all off at once.</p>
+    <p><strong>Gym Equipment:</strong> six toggles (Barbell, Dumbbells, Cables, Bands, Machines, Pull-up Bar). Swap lists only show what you can do; an exercise that needs equipment you've switched off gets an amber warning instead of disappearing, and the coach card on the Accessories screen offers the best swap you can do. The same switches are on Accessories → Your gym, where each shows how many exercises it covers. Props &amp; Implements are inside this group too: boards, blocks, box, adjustable bench, pins, ab wheel, dip bars, foot anchor, SSB, push-up handles. Switch one off and the exercises that need it drop out of swaps and suggestions. "No prop-assisted exercises" switches them all off at once.</p>
     <p><strong>Bodyweight:</strong> log today's bodyweight; the group shows your latest weigh-in and your last five. A weigh-in is saved only when you tap Log; finishing a session does not add one. Bodyweight is factored into AI coaching prompts and progression context, and is stored locally only.</p>
     <p><strong>Training Profile:</strong> five fields that adjust your MEV/MRV targets. See "Training Profile &amp; Individualized MEV/MRV" above.</p>
     <p><strong>Coach Actions:</strong> the list of deload jumps and TM changes, each with Revert. See "How the TM Moves" and "Coach and Hermes" below.</p>
@@ -4053,18 +4208,21 @@ body.v17-precheck .v171-back{display:none}
     <p><strong>Before a new cycle (app suggestion, not from the book):</strong> a week off or a light week of general fitness can help clear 16 weeks of fatigue. If you missed rep standards, the app's "Reduce TM 5%" (app rule, above) is the built-in way to restart lighter; you can also edit any TM in Settings.</p>
     <p><strong>Restart with new maxes</strong> (bottom of Settings): for coming back after weeks off, or when a change in training has moved your maxes up or down. Type your current 1RM for each lift; the TM becomes 90% of it (the book's starting rule) and a lift you leave alone keeps its TM. Then choose: <em>Keep history</em> starts the next cycle at week 1, exactly as "Start next cycle" does, with the new TMs; <em>Wipe history</em> runs "Wipe history and start over" first. Hermes is told about each changed TM the same way as when you edit one in Settings.</p>
     <p><strong>Wipe history and start over:</strong> asks "Export first?", then erases sessions, accessory logs and progress, weak points, PR records, coach notes and chat, the coach action log, wave summaries and TM-cut blocks. It keeps your TMs (and the 1RM beside them), goals, everything in Settings and your accessory choices, and goes back to week 1, cycle 1. Accessory weights go back to the app's starting weights from your TM, also for a library exercise you renamed; exercises you added go back to the last weight you typed (0 if none). A library exercise renamed in v13.2.2 or earlier can't be matched to the library: the confirmation names it and its weight is kept.</p>
-    <p><strong>Reset Everything</strong> (bottom of Settings, with the cycle buttons) also erases Settings, including the Hermes address and token. Enter them again to pair this phone with Hermes again.</p>
+    <p><strong>Reset Everything</strong> (bottom of Settings, with the cycle buttons) also erases Settings, including the Hermes address and token. Enter them again to pair this phone with Hermes again. It also deletes the recovery copies on this phone, so nothing from before the reset is left: export a backup first if you might want your data back.</p>
     <p>Nothing is deleted automatically any more: history is kept however long it gets. Only the smaller backup copy in the browser may be trimmed if storage is full.</p>
   </div>
 
   <h2 id="guide-accessories">Accessories — Continuous Flow</h2>
   <div class="section">
     <p>After the main lift, tap <strong>"Continue to Accessories →"</strong> to log accessories inline.</p>
-    <p><strong>3-Tier System:</strong> <strong>T1</strong> Supplemental (5–8 reps) · <strong>T2</strong> Hypertrophy (8–15) · <strong>T3</strong> Core/Prehab (10–20).</p>
+    <p><strong>3-Tier System:</strong> <strong>Strength</strong> (T1: supplemental, 5–8 reps) · <strong>Muscle</strong> (T2: hypertrophy, 8–15) · <strong>Core and joints</strong> (T3: core and prehab, 10–20). The screens use the names. This guide also uses the tier numbers.</p>
+    <p><strong>The Accessories screen</strong> (Program → Open accessories) shows your plan first: the exercises for the lift you pick, in three sections named Strength (T1), Muscle (T2) and Core and joints (T3). Each exercise shows what it is for and a label. <strong>Top pick</strong> is the library's first choice for that purpose. <strong>Best for your gym</strong> is the best one you can do when the top pick needs equipment you've switched off. <strong>Your pick</strong> is anything else. Tap an exercise to open it. <strong>Swap exercise</strong> lists the same purpose first, then other purposes, then what your gym rules out and what each needs. Everything the row had before is still there: reps, Save Log, Apply ↑, Deload, move, duplicate and delete.</p>
+    <p><strong>Coach suggestion:</strong> a card shows above the plan only when there is a reason: an exercise needs equipment you switched off, the weak point you marked has a matching swap, or Hermes has sent an accessory card for that lift (the card Home shows, with the same Apply and Dismiss). Swap applies it. Keep hides it; a weak-point suggestion comes back only if you mark the same weak point again. A dot on a lift's tab means that lift has a suggestion.</p>
+    <p><strong>Recommended plan:</strong> a new plan takes the best exercise you can do for each purpose, two per section, instead of the first two you can do. With all equipment on it is the same six as before. The plan you have is never changed without a tap. <strong>Reset to recommended</strong> appears when your plan differs; exercises that stay keep their weight and progress, and Undo puts the old plan back.</p>
     <p><strong>Double progression:</strong> hold the weight, build reps. All sets at the top of the range → green glow → Apply ↑. Deload weeks cut the sets.</p>
-    <p><strong>Exercises you added</strong> remember the last weight you typed for them (Add, Duplicate, an edit under Program → Set up accessories, or a swap into a custom slot). Apply ↑, deloads and recalibration don't change that remembered weight; Wipe history goes back to it. An exercise you added also has a <strong>Loaded on a barbell</strong> switch (off by default): when it is on, Deload lands on a weight you can load with that lift's bar, collars and plates, as it does for the library's barbell exercises.</p>
+    <p><strong>Exercises you added</strong> remember the last weight you typed for them (Add, Duplicate, an edit under Program → Open accessories, or a swap into a custom slot). Apply ↑, deloads and recalibration don't change that remembered weight; Wipe history goes back to it. An exercise you added also has a <strong>Loaded on a barbell</strong> switch (off by default): when it is on, Deload lands on a weight you can load with that lift's bar, collars and plates, as it does for the library's barbell exercises.</p>
     <p>Tap <strong>?</strong> on an exercise for cues, a tutorial link and swap chips. Each inline card also has <strong>⇄ Swap</strong>, which lists the legal alternatives for that tier (filtered by equipment and props), with exercises for your weak point at the top. ▲/▼ reorder exercises.</p>
-    <p><strong>Weak Point Targeting:</strong> after a session the app asks "Where did you struggle?" and suggests up to two targeted swaps.</p>
+    <p><strong>Weak Point Targeting:</strong> after a session the app asks "Where did you struggle?" and suggests up to two targeted swaps. A Muscle swap is skipped when it would take out your only exercise for a muscle group. The same suggestion shows on the Accessories screen. Your answer stays with that lift until you give another one, also when the app is closed and reopened: accessories that target it carry a star in the session's list. When you take a suggested swap, the app holds that target for the rest of that wave: the stars follow the hold, and if you then mark a different weak point the recap asks Keep or Switch (Switch moves the hold to the new one). Wipe history and Reset Everything erase your answers.</p>
   </div>
 
   <h2 id="guide-history">History Tab</h2>
@@ -4105,7 +4263,7 @@ body.v17-precheck .v171-back{display:none}
     <p>Starting the TM at 90% of your max (book) means every prescribed weight is one you can handle on a bad day. The test-day rule then moves the TM by what you actually showed, and the 5% rule keeps the projected max at least 5% above the new TM.</p>
 
     <h3>The 3-Tier Accessory System</h3>
-    <p><strong>Tier 1 (Supplemental, 5–8 reps):</strong> barbell variations for where your lift breaks down (Pause Squats for the bottom, Close-Grip Bench for lockout). <strong>Tier 2 (Hypertrophy, 8–15):</strong> build the prime movers and keep push/pull balanced. <strong>Tier 3 (Core/Prehab, 10–20):</strong> keep you training consistently.</p>
+    <p><strong>Strength (Tier 1: supplemental, 5–8 reps):</strong> barbell variations for where your lift breaks down (Pause Squats for the bottom, Close-Grip Bench for lockout). <strong>Muscle (Tier 2: hypertrophy, 8–15):</strong> build the prime movers and keep push/pull balanced. <strong>Core and joints (Tier 3: core and prehab, 10–20):</strong> keep you training consistently.</p>
 
     <h3>Why Double Progression for Accessories?</h3>
     <p>Hold the weight and build reps; when every set reaches the top of the range, add the increment and start again. Simple and self-regulating.</p>
@@ -4307,7 +4465,7 @@ body.v17-precheck .v171-back{display:none}
       <div class="tight" style="flex:1"><button id="btnCalibApply" class="btn-p" style="width:100%">Apply</button></div>
     </div>
     <div class="install-help" style="margin-top:10px">
-      Your logged history is not touched. Tier 1 is computed from your training max; Tier 2/3 are seeded light and climb automatically as you hit the top of each rep range.
+      Your logged history is not touched. Strength is computed from your training max. Muscle, and Core and joints, are seeded light and climb automatically as you hit the top of each rep range.
     </div>
   </div>
 </div>
@@ -4439,7 +4597,7 @@ body.v17-precheck .v171-back{display:none}
   <div class="modal-card" style="text-align:left;max-height:85vh;overflow-y:auto">
     <div class="sheet-handle"></div>
     <div id="onboardStep1">
-      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.2</h2>
+      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.4</h2>
       <p style="font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px">A 16-week powerlifting tracker built on Chad Wesley Smith's <em>The Juggernaut Method 2.0</em>, with the 10s and 8s waves inverted (many sets × few reps) as in his JTS article. "+" sets that stop short of failure, one test-day AMRAP per wave, double-progression accessories. Three quick steps to get you training.</p>
       <div style="display:grid;gap:8px;margin-bottom:14px">
         <div class="onboard-step"><strong>Step 1</strong> — Enter your 1-rep maxes (honest, not ego)</div>
@@ -4480,6 +4638,33 @@ body.v17-precheck .v171-back{display:none}
 (() => {
   'use strict';
 
+  // v17.4.0 "2.4" — nine changes, each approved by Reese on 2026-11-16. (1) Weak points are remembered. (a) A saved
+  //   answer is kept when the app reopens: the check on load accepted single words only, so every answer with a space
+  //   or a slash was dropped. (b) A lift with no stored answer uses the newest answer saved on one of its sessions
+  //   (read only). (2) One set of names: the screens say Strength, Muscle, Core and joints where they said Tier 1/2/3
+  //   or T1/T2/T3 (the session's accessory list, its "?" sheet and swap drawer, the low-readiness note, the Recovery
+  //   volume tips, the new-cycle messages, the Recalibrate sheet, the help under the cycle buttons). The Guide keeps
+  //   its 3-Tier explanation. (3) Reset Everything also deletes the recovery copies on the device, so nothing from
+  //   before it is left; Wipe history keeps them, as its sheet says. (4) A wave hold belongs to the cycle it was set
+  //   in: it records its cycle, and a hold from the same wave of an earlier cycle no longer applies (weakHoldFor,
+  //   weakHoldCycle). (5) Two notes corrected: the "?" sheet says a Strength lift from the library follows the
+  //   training max, and the stalled-exercise hint points to Program, Open accessories (it said "the Accessories
+  //   tab"). (6) Wipe history replaces the backup copy in localStorage at once. (7) While a hold is on, the session's
+  //   accessory list works to the hold's target (weakPointInForce), and Switch on the recap moves the hold at once.
+  //   (8) When no swap can be offered for a weak point the recap says so, and says when the gym setting is why.
+  //   (9) A Strength lift from the library with no log yet shows "Load follows the wave." in its open row on
+  //   Accessories (accRowNote); that row is the same in the 2.2 form the screen falls back to, which is otherwise
+  //   untouched. No weight, percentage, progression or training-max rule changed. Hermes, the bridge, its packets and
+  //   its cards are untouched. Every change to the script, other than the version name, carries a "v17.4" comment.
+  // v17.3.0 "2.3" — the Accessories screen, approved by Reese on 2026-11-16. Plan first: the six exercises with what
+  //   each is for and how it was chosen (Top pick, Best for your gym, Your pick), a coach card that shows only when
+  //   there is a reason, a swap sheet ordered by purpose and by what the gym allows, and Your gym (the equipment
+  //   switches, each with what it covers). Two rule changes, each asked and approved: (1) a new plan picks the best
+  //   exercise he can do for each purpose instead of the first two he can do; (2b) a weak-point swap no longer takes
+  //   out the only Muscle exercise for a muscle group. The plan he has is never changed without a tap.
+  //   No weight, percentage, progression or training-max rule changed. Hermes, the bridge, its packets and its cards'
+  //   checks are untouched; the screen shows cards the app already holds and uses their existing Apply and Dismiss.
+  //   Every change carries a "v17.3" comment.
   // v17.2.0 "2.2" — Home display only, each change approved by Reese on 2026-11-16: the lift picker on one row with
   //   this week's weights, the cycle card's wording, key and next-test ring, the next-test line with its weight, and
   //   the Home map opening Program on the week tapped. The map's drawing is as in 2.1. No math, logic, state, storage
@@ -4522,7 +4707,7 @@ body.v17-precheck .v171-back{display:none}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '17.2.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '17.4.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -4683,6 +4868,10 @@ body.v17-precheck .v171-back{display:none}
     tier2:{ label:'Tier 2: Hypertrophy', setsMin:3, setsMax:5, repMin:8, repMax:15, deloadSetsMin:2, deloadSetsMax:3 },
     tier3:{ label:'Tier 3: Core & Prehab', setsMin:3, setsMax:4, repMin:10, repMax:20, deloadSetsMin:2, deloadSetsMax:2 }
   };
+  // v17.4: what the screens call the three tiers. The Accessories screen has used these names since 2.3 (V173_TIER);
+  // the session's accessory list, its "?" sheet and its swap drawer now use them too. TIER_CONSTRAINTS is unchanged.
+  const TIER_NAME = { tier1:'Strength', tier2:'Muscle', tier3:'Core and joints' };
+  function accTierName(tier){ return TIER_NAME[tier] || TIER_NAME.tier2; }
 
   /* ═══ WEAK POINT SYSTEM ═══ */
   const WEAK_POINT_OPTIONS = {
@@ -5037,6 +5226,147 @@ body.v17-precheck .v171-back{display:none}
     return EXERCISE_PROPS[exercise.name] || [];
   }
 
+  /* ═══ v17.3 (approved by Reese 2026-11-16, decision 1): WHAT EACH ACCESSORY IS FOR ═══
+     Every library exercise gets a purpose (a group key) and a plain line saying what it trains. Each list of a lift
+     names two slots, in the order of that list's two old defaults. The recommended plan is the best exercise the
+     lifter can do for each slot, where "best" is the library's own order.
+     With everything switched on, the recommended plan is exactly the old default (the first two of each list). With
+     equipment switched off it no longer takes "the first two you can do", which could give a squat day two single-leg
+     exercises and nothing for the hamstrings.
+     The purposes are this app's own grouping of its library (app rule; no source). They decide which exercises a new
+     plan picks and how the Accessories screen describes them. They change no weight and no progression. */
+  const ACC_PURPOSE = {
+    squat:{
+      tier1:{ slots:['hole', 'back'], nouns:{ hole:'bottom-position strength', back:'upper-back strength', general:'general squat strength' }, ex:{
+        'Pause Squat':['hole', 'Strength out of the hole'], 'SSB Squat':['back', 'Upper back, staying upright'],
+        'Front Squat':['hole', 'Out of the hole, quads'], 'Box Squat':['general', 'General squat strength'],
+        'Good Morning':['back', 'Back strength, hip hinge'], 'Pin Squat':['general', 'Strength at the sticking point'] } },
+      tier2:{ slots:['quads', 'hams'], nouns:{ quads:'quad and glute work', hams:'hamstring work', mobility:'mobility work' }, ex:{
+        'Bulgarian Split Squat':['quads', 'Quads and glutes, one leg at a time'], 'Lying Leg Curl':['hams', 'Hamstrings'],
+        'Leg Press':['quads', 'Quads'], 'Walking Lunge':['quads', 'Quads and glutes, one leg at a time'],
+        'Romanian Deadlift':['hams', 'Hamstrings and glutes'], 'Leg Extension':['quads', 'Quads, isolated'],
+        'Nordic Hamstring Curl':['hams', 'Hamstrings'], 'Pistol Squat':['quads', 'One-leg strength and depth'],
+        'Sissy Squat':['quads', 'Quads, isolated'], 'Bodyweight Lunge':['quads', 'Quads and glutes, one leg at a time'],
+        'Step-Up':['quads', 'Glutes and quads, one leg at a time'], 'Bodyweight Squat Hold':['mobility', 'Time in the bottom position'] } },
+      tier3:{ slots:['core', 'hips'], nouns:{ core:'core work', hips:'hip work', shoulders:'shoulder care', ankles:'calf and ankle work' }, ex:{
+        'Ab Wheel Rollout':['core', 'Core, resisting extension'], 'Banded Hip Flexor March':['hips', 'Hip stability'],
+        'Hanging Leg Raise':['core', 'Core'], 'Plank':['core', 'Core, holding position'],
+        'Pallof Press':['core', 'Core, resisting rotation'], 'Band Pull-Apart':['shoulders', 'Upper back and shoulder care'],
+        'Glute Bridge':['hips', 'Glutes, hip extension'], 'Bird Dog':['core', 'Core and spine stability'],
+        'Bodyweight Calf Raise':['ankles', 'Calves and ankles'] } }
+    },
+    bench:{
+      tier1:{ slots:['chest', 'lockout'], nouns:{ chest:'strength off the chest', lockout:'lockout strength' }, ex:{
+        'Long Pause Bench':['chest', 'Strength off the chest'], 'Close-Grip Bench':['lockout', 'Lockout, triceps'],
+        'Spoto Press':['chest', 'Strength off the chest'], 'Wide Grip Bench':['chest', 'Strength off the chest'],
+        'Board Press (2-3 board)':['lockout', 'Lockout'], 'Floor Press':['lockout', 'Lockout, triceps'],
+        'Larsen Press':['chest', 'Chest drive without leg drive'] } },
+      tier2:{ slots:['back', 'chest'], nouns:{ back:'upper-back work', chest:'chest work', shoulders:'shoulder work', triceps:'triceps work' }, ex:{
+        'Chest-Supported Row':['back', 'Upper back'], 'Incline Dumbbell Press':['chest', 'Chest and shoulders'],
+        'Cable Pec Fly':['chest', 'Chest, isolated'], 'Weighted Chin-Up':['back', 'Lats and biceps'],
+        'Lateral Raise':['shoulders', 'Shoulders'], 'Dumbbell Row':['back', 'Upper back and lats'],
+        'Barbell Row':['back', 'Upper back and lats'], 'Push-Up (Deficit)':['chest', 'Chest, long range of motion'],
+        'Diamond Push-Up':['triceps', 'Triceps'], 'Inverted Row':['back', 'Upper back'],
+        'Dip':['chest', 'Chest and triceps'], 'Pike Push-Up':['shoulders', 'Shoulders'] } },
+      tier3:{ slots:['reardelt', 'triceps'], nouns:{ reardelt:'shoulder care', triceps:'triceps work', core:'core work' }, ex:{
+        'Face Pull':['reardelt', 'Rear delts, shoulder care'], 'Triceps Pushdown':['triceps', 'Triceps'],
+        'Band Pull-Apart':['reardelt', 'Rear delts, shoulder care'], 'Overhead Tricep Extension':['triceps', 'Triceps, long head'],
+        'Rear Delt Fly':['reardelt', 'Rear delts'], 'Plank':['core', 'Core, holding position'],
+        'Prone Y-T-W Raise':['reardelt', 'Rear delts and rotator cuff'], 'Push-Up Plus':['reardelt', 'Serratus, shoulder stability'] } }
+    },
+    deadlift:{
+      tier1:{ slots:['floor', 'lockout'], nouns:{ floor:'strength off the floor', lockout:'lockout strength' }, ex:{
+        'Deficit Deadlift':['floor', 'Strength off the floor'], 'Block Pull':['lockout', 'Lockout'],
+        'Pause Deadlift':['floor', 'Off the floor, holding position'], 'Snatch Grip Deadlift':['floor', 'Upper back, off the floor'],
+        'Romanian Deadlift':['lockout', 'Hamstrings and glutes, lockout'], 'Stiff-Leg Deadlift':['lockout', 'Hamstrings, hip hinge'] } },
+      tier2:{ slots:['back', 'glutes'], nouns:{ back:'upper-back work', glutes:'glute and hamstring work', quads:'quad work' }, ex:{
+        'Pendlay Row':['back', 'Lats and upper back'], 'Barbell Hip Thrust':['glutes', 'Glutes'],
+        'Single-Arm DB Row':['back', 'Upper back and grip'], 'Leg Press':['quads', 'Quads, leg drive'],
+        'Weighted Chin-Up':['back', 'Lats and biceps'], 'GHD / Back Extension':['glutes', 'Lower back, glutes and hamstrings'],
+        'Leg Curl':['glutes', 'Hamstrings'], 'Single-Leg RDL (Bodyweight)':['glutes', 'Hamstrings and balance'],
+        'Glute-Ham Raise':['glutes', 'Hamstrings and glutes'], 'Inverted Row':['back', 'Upper back and lats'],
+        'Chin-Up':['back', 'Lats and biceps'] } },
+      tier3:{ slots:['core', 'upperback'], nouns:{ core:'core work', upperback:'shoulder care', lowback:'lower-back work' }, ex:{
+        'Ab Wheel Rollout':['core', 'Core, resisting extension'], 'Band Pull-Apart':['upperback', 'Upper back and shoulder care'],
+        'Hanging Leg Raise':['core', 'Core'], 'Pallof Press':['core', 'Core, resisting rotation'],
+        'Plank':['core', 'Core, holding position'], 'Face Pull':['upperback', 'Rear delts, shoulder care'],
+        'Superman Hold':['lowback', 'Lower back'], 'Dead Bug':['core', 'Core, bracing'] } }
+    },
+    ohp:{
+      tier1:{ slots:['strict', 'lockout'], nouns:{ strict:'strict pressing strength', lockout:'lockout strength' }, ex:{
+        'Z-Press':['strict', 'Strict pressing, core'], 'Push Press':['lockout', 'Overload and lockout'],
+        'Pin Press':['lockout', 'Lockout'], 'Close-Grip Bench':['lockout', 'Pressing strength, triceps'],
+        'Seated Barbell Press':['strict', 'Strict pressing'] } },
+      tier2:{ slots:['shoulders', 'back'], nouns:{ shoulders:'shoulder work', back:'upper-back work', sidedelt:'side-delt work' }, ex:{
+        'Seated DB Shoulder Press':['shoulders', 'Shoulders'], 'Lat Pulldown':['back', 'Lats and upper back'],
+        'Cable Row':['back', 'Upper back'], 'Incline Dumbbell Press':['shoulders', 'Chest and shoulders'],
+        'Lateral Raise':['sidedelt', 'Side delts'], 'Dumbbell Row':['back', 'Upper back and lats'],
+        'Arnold Press':['shoulders', 'Shoulders, through rotation'], 'Handstand Push-Up':['shoulders', 'Strict overhead pressing'],
+        'Pike Push-Up (Elevated)':['shoulders', 'Overhead pressing'], 'Chin-Up':['back', 'Lats and upper back'],
+        'Inverted Row':['back', 'Upper back'] } },
+      tier3:{ slots:['reardelt', 'triceps'], nouns:{ reardelt:'shoulder care', triceps:'triceps work', sidedelt:'side-delt work', core:'core work' }, ex:{
+        'Face Pull':['reardelt', 'Rear delts, shoulder care'], 'Triceps Pushdown':['triceps', 'Triceps'],
+        'Band Pull-Apart':['reardelt', 'Upper back and shoulder care'], 'Lateral Raise':['sidedelt', 'Side delts'],
+        'Overhead Tricep Extension':['triceps', 'Triceps, long head'], 'Plank':['core', 'Core, holding position'],
+        'Prone Y-T-W Raise':['reardelt', 'Rear delts and rotator cuff'], 'Scapular Push-Up':['reardelt', 'Serratus, shoulder health'] } }
+    }
+  };
+  // What a library exercise is for in this lift's list: { g: group key, line: plain words }, or null (not in the table).
+  function accPurpose(liftId, tier, name){
+    const t = (ACC_PURPOSE[liftId] || {})[tier];
+    const e = (t && Object.prototype.hasOwnProperty.call(t.ex, name)) ? t.ex[name] : null;
+    return e ? { g:e[0], line:e[1] } : null;
+  }
+  function accGroupNoun(liftId, tier, g){
+    const t = (ACC_PURPOSE[liftId] || {})[tier];
+    return (t && g && Object.prototype.hasOwnProperty.call(t.nouns, g)) ? t.nouns[g] : '';
+  }
+  // The recommended exercises of one list: one per slot, at most two. For each slot the first exercise of its purpose
+  // the lifter can do (library order). A slot nothing can fill takes the first exercise still free, one with a purpose
+  // the list does not have yet if there is one. Never an exercise exerciseAvailable() rejects, and never more than the
+  // old rule gave: a list with one usable exercise gets one, a list with none stays empty.
+  // Each row: { slot, pick, top } where top is the slot's first exercise whether or not the lifter can do it.
+  function accRecommendedTier(liftId, tier){
+    const lib = (ACCESSORY_LIBRARY[liftId] || {})[tier] || [];
+    const def = (ACC_PURPOSE[liftId] || {})[tier] || null;
+    const g = x => { const p = accPurpose(liftId, tier, x.name); return p ? p.g : null; };
+    const avail = lib.filter(x => exerciseAvailable(x));
+    const slots = def ? def.slots.slice(0, 2) : [];
+    while (slots.length < 2) slots.push(null);
+    const picks = slots.map(sl => sl ? (avail.find(x => g(x) === sl) || null) : null);
+    for (let i = 0; i < picks.length; i++){
+      if (picks[i]) continue;
+      const taken = picks.filter(Boolean), names = new Set(taken.map(x => x.name)), have = new Set(taken.map(g));
+      picks[i] = avail.find(x => !names.has(x.name) && !have.has(g(x))) || avail.find(x => !names.has(x.name)) || null;
+    }
+    return slots.map((sl, i) => ({ slot:sl, pick:picks[i], top:sl ? (lib.find(x => g(x) === sl) || null) : null })).filter(r => r.pick);
+  }
+  // A new slot for a library exercise, as the defaults have always built one.
+  function newLibTemplate(liftId, tier, item){
+    const con = TIER_CONSTRAINTS[tier];
+    const sets = tier === 'tier3' ? 3 : 4;
+    return {
+      id:newAccessoryId(), name:item.name, category:item.category, libName:item.name,   // v14.0.1 (F6)
+      tier, sets, repMin:con.repMin, repMax:con.repMax,
+      weight:calibratedSwapWeight(liftId, item, tier), increment:item.increment || 5,  // v13.0.8
+      lastLoggedSets:Array(sets).fill(con.repMin),
+      lastOutcome:'Hold load until all sets hit upper range.',
+      lastCompletedAt:'', pendingProgression:false, suggestedWeight:null
+    };
+  }
+  // v17.3 (decision 2b): Muscle work keeps every muscle group it has. A weak-point swap may not take out the only
+  // Tier 2 exercise for a muscle group unless the exercise coming in trains that group too. `names` is the Tier 2
+  // list as it would stand after the swaps already offered in the same pass. Tier 1 is not guarded: its two slots
+  // are variations of the main lift, and moving both onto one weak point is what weak-point targeting is for.
+  function accSwapKeepsCoverage(liftId, tier, outName, inName, names){
+    if (tier !== 'tier2') return true;
+    const g = n => { const p = accPurpose(liftId, tier, n); return p ? p.g : null; };
+    const out = g(outName);
+    if (!out || g(inName) === out) return true;
+    let seen = false;
+    return names.some(n => { if (n === outName && !seen){ seen = true; return false; } return g(n) === out; });
+  }
+
   /* ═══ UTILITIES ═══ */
   function newAccessoryId(){ return 'acc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
 
@@ -5246,27 +5576,12 @@ body.v17-precheck .v171-back{display:none}
   }
 
   function buildDefaultAccessoriesForLift(liftId){
-    const lib = ACCESSORY_LIBRARY[liftId] || {};
+    // v17.3 (decision 1): one exercise per purpose (accRecommendedTier), not the first two the lifter can do. With
+    // everything switched on the result is the same six as before. As before (v13.2.0): never an exercise
+    // exerciseAvailable() rejects, and a list short of usable movements gets fewer than two, or none.
     const templates = [];
     ['tier1','tier2','tier3'].forEach(tier => {
-      const con = TIER_CONSTRAINTS[tier];
-      const all = lib[tier] || [];
-      // v13.2.0: take the top 2 the lifter can actually perform, and nothing else.
-      // An exercise exerciseAvailable() rejects is never backfilled into a new
-      // default — if the filters leave a tier with fewer than 2 usable movements
-      // (or none), the tier gets fewer than 2 (or none).
-      const items = all.filter(x => exerciseAvailable(x));
-      items.slice(0, 2).forEach(item => {
-        const sets = tier === 'tier3' ? 3 : 4;
-        templates.push({
-          id:newAccessoryId(), name:item.name, category:item.category, libName:item.name,   // v14.0.1 (F6)
-          tier, sets, repMin:con.repMin, repMax:con.repMax,
-          weight:calibratedSwapWeight(liftId, item, tier), increment:item.increment || 5,  // v13.0.8
-          lastLoggedSets:Array(sets).fill(con.repMin),
-          lastOutcome:'Hold load until all sets hit upper range.',
-          lastCompletedAt:'', pendingProgression:false, suggestedWeight:null
-        });
-      });
+      accRecommendedTier(liftId, tier).forEach(r => templates.push(newLibTemplate(liftId, tier, r.pick)));
     });
     return { framework:'3tier', templates };
   }
@@ -5882,8 +6197,16 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     p.bodyweightLb = _num(p.bodyweightLb, dp.bodyweightLb, 0, 2000);
     p.lifestyleStress = _num(p.lifestyleStress, dp.lifestyleStress, 1, 5);
     if (s.weakPoints !== undefined){
+      // v17.4: an answer is kept when it is one of that lift's own answers (WEAK_POINT_OPTIONS). The check used before,
+      // _slug (letters, digits, _ + -), dropped every answer with a space or a slash, so most were forgotten on reopening.
       s.weakPoints = _isObj(s.weakPoints)
-        ? Object.fromEntries(Object.entries(s.weakPoints).filter(([k, v]) => _isLift(k) && _slug(v, null, 60)))
+        ? Object.fromEntries(Object.entries(s.weakPoints).filter(([k, v]) => _isLift(k) && typeof v === 'string' && (WEAK_POINT_OPTIONS[k] || []).includes(v)))
+        : {};
+    }
+    if (s.accKeep !== undefined){   // v17.3: coach suggestions answered with Keep on the Accessories screen (per lift, the newest 24)
+      s.accKeep = _isObj(s.accKeep)
+        ? Object.fromEntries(Object.entries(s.accKeep).filter(([k, v]) => _isLift(k) && Array.isArray(v))
+            .map(([k, v]) => [k, v.filter(x => typeof x === 'string' && x.length > 0 && x.length <= 240).slice(-24)]))
         : {};
     }
     for (const l of LIFTS){
@@ -6686,12 +7009,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       html += '<div class="lift-intel-meta"><span>' + freqLabel + '</span><span>' + intel.style + '</span><span>Current: ' + vs.sets + ' set' + (vs.sets === 1 ? '' : 's') + '</span></div>';
       // Hidden detail
       html += '<div class="lift-intel-detail"><p><strong>Phase goal:</strong> ' + escapeHtml(intel.goal) + '</p>';
-      html += '<p><strong>Coach note:</strong> ' + escapeHtml(intel.note) + '</p>';
+      html += '<p><strong>Coach note:</strong> ' + escapeHtml(typeof intel.note === 'string' ? intel.note.replace('T1 accessories', 'Strength accessories').replace('T1 volume', 'Strength accessory volume') : intel.note) + '</p>';   // v17.4: the screens' name for Tier 1; LIFT_INTELLIGENCE_CONFIG itself is unchanged
       let rec = '';
-      if (vs.status === 'Below target') rec = 'Volume is low — prioritize your T1 accessories (' + escapeHtml(lift.name) + ' variations like pause or close-grip work) to close the gap.';
+      if (vs.status === 'Below target') rec = 'Volume is low — prioritize your Strength accessories (' + escapeHtml(lift.name) + ' variations like pause or close-grip work) to close the gap.';   // v17.4: was T1 accessories
       else if (vs.status === 'In range') rec = 'On track. Main lift plus current accessories are providing enough stimulus.';
-      else if (vs.status === 'Near ceiling') rec = 'At the upper limit — skip extra T1/T2 accessory sets for ' + escapeHtml(lift.name) + ' this week.';
-      else if (vs.status === 'Above recoverable') rec = 'Too much volume — drop a T1 accessory set or skip T2 work for ' + escapeHtml(lift.name) + ' to recover.';
+      else if (vs.status === 'Near ceiling') rec = 'At the upper limit — skip extra Strength and Muscle accessory sets for ' + escapeHtml(lift.name) + ' this week.';   // v17.4: was T1/T2
+      else if (vs.status === 'Above recoverable') rec = 'Too much volume — drop a Strength accessory set or skip Muscle work for ' + escapeHtml(lift.name) + ' to recover.';   // v17.4: was T1 and T2
       else rec = 'Complete your ' + escapeHtml(lift.name) + ' session this week to start tracking.';
       html += '<p style="color:var(--accent)"><strong>Recommendation:</strong> ' + rec + '</p></div>';
       html += '</div>';
@@ -8088,7 +8411,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     let changes = '';
     if (r.droppedSets) changes += '• Main lift: ' + r.originalSetCount + ' \u2192 ' + r.adjustedSetCount + ' working set' + (r.adjustedSetCount === 1 ? '' : 's') + ' (\u2212' + r.droppedSets + ')\n';
-    changes += '• Tier 2/3 accessories: \u22121 set each\n';
+    changes += '• Accessories in Muscle and in Core and joints: \u22121 set each\n';   // v17.4: the screens' names for Tier 2 and Tier 3
     changes += '• Sleep: ' + r.sleep + '/5 · Motivation: ' + r.motivation + '/5 · Nutrition: ' + r.nutrition + '/5 · Soreness: ' + r.soreness + '/5 · Performance: ' + (r.performance||'?') + '/5';
     el.autoregChanges.textContent = changes;
   }
@@ -8130,6 +8453,42 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function currentWaveId(){
     try { return currentMicrocycle()?.wave || null; } catch(_){ return null; }
+  }
+  // v17.4 (approved 2026-11-16): the wave hold of a lift, if it is the hold of this wave of this cycle. Before, only the
+  // wave's name was compared, so a hold set in the 8s wave of one cycle still held in the 8s wave of the next. A hold
+  // now records its cycle (applySwapPair); one saved before 2.4 has none, and weakHoldCycle reads it off the session log.
+  function weakHoldFor(liftId){
+    const lock = state.settings.weakTargetLock?.[liftId];
+    if (!lock || !lock.weakPoint || !lock.wave || lock.wave !== currentWaveId()) return null;
+    const now = state.program.cycle || 1;
+    return (Number.isInteger(lock.cycle) ? lock.cycle : weakHoldCycle(lock, now)) === now ? lock : null;
+  }
+  // v17.4: the cycle a hold saved before 2.4 was set in. It is the cycle of the session logged just before it was set.
+  // If the next session after it belongs to a later cycle (the hold was set between two cycles), the hold belongs to
+  // that later cycle only when it names a wave that comes before the wave of the session logged before it: within a
+  // cycle the waves only go forward. With no session before it, the next session's cycle; with no session or no date
+  // to tell by, the current cycle, as it always did. Nothing is written.
+  function weakHoldCycle(lock, now){
+    const at = Date.parse(lock.appliedAt);
+    if (!Number.isFinite(at)) return now;
+    let before = null, after = null;
+    for (const h of state.history || []){
+      const t = h ? Date.parse(h.completedAt) : NaN;
+      if (!Number.isFinite(t)) continue;
+      if (t <= at){ if (!before || t >= before.t) before = { t, cycle:h.cycle || 1, wave:h.wave }; }
+      else if (!after || t < after.t) after = { t, cycle:h.cycle || 1 };
+    }
+    const later = after ? after.cycle : now;
+    if (!before || before.cycle >= later) return before ? before.cycle : later;
+    const order = PROGRAM.waves.concat('done'), a = order.indexOf(lock.wave), b = order.indexOf(before.wave);
+    return (a >= 0 && b >= 0 && a < b) ? later : before.cycle;
+  }
+  // v17.4 (approved 2026-11-16): the weak point the session's accessory list works to: its stars, its swap list and
+  // "Why?". While a hold is on that is the hold's target, as on the Accessories screen (v173Candidates); otherwise the
+  // answer tapped in this session, or the one on file, as before. Each caller keeps that answer if this fails.
+  function weakPointInForce(liftId){
+    const hold = weakHoldFor(liftId);
+    return hold ? hold.weakPoint : (_sessionWeakPoint || getWeakPointForLift(liftId));
   }
 
   // v13.0.8: THE single authority for putting a library exercise into state. Tier 1
@@ -8184,10 +8543,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       while (pairs.length < 2){
         const owned = data.templates.filter(t => t.tier === tier && !usedOut.has(t.id));
         const ownedNames = new Set(data.templates.filter(t => t.tier === tier).map(t => t.name));
-        const inCand = tierLib.find(ex =>
-          !ownedNames.has(ex.name) && !usedIn.has(ex.name) &&
-          exerciseAvailable(ex) && accessoryMatchesWeakPoint(ex, weakPoint));
-        const outCand = owned.find(t => {
+        // v17.3 (2b): this list as it would stand after the swaps already offered in this pass
+        const standing = owned.map(t => t.name).concat(pairs.filter(p => p.tier === tier).map(p => p.inName));
+        const outFor = (ex) => owned.find(t => {
           const le = tierLib.find(x => x.name === t.name);
           if (!le || accessoryMatchesWeakPoint(le, weakPoint)) return false;
           // v13.0.7: on pressing days, rows / face pulls / rear-delt work is
@@ -8197,8 +8555,18 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
             const hay = _wpNorm((le.category || '') + ' ' + (le.name || ''));
             if (['row','back','lat','face pull','rear delt','pull apart'].some(p => hay.includes(_wpNorm(p)))) return false;
           }
-          return true;
+          // v17.3 (2b): a Muscle swap may not take out the only exercise for a muscle group (see accSwapKeepsCoverage)
+          return accSwapKeepsCoverage(liftId, tier, t.name, ex.name, standing);
         });
+        // v17.3 (2b): the first exercise for the weak point that has something it may replace. Before the guard the
+        // choice of what goes out did not depend on what comes in, so only the first candidate was ever tried; where
+        // the guard blocks nothing the pair is the same as before.
+        let inCand = null, outCand = null;
+        for (const ex of tierLib){
+          if (ownedNames.has(ex.name) || usedIn.has(ex.name) || !exerciseAvailable(ex) || !accessoryMatchesWeakPoint(ex, weakPoint)) continue;
+          const out = outFor(ex);
+          if (out){ inCand = ex; outCand = out; break; }
+        }
         if (!inCand || !outCand) break;
         usedOut.add(outCand.id); usedIn.add(inCand.name);
         pairs.push({
@@ -8240,7 +8608,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // Block-hold: applying commits this wave to the chosen weak point
     if (!state.settings.weakTargetLock) state.settings.weakTargetLock = {};
     state.settings.weakTargetLock[plan.liftId] = {
-      weakPoint: plan.weakPoint, wave: currentWaveId(), appliedAt: nowISO()
+      weakPoint: plan.weakPoint, wave: currentWaveId(), cycle: state.program.cycle || 1, appliedAt: nowISO()   // v17.4: the cycle the hold belongs to (weakHoldFor)
     };
     await saveState();
     toast('Swapped to ' + p.inName + '.', 'g');
@@ -8268,8 +8636,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         el.scoAccText.innerHTML = 'Holding <strong>' + escapeHtml(plan.lock.weakPoint) + '</strong> targeting for this wave. Matching accessories stay starred.';
         el.scoAccRows.innerHTML = '';
       };
-      el.scoAccRows.querySelector('[data-swap-switch]').onclick = () =>
+      el.scoAccRows.querySelector('[data-swap-switch]').onclick = async () => {
+        // v17.4 (approved 2026-11-16): Switch moves the hold to the new weak point at once, so the stars, the swap list
+        // and the Accessories card follow it for the rest of the wave. Before, the hold moved only when a swap was taken.
+        if (!state.settings.weakTargetLock) state.settings.weakTargetLock = {};
+        state.settings.weakTargetLock[plan.liftId] = { weakPoint: plan.weakPoint, wave: currentWaveId(), cycle: state.program.cycle || 1, appliedAt: nowISO() };
+        await saveState();
         showAccSuggestion(plan.liftId, plan.weakPoint, true);
+        render();
+      };
       el.scoAccApply.hidden = true;
       return;
     }
@@ -8286,8 +8661,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
 
     if (plan.mode === 'nomap'){
-      el.scoAccText.innerHTML = 'No movement in this lift\u2019s library maps to ' + wpL +
-        ' \u2014 matching work will be starred once you add it from the Accessories tab.';
+      // v17.4 (approved 2026-11-16): it said "No movement in this lift's library maps to ..." and pointed to an
+      // "Accessories tab". The library has an exercise for every weak point; this shows when none can be offered.
+      // off: how many of them the gym setting hides.
+      const off = ['tier1', 'tier2'].flatMap(tr => ACCESSORY_LIBRARY[plan.liftId]?.[tr] || []).filter(x => accessoryMatchesWeakPoint(x, plan.weakPoint) && !exerciseAvailable(x)).length;
+      el.scoAccText.innerHTML = 'No swap to offer for your ' + wpL + ' weakness right now. ' +
+        (off ? off + (off === 1 ? ' exercise that targets it needs' : ' exercises that target it need') + ' equipment that is switched off in Settings \u2192 Gym Equipment. ' : '') +
+        'Matching work is starred once it is in your plan (Program \u2192 Open accessories).';
       el.scoAccRows.innerHTML = '';
       el.scoAccApply.hidden = true;
       return;
@@ -8334,8 +8714,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const repeated = state.history.filter(h => h.liftId === liftId && h.weakPoint === weakPoint).length >= 2;
 
     // Block-hold gate: an applied targeting commitment holds for the wave
-    const lock = state.settings.weakTargetLock?.[liftId];
-    if (!force && lock && lock.weakPoint && lock.weakPoint !== weakPoint && lock.wave && lock.wave === currentWaveId()){
+    const lock = weakHoldFor(liftId);   // v17.4: the hold of this wave of this cycle, if there is one
+    if (!force && lock && lock.weakPoint !== weakPoint){
       _swapPlan = { mode:'hold', liftId, weakPoint, lock };
       renderSwapCard();
       el.scoAccSuggestion.hidden = false;
@@ -8729,7 +9109,17 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   function getWeakPointForLift(liftId){
-    return state.settings.weakPoints?.[liftId] || null;
+    const now = state.settings.weakPoints?.[liftId];
+    if (now) return now;
+    // v17.4: with no stored answer, the newest answer saved on a session of this lift. Builds before 2.4 dropped most
+    // stored answers when the app reopened; the session each was marked on still has it. Nothing is written here.
+    // Wipe history and Reset Everything erase the sessions, so they erase these answers too.
+    const hist = Array.isArray(state.history) ? state.history : [], opts = WEAK_POINT_OPTIONS[liftId] || [];
+    for (let i = hist.length - 1; i >= 0; i--){
+      const h = hist[i];
+      if (h && h.liftId === liftId && typeof h.weakPoint === 'string' && h.weakPoint) return opts.includes(h.weakPoint) ? h.weakPoint : null;
+    }
+    return null;
   }
 
   async function fetchWeakPointWhy(liftId, accName, weakPoint){
@@ -8790,7 +9180,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const libItem = (ACCESSORY_LIBRARY[liftId]?.[tier] || []).find(x => x.name === sel.value);
     if (!libItem){ box.innerHTML = ''; return; }
 
-    const wp = _sessionWeakPoint || getWeakPointForLift(liftId);
+    let wp = _sessionWeakPoint || getWeakPointForLift(liftId);
+    try{ wp = weakPointInForce(liftId); }catch(err){ console.error('Hold not read', err); }   // v17.4: the hold's target while a hold is on; if that fails, the answer as before
     const isMatch = wp && wp !== 'No issues' && accessoryMatchesWeakPoint(libItem, wp);
     const hits = weakPointsAddressed(liftId, libItem);
     const w = calibratedSwapWeight(liftId, libItem, tier);
@@ -8799,10 +9190,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     const fixLine = hits.length
       ? 'Helps with: <strong>' + hits.map(escapeHtml).join('</strong> · <strong>') + '</strong>'
-      : 'General ' + escapeHtml((TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2).label.replace(/^Tier \d: /, '').toLowerCase()) + ' work — not tied to one sticking point.';
+      : 'General ' + ({ tier1:'strength', tier2:'muscle', tier3:'core and joint' }[tier] || 'muscle') + ' work — not tied to one sticking point.';   // v17.4: was supplemental, hypertrophy, core & prehab (cut from the tier labels)
 
     box.innerHTML =
-      (isMatch ? '<div class="asd-star">\u2605 Targets today\u2019s weak point \u2014 ' + escapeHtml(wp) + '</div>' : '') +
+      (isMatch ? '<div class="asd-star">\u2605 Targets your weak point \u2014 ' + escapeHtml(wp) + '</div>' : '') +   // v17.4: was "today's weak point"; on a hold it is the hold's target
       '<div class="asd-cat">' + escapeHtml(libItem.category || 'Accessory') + '</div>' +
       '<div class="asd-fix">' + fixLine + '</div>' +
       '<div class="asd-meta">Starts at <strong>' + (w > 0 ? escapeHtml(formatWeight(w)) : 'bodyweight') + '</strong> \u00B7 ' +
@@ -8813,7 +9204,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const tier = item.tier || 'tier2';
     const tierCon = TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2;
     const { available, blocked } = swapCandidates(liftId, item);
-    const wp = _sessionWeakPoint || getWeakPointForLift(liftId);
+    let wp = _sessionWeakPoint || getWeakPointForLift(liftId);
+    try{ wp = weakPointInForce(liftId); }catch(err){ console.error('Hold not read', err); }   // v17.4: the hold's target while a hold is on; if that fails, the answer as before
     const hasWP = wp && wp !== 'No issues';
 
     const hiddenNote = blocked.length
@@ -8823,7 +9215,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     if (!available.length){
       return '<div class="acc-swap-drawer">' +
-        '<div class="asd-empty">No other ' + escapeHtml(tierCon.label) + ' movement is available under your current filters.' +
+        '<div class="asd-empty">No other exercise in ' + escapeHtml(accTierName(tier)) + ' is available under your current filters.' +   // v17.4
         (blocked.length ? ' ' + blocked.length + ' are hidden \u2014 loosen Settings \u2192 Gym Equipment to see them.' : '') +
         '</div>' +
         '<div class="asd-actions"><button class="btn-s" data-swapcancel="' + escapeHtml(item.id) + '">Close</button></div>' +
@@ -8838,7 +9230,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     const groups =
       (matches.length ? '<optgroup label="\u2605 Targets ' + escapeHtml(wp) + '">' + matches.map(opt).join('') + '</optgroup>' : '') +
-      (rest.length ? '<optgroup label="' + escapeHtml(tierCon.label) + ' \u2014 other options">' + rest.map(opt).join('') + '</optgroup>' : '');
+      (rest.length ? '<optgroup label="' + escapeHtml(accTierName(tier)) + ' \u2014 other options">' + rest.map(opt).join('') + '</optgroup>' : '');   // v17.4
 
     return '<div class="acc-swap-drawer">' +
       '<div class="asd-head">Swap this exercise' +
@@ -8896,7 +9288,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const weightStr = item.weight > 0 ? formatWeight(item.weight) : 'BW';
 
       const card = document.createElement('div');
-      const weakPoint = _sessionWeakPoint || getWeakPointForLift(liftId);
+      let weakPoint = _sessionWeakPoint || getWeakPointForLift(liftId);
+      try{ weakPoint = weakPointInForce(liftId); }catch(err){ console.error('Hold not read', err); }   // v17.4: the hold's target while a hold is on; if that fails, the answer as before
       const isWeakMatch = accessoryMatchesWeakPoint(item, weakPoint);
       card.className = 'inline-acc-card' + (hasProg ? ' has-progress' : '') + (isWeakMatch ? ' acc-weak-match' : '') + (doneLog ? ' acc-logged' : '');
 
@@ -8937,9 +9330,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       card.innerHTML = '<div class="inline-acc-top">' +
         '<div style="min-width:0;flex:1">' +
           '<h3>' + escapeHtml(item.name) + ' <button class="btn-s ex-help-btn" data-ex-help="' + escapeHtml(item.id) + '" aria-label="Help, ' + escapeHtml(item.name) + '">?</button>' + weakBadge + '</h3>' +
-          '<div class="inline-acc-meta"><span class="tier-tag">' + escapeHtml(tierCon.label) + '</span> · ' + escapeHtml(weightStr) + ' · ' + numText(item.repMin, '?') + '-' + numText(item.repMax, '?') + ' reps</div>' +
+          '<div class="inline-acc-meta"><span class="tier-tag">' + escapeHtml(accTierName(item.tier)) + '</span> · ' + escapeHtml(weightStr) + ' · ' + numText(item.repMin, '?') + '-' + numText(item.repMax, '?') + ' reps</div>' +   // v17.4: Strength, Muscle, Core and joints (was the tier label)
           propWarnTag +
-          (accessoryStallHint(liftId, item) ? '<div class="acc-stall">' + escapeHtml(accessoryStallHint(liftId, item)) + ' The Deload control is on the Accessories tab.</div>' : '') +   // v15 (round 5, E)
+          (accessoryStallHint(liftId, item) ? '<div class="acc-stall">' + escapeHtml(accessoryStallHint(liftId, item)) + ' The Deload control is under Program \u2192 Open accessories, inside the exercise.</div>' : '') +   // v15 (round 5, E); v17.4: was "on the Accessories tab"
         '</div>' +
         loggedBadge +
         (hasProg ? '<span class="pill g" style="margin:0">\u2191 ' + escapeHtml(formatWeight(item.suggestedWeight)) + '</span>' : '') +
@@ -9018,13 +9411,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     el.confirmMsg.innerHTML =
       '<div class="help-body">' +
-      '<div class="help-tier">' + escapeHtml(tierCon.label) + '</div>' +
+      '<div class="help-tier">' + escapeHtml(accTierName(tier)) + '</div>' +   // v17.4: Strength, Muscle, Core and joints
       '<div><strong>Category:</strong> ' + escapeHtml(item.category || '') + '</div>' +
       '<div><strong>Equipment:</strong> ' + escapeHtml(eqLabel) + '</div>' +
       '<div><strong>Rep range:</strong> ' + tierCon.repMin + '\u2013' + tierCon.repMax + ' reps</div>' +
       '<div><strong>Sets:</strong> ' + item.sets + ' working set' + (item.sets === 1 ? '' : 's') + '</div>' +
       '<div><strong>Weight:</strong> ' + (item.weight > 0 ? escapeHtml(formatWeight(item.weight)) : 'Bodyweight') + '</div>' +
-      '<div><strong>Progression:</strong> Hold weight until all sets hit ' + tierCon.repMax + ' reps, then add ' + item.increment + ' ' + escapeHtml(state.settings.units) + '</div>' +
+      '<div><strong>Progression:</strong> ' + (isFormulaGoverned(liftId, item)   // v17.4: a Strength lift from the library is set from the training max; it said to add weight at the top of the rep range
+        ? 'Follows your ' + escapeHtml(String((getLiftMeta(liftId) || {}).name || 'lift').toLowerCase()) + ' training max. The app sets the weight each week; there is nothing to add by hand.'
+        : 'Hold weight until all sets hit ' + tierCon.repMax + ' reps, then add ' + item.increment + ' ' + escapeHtml(state.settings.units)) + '</div>' +
       cuesHTML +
       swapHTML +
       '</div>';
@@ -9075,7 +9470,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // behaviour of preserving a weight the lifter already dialled in.
     if (opts && opts.recalibrate){
       item.weight = calibratedSwapWeight(liftId, newExercise, tier);
-      item.lastOutcome = 'Swapped in mid-session.';
+      item.lastOutcome = (opts && typeof opts.note === 'string' && opts.note) ? opts.note : 'Swapped in mid-session.';   // v17.3: the Accessories screen says where its swap came from
     } else if (!item.weight || item.weight === 0){
       item.weight = calibratedSwapWeight(liftId, newExercise, tier);  // v13.0.8
     }
@@ -10168,6 +10563,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.accessoryCoverage.innerHTML = html;
   }
 
+  // v17.4 (approved 2026-11-16): the note in an exercise's open row on Accessories. A Strength lift from the library
+  // takes its weight from the wave, so until it has a log it says so; it showed the note every new exercise starts
+  // with, "Hold load until all sets hit upper range." Display only: the saved note is not changed.
+  function accRowNote(liftId, item){
+    const note = item.lastOutcome || 'Hold load.';
+    return ((note === 'Hold load.' || note === 'Hold load until all sets hit upper range.') && isFormulaGoverned(liftId, item)) ? 'Load follows the wave.' : note;
+  }
   function renderAccessories(){
     const liftId = el.accLiftSelect.value || 'squat';
     const data = accessoryLiftState(liftId);
@@ -10204,6 +10606,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const equipWarnTag = equipUnavail ? '<span class="acc-warn">⚠ ' + warnWhy + ' — consider swapping</span>' : '';
       const stallHint = accessoryStallHint(liftId, item);   // v15 (round 5, E)
       const stallTag = stallHint ? '<span class="acc-stall">' + escapeHtml(stallHint) + '</span>' : '';
+      let rowNote = item.lastOutcome || 'Hold load.';   // v17.4: the note in the open row, as it was; then accRowNote's, if it can be worked out
+      try{ rowNote = accRowNote(liftId, item); }catch(err){ console.error('Row note not worked out', err); }
 
       // Collapsed summary info
       const weightStr = item.weight > 0 ? formatWeight(item.weight) : 'BW';
@@ -10259,7 +10663,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
             <div class="progress-note" style="margin-top:10px">
               ${hasProg
                 ? `<span class="pill g">Ready to progress → ${escapeHtml(formatWeight(item.suggestedWeight))}</span>`
-                : `<span class="pill w">${escapeHtml(item.lastOutcome || 'Hold load.')}</span>`}
+                : `<span class="pill w">${escapeHtml(rowNote)}</span>`}
             </div>
             <div class="row" style="margin-top:12px">
               <div class="tight"><button class="btn-p" data-acc-save="${escapeHtml(item.id)}">Save Log</button></div>
@@ -10284,6 +10688,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       });
     });
     renderAccessoryHistory();
+    try{ v173Accessories(); }catch(err){ console.error('v173 accessories failed', err); }   // v17.3: the plan-first screen, drawn over this list
   }
 
   function renderAccessoryHistory(){
@@ -14261,7 +14666,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       '\n\nCycle ' + (cur + 1) + ' starts at week 1 (10s wave) with your current TMs:\n' +
       lifts_tm_lines() +
       '\n\nKept: history (every session keeps its cycle number), accessory weights and progress, weak points.' +
-      '\n\nAs at every new week, Tier 1 lifts from the library are recalculated from your TM for week 1.';
+      '\n\nAs at every new week, Strength lifts from the library are recalculated from your TM for week 1.';   // v17.4: was Tier 1
     const ok = await showConfirm('Start next cycle', msg, 'Start cycle ' + (cur + 1), 'btn-w');
     if (!ok) return false;
     await applyCycleStart(cur, done);
@@ -14387,7 +14792,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       (done ? 'Cycle ' + cur + ' is complete.' : 'You are in week ' + (state.program.index + 1) + ' of cycle ' + cur + '. The rest of it will be skipped.') +
       '\n\nCycle ' + (cur + 1) + ' starts at week 1 (10s wave) with:\n' + restartEditLines(edits) +
       '\n\nKept: history (every session keeps its cycle number), accessory weights and progress, weak points.' +
-      '\n\nAs at every new week, Tier 1 lifts from the library are recalculated from your TM for week 1.',
+      '\n\nAs at every new week, Strength lifts from the library are recalculated from your TM for week 1.',   // v17.4: was Tier 1
       'Start cycle ' + (cur + 1), 'btn-w');
     if (!ok) return false;
     restartApplyTms(edits);
@@ -14435,6 +14840,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     state.accessories.history = [];
     state.settings.weakPoints = {};
     delete state.settings.weakTargetLock;
+    delete state.settings.accKeep;   // v17.3: the "Keep" answers go with the weak points they were about
     for (const l of LIFTS) if (state.lifts[l.id]) state.lifts[l.id].tmCutGate = null;
     state.program.index = 0; state.program.cycle = 1; state.program.completion = {};
     state.activeSession = null; state.accessoryPhase = null;
@@ -14464,23 +14870,55 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     applyHistoryWipe();
     stopSessionTimer();
     await saveState();
+    writeLocalBackup(true);   // v17.4 (approved 2026-11-16): the backup copy in localStorage is replaced at once, as Reset Everything does (it is otherwise refreshed at most once a minute, so it still held the wiped sessions)
     toast('History wiped — week 1. Your TMs and Settings are kept.', 'g');
     render();
     return true;
   }
 
-  // "Reset Everything" (unchanged for Reese) also wipes Settings. The device record (installId, seq) lives outside
+  // v17.4 (owner request, 2026-11-16): Reset Everything also deletes the recovery copies on this device: the copies
+  // kept before an update or an import, and after a save conflict or an unreadable save. They hold the sessions from
+  // before the reset, and History could still export them or restore one (Undo import). Every "recovery:" entry is
+  // deleted, whether the index lists it or not. Wipe history keeps them, as its sheet says.
+  // Returns false when the store could not be cleared. (Reset Everything also removes the two display records in
+  // localStorage and replaces the backup copy there at once, so nothing from before the reset is left on the device
+  // except the bridge's device record, which Hermes needs: installId and seq.)
+  async function dropAllRecoveryCopies(){
+    if (!idbAvailable || !db) return true;   // recovery copies exist only in IndexedDB
+    try{
+      const keys = await new Promise((res, rej) => {
+        const r = db.transaction('meta', 'readonly').objectStore('meta').getAllKeys();
+        r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error);
+      });
+      for (const k of keys) if (typeof k === 'string' && k.startsWith('recovery:') && k !== RECOVERY_INDEX_KEY) await idb.del('meta', k);
+      _recoveryIndex = [];
+      await idb.put('meta', [], RECOVERY_INDEX_KEY);
+      refreshRecoveryRow();
+      return true;
+    }catch(err){
+      console.error('Recovery copies not cleared', err);
+      try{ await loadRecoveryIndex(); }catch(_){}
+      return false;
+    }
+  }
+
+  // "Reset Everything" also wipes Settings. The device record (installId, seq) lives outside
   // the state and survives; a new historyGeneration starts, the send queue is cleared, and pendingPairing makes the
   // next save of the Hermes URL and token announce bridge_paired with reason reset_everything (BRIDGE_SPEC 6, C2).
   async function resetAll(){
-    const ok = await showConfirm('Reset Everything', 'This will erase all settings, history, program state, and accessories. This cannot be undone.', 'Reset All', 'btn-d');
+    const ok = await showConfirm('Reset Everything', 'This will erase all settings, history, program state, accessories and the recovery copies on this phone. This cannot be undone.', 'Reset All', 'btn-d');   // v17.4: names the recovery copies
     if (!ok) return;
+    const copiesGone = await dropAllRecoveryCopies();   // v17.4: first, so the reset below runs exactly as it did
+    // v17.4: the two display records kept outside the save go too: the plate style, and today's check-in with any units round trip
+    try{ localStorage.removeItem(V16_UI_KEY); localStorage.removeItem(V17_UI_KEY); v16ApplyPlateStyle(); }catch(err){ console.error('Display records not cleared', err); }
     const prevGen = state.hermes?.historyGeneration || null;
     state = deepClone(DEFAULT_STATE);
     ensureHistoryGeneration(state);
     hermesResetEverything(prevGen);
     stopSessionTimer(); stopRestMiniBadge(); releaseWakeLock();
-    await saveState(); toast('Reset complete.', 'g'); render();
+    await saveState();
+    writeLocalBackup(true);   // v17.4: the backup copy in localStorage is replaced at once (it is otherwise refreshed at most once a minute, so it could still hold the old data)
+    toast(copiesGone ? 'Reset complete.' : 'Reset complete. The recovery copies could not be deleted.', copiesGone ? 'g' : 'w'); render();   // v17.4: says so if the copies stayed
   }
 
   function exportData(){
@@ -14700,7 +15138,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       ' heavier than your main working weight</strong> (' + escapeHtml(formatWeight(mainWW)) + ' this microcycle): ' +
       escapeHtml(over.slice(0,4).map(o => o.name + ' ' + formatWeight(o.weight)).join(', ')) +
       (over.length > 4 ? ' +' + (over.length-4) + ' more' : '') +
-      '. Supplemental work should sit below the competition lift \u2014 tap Recalibrate above.';
+      '. Supplemental work should sit below the competition lift \u2014 tap Recalibrate weights, under the list.';   // v17.3: where the control is now
   }
 
   async function addAccessory(tier='tier2'){
@@ -14708,7 +15146,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const con = TIER_CONSTRAINTS[tier] || TIER_CONSTRAINTS.tier2;
     const sets = tier === 'tier3' ? 3 : 4;
     accessoryLiftState(liftId).templates.push({
-      id:newAccessoryId(), name:'New ' + con.label, category:'Custom', custom:true,
+      id:newAccessoryId(), name:'New exercise', category:'Custom', custom:true,   // v17.3: was 'New Tier 2: Hypertrophy' and the like; the screen no longer says T1, T2, T3
       tier, sets, repMin:con.repMin, repMax:con.repMax,
       weight:0, increment:state.settings.rounding,
       typedWeight:0, typedWeightSeeded:false,   // v14 (Q1): Add sets typedWeight to its creation weight
@@ -15571,7 +16009,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const whyAcc = t.getAttribute('data-why-acc');
       const whyLift = t.getAttribute('data-why-lift');
       if (whyAcc && whyLift){
-        const weakPoint = _sessionWeakPoint || getWeakPointForLift(whyLift);
+        let weakPoint = _sessionWeakPoint || getWeakPointForLift(whyLift);
+        try{ weakPoint = weakPointInForce(whyLift); }catch(err){ console.error('Hold not read', err); }   // v17.4: the weak point the star is for
         if (!weakPoint){ toast('No weak point selected.', 'w'); return; }
         t.textContent = '...';
         t.disabled = true;
@@ -16202,7 +16641,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const session = state.activeSession;
     t.textContent = (_v16View === 'Workout' && session) ? ((getLiftMeta(session.liftId) || {}).name || 'Session') : (V16_TITLES[_v16View] || _v16View);
     s.textContent = _v16View === 'Workout' ? new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' })
-      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.2';
+      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.4';
     const micro = currentMicrocycle();
     document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8FA8FF' : (V16_WAVE_COLOR[micro.wave] || '#FFE45C'));
   }
@@ -16210,6 +16649,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (name === 'Settings' && _v16View !== 'Settings'){ try{ renderSettings(); }catch(err){ console.error('settings refresh failed', err); } }   // v17.1 (L16): Settings opens showing what is saved
     _v16View = name;
     if (name === 'Program') _v16Week = null;   // open on the current week every time
+    if (name === 'Accessories'){ try{ v173Enter(); }catch(err){ console.error('v173 enter failed', err); } }   // v17.3: Accessories opens on the plan
     if (name === 'Tools'){
       const liftData = state.lifts[el.liftSelect.value || 'squat'];
       if (liftData && el.calcRpe1rm && (!el.calcRpe1rm.value || el.calcRpe1rm.value === _v16RpeAuto)){   // r2: refresh after a TM change; a typed number is left alone
@@ -16530,7 +16970,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
     const L = 80, R = W - 80;
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.2', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 150, true); ctx.fillText(wave + ' wave', L - 6, 300);
     const ds = rows.map(r => Date.parse(r.date)).filter(Number.isFinite), passed = rows.filter(r => r.reps >= r.standard).length;
     F(600, 38);
@@ -16681,7 +17121,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     c.width = W; c.height = H;
     ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#FFE45C'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.2', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 130, true);
     let size = 130; while (ctx.measureText(r.title).width > R - L && size > 60){ size -= 6; F(800, size, true); }
     ctx.fillText(r.title, L - 5, 300);
@@ -17745,6 +18185,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     try{ v16Bind(); }catch(err){ console.error('v16 bind failed', err); }   // r3: boot continues
     try{ v17Bind(); }catch(err){ console.error('v17 bind failed', err); }   // 2.0: boot continues
     try{ v171Bind(); }catch(err){ console.error('v171 bind failed', err); }   // 2.1: boot continues
+    try{ v173Bind(); }catch(err){ console.error('v173 bind failed', err); }   // 2.3: boot continues
     setupModalA11y(); // v11.0.2: dialog roles + Escape-to-close
     wireOnboarding(); // v10: attach onboarding modal handlers
     try{ db = await idb.open(); }
@@ -18072,6 +18513,466 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     results.forEach(r => console.log((r.pass ? '✓ ' : '✗ ') + r.name));
     if (failed.length) console.warn('FAILED:', failed.map(f => f.name));
     return { total: results.length, passed: results.length - failed.length, failed: failed.map(f => f.name) };
+  }
+
+  /* ═══ v17.3 "2.3": THE ACCESSORIES SCREEN ═══
+     A display layer over renderAccessories(), which still draws the list and keeps every control it had. In front of
+     that list this layer puts the lift tabs, the coach card and the plan's status; on each exercise it puts what the
+     exercise is for and how it was chosen. The 2.2 controls are hidden only once this layer has finished drawing
+     (class v173-on on the view), so a fault here leaves the 2.2 screen in place.
+     It changes the plan only through code that already existed (swapExercise, applySwapPair, applyCard, dismissCard,
+     addAccessory, the calibration sheet), plus three things of its own: "Reset to recommended", the "Keep" answers
+     (settings.accKeep) and the switches of Your gym, which write the same settings as Settings → Gym Equipment. */
+  const V173_TIER = { tier1:'Strength', tier2:'Muscle', tier3:'Core and joints' };
+  const V173_EQ = { barbell:'Barbell', dumbbell:'Dumbbells', cable:'Cable', band:'Band', machine:'Machine', pullup_bar:'Pull-up bar', bodyweight:'Bodyweight' };
+  const V173_EQS = { barbell:'Barbell', dumbbell:'Dumbbells', machine:'Machines', cable:'Cables', band:'Bands', pullup_bar:'Pull-up bar' };   // the switches of Your gym, in this order
+  const V173_EQ_NEED = { barbell:'a barbell', dumbbell:'dumbbells', cable:'a cable machine', band:'bands', machine:'a machine', pullup_bar:'a pull-up bar' };
+  const V173_PROP_NEED = { box:'a box', bench_adj:'an adjustable bench', boards:'press boards', blocks:'pulling blocks', deficit:'a deficit platform', rack_pins:'rack pins',
+    ab_wheel:'an ab wheel', dip_bars:'dip bars', anchor:'a foot anchor', spec_bar:'a safety squat bar', handles:'push-up handles' };
+  const V173_NUM = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+  const V173_LOCK = '<svg class="v17-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  let _v173Mode = 'plan', _v173Hist = false, _v173Add = false, _v173Extras = false, _v173Sug = '', _v173Busy = false;
+  let _v173Off = false;   // set when one of this layer's own actions fails: the 2.2 screen is used until the app is reopened
+  let _v173List = [], _v173Live = [];   // the suggestions on screen, and the keys of every suggestion the rules give for this lift
+
+  function v173Join(a){ return a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+  function v173Lifts(){ return [...el.accLiftSelect.options].map(o => o.value); }
+  function v173LiftName(id){ return String((getLiftMeta(id) || {}).name || id).toLowerCase(); }
+  function v173Lift(){ return el.accLiftSelect.value || 'squat'; }
+  // What an exercise needs that is switched off, in words: "a machine", "dumbbells and an adjustable bench".
+  function v173Needs(lib){
+    const out = [], s = state.settings, p = s.props || {};
+    if (!equipmentAvailable(lib)) out.push(V173_EQ_NEED[lib.equip] || String(lib.equip));
+    exerciseProps(lib).filter(k => s.propsNone === true || p[k] === false).forEach(k => out.push(V173_PROP_NEED[k] || (PROP_CATALOG[k] ? PROP_CATALOG[k].short : k)));
+    return v173Join(out);
+  }
+  function v173Slot(it){ return getEffectiveAccSets(it) + ' × ' + numText(it.repMin, '?') + '–' + numText(it.repMax, '?'); }   // this week's sets (halved in a deload week), as the list has always shown
+  function v173SlotPlan(it){ return numText(it.sets, '?') + ' × ' + numText(it.repMin, '?') + '–' + numText(it.repMax, '?'); }   // the slot itself, for a swap that outlasts the week
+
+  /* ── the plan next to the recommended one ── */
+  function v173Plan(liftId){
+    const data = accessoryLiftState(liftId), rec = {}, recKey = new Map();
+    ['tier1', 'tier2', 'tier3'].forEach(t => { rec[t] = accRecommendedTier(liftId, t); rec[t].forEach(r => recKey.set(t + '|' + r.pick.name, r)); });
+    const seen = new Set();
+    const rows = data.templates.map(item => {
+      const custom = isCustomAccessory(item), lib = custom ? null : accLibEntry(liftId, item), pur = lib ? accPurpose(liftId, item.tier, item.name) : null;
+      const key = item.tier + '|' + item.name, r = (lib && !seen.has(key)) ? recKey.get(key) : null;   // a second copy of a recommended exercise is the lifter's own
+      if (r) seen.add(key);
+      let label = 'yours', why = '';
+      if (r){
+        const isTop = !!(r.top && r.top.name === r.pick.name);
+        label = isTop ? 'top' : 'gym';
+        if (!isTop && r.top) why = 'Top pick is ' + r.top.name + ', which needs ' + v173Needs(r.top) + '.';
+      }
+      const blocked = !!(lib && !exerciseAvailable(lib));
+      return { item, lib, pur, label, why, blocked, needs:blocked ? v173Needs(lib) : '', stall:accessoryStallHint(liftId, item) };
+    });
+    const missing = [...recKey.keys()].filter(k => !seen.has(k));
+    const extra = rows.filter(r => r.label === 'yours');
+    return { liftId, data, rec, rows, missing, extra, same:!missing.length && !extra.length };
+  }
+
+  /* ── suggestions: what the app's rules and the waiting Hermes cards say about this lift's plan ── */
+  // The best exercise the gym allows in place of `item`: its own purpose first, then a purpose the list lacks, then any.
+  function v173BestFit(liftId, item, owned){
+    const tier = item.tier, lib = (ACCESSORY_LIBRARY[liftId] || {})[tier] || [], g = n => { const p = accPurpose(liftId, tier, n); return p ? p.g : null; };
+    const free = lib.filter(x => x.name !== item.name && !owned.has(x.name) && exerciseAvailable(x)), mine = g(item.name);
+    const same = mine ? free.find(x => g(x.name) === mine) : null;
+    if (same) return { ex:same, same:true };
+    const have = new Set([...owned].filter(n => n !== item.name).map(g));
+    const other = free.find(x => !have.has(g(x.name))) || free[0] || null;
+    return other ? { ex:other, same:false } : null;
+  }
+  // The weak point marked for a lift. v17.4: the app's own getter now does what this did in 2.3 (the stored answer,
+  // else the newest answer saved on a session of that lift), so the coach card and the session list read the same one.
+  function v173WeakPoint(liftId){ return getWeakPointForLift(liftId); }
+  function v173Cards(liftId){
+    const gen = state.hermes && state.hermes.historyGeneration;
+    return ((state.hermes && state.hermes.cards) || []).filter(c => c && c.status === 'pending' && c.card && _isObj(c.card.basis) && c.card.basis.historyGeneration === gen
+      && _isObj(c.card.action) && (c.card.action.type === 'swap_accessory' || c.card.action.type === 'accessory_sets') && _isObj(c.card.action.params) && c.card.action.params.liftId === liftId);
+  }
+  function v173Candidates(liftId, P){
+    const out = [], lift = v173LiftName(liftId), owned = new Set(P.data.templates.map(t => t.name));
+    // 1. app rule: an exercise in the plan needs equipment that is switched off
+    P.rows.forEach(r => {
+      if (!r.blocked) return;
+      const it = r.item, fit = v173BestFit(liftId, it, owned), noun = r.pur ? accGroupNoun(liftId, it.tier, r.pur.g) : '';
+      const s = { key:'eq|' + it.tier + '|' + it.name, kind:'equip', src:'App rule', accId:it.id, keepName:it.name, swap:true };
+      if (fit){
+        const w = calibratedSwapWeight(liftId, fit.ex, it.tier);
+        s.to = fit.ex.name;
+        s.title = 'Swap ' + it.name + ' for ' + fit.ex.name;
+        s.body = it.name + ' needs ' + r.needs + ', switched off in Your gym. ' + (fit.same && noun ? fit.ex.name + ' is the best fit for ' + noun + ' in your gym.'
+          : 'Nothing else for ' + (noun || 'that purpose') + ' fits your gym, so this is the next pick for ' + V173_TIER[it.tier].toLowerCase() + '.');
+        s.note = 'Same slot: ' + v173SlotPlan(it) + ', starting at ' + (w > 0 ? formatWeight(w) : 'bodyweight') + '. Your ' + it.name + ' logs stay in History.';
+      } else {
+        s.title = it.name + ' needs ' + r.needs;
+        s.body = 'It is switched off in Your gym, and nothing else in ' + V173_TIER[it.tier] + ' fits your gym.';
+        s.note = '';
+      }
+      out.push(s);
+    });
+    // 2. Hermes: accessory cards the app already holds for this lift, checked now with the card's own check
+    v173Cards(liftId).forEach(rec => {
+      const c = rec.card, a = c.action, p = a.params || {};
+      let chk; try{ chk = checkCardAction(c); }catch(_){ chk = { ok:false, reason:'the card could not be checked' }; }
+      const target = P.data.templates.find(t => t.name === (a.type === 'swap_accessory' ? p.from : p.exercise));
+      out.push({ key:'card|' + c.id, kind:'card', src:'Hermes', accId:target ? target.id : '', swap:a.type === 'swap_accessory', title:String(c.title || ''), body:String(c.body || ''),
+        evidence:(Array.isArray(c.evidence) ? c.evidence : []).slice(0, 3).map(x => String((x && x.text) || '')).filter(Boolean), ok:!!chk.ok, reason:chk.ok ? '' : String(chk.reason || ''), cardId:c.id });
+    });
+    // 3. app rule: the weak point marked after this lift (held for the wave once a swap for it was applied)
+    const lock = weakHoldFor(liftId);   // v17.4: a hold counts only in the cycle it was set in
+    const wp = lock ? lock.weakPoint : v173WeakPoint(liftId);
+    if (wp && wp !== 'No issues'){
+      const pairs = buildSwapPairs(liftId, wp), n = (state.history || []).filter(h => h && h.liftId === liftId && h.weakPoint === wp).length;
+      pairs.forEach((p, i) => {
+        const it = P.data.templates.find(t => t.id === p.outId); if (!it) return;
+        out.push({ key:'wp|' + wp + '|' + n + '|' + p.outName + '>' + p.inName, kind:'weak', src:'App rule', accId:p.outId, keepName:p.outName, swap:true, to:p.inName, wp, n, pairs, pairIdx:i,
+          title:'Swap ' + p.outName + ' for ' + p.inName,
+          body:'You marked “' + wp.toLowerCase() + '” ' + (n >= 1 ? 'on ' + n + ' ' + lift + ' session' + (n === 1 ? '' : 's') : 'as your ' + lift + ' weak point') + '. ' + p.inName + ' is matched to it and ' + p.outName + ' is not.',
+          note:'Same slot: ' + v173SlotPlan(it) + ', starting at ' + (p.weight > 0 ? formatWeight(p.weight) : 'bodyweight') + '. Your ' + p.outName + ' logs stay in History.' });
+      });
+    }
+    return out;
+  }
+  function v173Suggestions(liftId, P){
+    const all = v173Candidates(liftId, P), kept = new Set((state.settings.accKeep && Array.isArray(state.settings.accKeep[liftId])) ? state.settings.accKeep[liftId] : []);
+    return { live:all.filter(s => s.kind !== 'card').map(s => s.key), list:all.filter(s => s.kind === 'card' || !kept.has(s.key)) };
+  }
+
+  /* ── drawing ── */
+  function v173Tabs(liftId, counts){
+    const ids = v173Lifts(); if (!ids.length) return '';
+    return '<div class="v17-seg v173-tabs" role="group" aria-label="Lift">' + ids.map(id => {
+      const n = counts[id] || 0, nm = V17_SHORT[id] || (getLiftMeta(id) || {}).name || id;
+      return '<button type="button" data-v173-lift="' + escapeHtml(id) + '" aria-pressed="' + (id === liftId) + '"' + (n ? ' aria-label="' + escapeHtml(nm + ', ' + n + ' coach suggestion' + (n === 1 ? '' : 's')) + '"' : '') + '>'
+        + escapeHtml(nm) + (n ? '<i class="v173-dot"></i>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  function v173GymLine(){
+    const eq = state.settings.equipment || {}, p = state.settings.props || {};
+    const off = Object.keys(V173_EQS).filter(k => eq[k] === false).map(k => V173_EQS[k].toLowerCase());
+    const pOff = state.settings.propsNone === true ? -1 : Object.keys(PROP_CATALOG).filter(k => p[k] === false).length;
+    return (off.length ? 'No ' + v173Join(off) : 'All equipment on') + (pOff === -1 ? ' · no extras' : pOff > 0 ? ' · ' + pOff + ' extra' + (pOff === 1 ? '' : 's') + ' off' : '');
+  }
+  function v173Status(liftId, P){
+    const n = P.data.templates.length, lift = v173LiftName(liftId), word = n <= 10 ? V173_NUM[n] : String(n);
+    let h, p, ic = 'ok', reset = '';
+    if (!n){
+      h = 'No exercises yet'; ic = 'mine';
+      p = P.missing.length ? 'The recommended plan has ' + P.missing.length + ' for your gym.' : 'Nothing in the library fits your gym. Switch something on in Your gym, or add your own exercise.';
+      if (P.missing.length) reset = '<button type="button" class="btn-p v173-reset" data-v173="reset">Use the recommended plan</button>';
+    } else if (P.same){
+      h = 'Recommended plan';
+      p = word + ' exercise' + (n === 1 ? '' : 's') + ' after ' + lift + ', picked for your gym. Nothing to set up.';
+    } else {
+      h = 'Your plan'; ic = 'mine';
+      const out = P.extra.map(r => r.item.name), add = P.missing.map(x => x.split('|')[1]), m = n - out.length;
+      p = (m === n ? (n === 1 ? 'Your exercise matches' : 'All ' + n + ' exercises match') : m + ' of ' + n + ' exercises match') + ' the recommended plan'
+        + (add.length ? (out.length ? ', which has ' + v173Join(add) + ' instead of your ' + v173Join(out) + '.' : ', which also has ' + v173Join(add) + '.') : '.');
+      reset = '<button type="button" class="btn-s v173-reset" data-v173="reset">Reset to recommended</button>';
+    }
+    return '<section class="v17-slab v173-status" aria-label="Plan">'
+      + '<div class="v173-st"><span class="v173-st-ic ' + ic + '">' + v17Ic(ic === 'ok' ? 'check' : 'layers', 22) + '</span><div><h2>' + escapeHtml(h) + '</h2><p>' + escapeHtml(p) + '</p></div></div>' + reset
+      + '<button type="button" class="v173-gymline" data-v173="gym" aria-label="' + escapeHtml('Your gym: ' + v173GymLine() + '. Edit') + '">' + v17Ic('barbell', 20) + '<span>' + escapeHtml(v173GymLine()) + '</span><b>Edit</b></button></section>';
+  }
+  function v173Coach(S){
+    const L = S.list; _v173List = L; _v173Live = S.live;
+    if (!L.length) return '';
+    let i = L.findIndex(s => s.key === _v173Sug); if (i < 0) i = 0;
+    const s = L[i];
+    let btns;
+    if (s.kind === 'card') btns = (s.ok ? '<button type="button" class="btn-p" data-v173-do="' + i + '">Apply</button>' : '') + '<button type="button" class="btn-s" data-v173-keep="' + i + '">Dismiss</button>';
+    else btns = (s.to ? '<button type="button" class="btn-p" data-v173-do="' + i + '">Swap</button>' : '<button type="button" class="btn-p" data-v173="gym">Edit your gym</button>')
+      + '<button type="button" class="btn-s" data-v173-keep="' + i + '">Keep ' + escapeHtml(s.keepName) + '</button>';
+    const more = L.map((x, j) => j === i ? '' : '<button type="button" data-v173-show="' + j + '"><span>' + escapeHtml(x.title) + '</span>' + v17Ic('right', 18) + '</button>').join('');
+    return '<section class="v17-slab v173-coach" aria-label="Coach suggestions">'
+      + '<div class="v173-coach-h"><i>' + v17Ic('chat', 20) + '</i><b>Coach suggestion' + (L.length > 1 ? ' ' + (i + 1) + ' of ' + L.length : '') + '</b><em>' + escapeHtml(s.src) + '</em></div>'
+      + '<h3>' + escapeHtml(s.title) + '</h3>' + (s.body ? '<p>' + escapeHtml(s.body) + '</p>' : '')
+      + (s.evidence && s.evidence.length ? '<ul>' + s.evidence.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : '')
+      + (s.kind === 'card' && !s.ok ? '<p class="w">Can’t be applied: ' + escapeHtml(s.reason) + '.</p>' : '')
+      + (s.note ? '<p class="n">' + escapeHtml(s.note) + '</p>' : '')
+      + '<div class="v173-coach-b">' + btns + '</div>' + (more ? '<div class="v173-coach-more">' + more + '</div>' : '') + '</section>';
+  }
+  function v173RuleText(liftId, tier, rows){
+    const its = rows.map(r => r.item);
+    const gov = its.filter(it => isFormulaGoverned(liftId, it)).length;   // the library's Strength lifts ride the wave; one he added does not
+    if (tier === 'tier1' && gov) return (gov === its.length ? 'follows' : 'library lifts follow') + ' your ' + String(V17_SHORT[liftId] || 'lift').toLowerCase() + ' max';
+    const w = its.filter(it => it.weight > 0 && !isFormulaGoverned(liftId, it)); if (!w.length) return '';
+    return 'add weight at ' + (w.every(it => it.repMax === w[0].repMax) ? numText(w[0].repMax, 'the top') + ' reps' : 'the top reps');
+  }
+  function v173Rows(liftId, P, S){
+    const list = el.accessoryList; if (!list) return;
+    const flag = new Map(); S.list.forEach(s => { if (s.accId && !flag.has(s.accId)) flag.set(s.accId, s.swap ? 'Coach suggests a swap' : 'Coach suggestion'); });
+    const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls + ' v173-only'; d.innerHTML = html; return d; };
+    const cards = [...list.querySelectorAll('.acc-card')];
+    let prev = null;
+    cards.forEach((card, ci) => {
+      const id = card.getAttribute('data-acc-id'), r = P.rows.find(x => x.item.id === id); if (!r) return;
+      const it = r.item;
+      if (it.tier !== prev){
+        prev = it.tier;
+        const run = []; for (let k = ci; k < cards.length; k++){ const q = P.rows.find(x => x.item.id === cards[k].getAttribute('data-acc-id')); if (!q || q.item.tier !== it.tier) break; run.push(q); }
+        const rule = v173RuleText(liftId, it.tier, run);
+        list.insertBefore(mk('v173-grp', '<h3>' + escapeHtml(V173_TIER[it.tier] || 'Accessories') + '</h3>' + (rule ? '<span>' + escapeHtml(rule) + '</span>' : '')), card);
+      }
+      const eq = r.lib ? (V173_EQ[r.lib.equip] || '') : '';
+      const load = it.weight > 0 ? formatWeight(it.weight) + (eq ? ' · ' + eq : '') : (eq || 'Bodyweight');
+      const line = r.pur ? r.pur.line : ((it.category && it.category !== 'Custom') ? it.category : 'Your own exercise');
+      const tag = flag.has(id) ? '<span class="v173-tag coach">' + flag.get(id) + '</span>'
+        : '<span class="v173-tag ' + r.label + '">' + (r.label === 'top' ? 'Top pick' : r.label === 'gym' ? 'Best for your gym' : 'Your pick') + '</span>';
+      const up = (it.pendingProgression && Number.isFinite(it.suggestedWeight)) ? '<span class="v173-up">↑ ' + escapeHtml(formatWeight(it.suggestedWeight)) + '</span>' : '';
+      const row = mk('v173-row', '<b>' + escapeHtml(it.name) + '</b><div class="v173-row-p">' + escapeHtml(line) + '</div>'
+        + '<div class="v173-row-m">' + tag + '<span>' + escapeHtml(v173Slot(it) + (isDeloadWeek() ? ' (deload)' : '') + ' · ' + load) + '</span>' + up + '</div>'
+        + (r.why ? '<div class="v173-row-n">' + V173_LOCK + '<span>' + escapeHtml(r.why) + '</span></div>' : '')
+        + (r.blocked ? '<div class="v173-row-n warn"><span>Needs ' + escapeHtml(r.needs) + ', switched off in Your gym.</span></div>' : '')
+        + (r.stall ? '<div class="v173-row-n warn"><span>' + escapeHtml(r.stall) + '</span></div>' : ''));
+      const head = card.querySelector('.acc-header'), inner = card.querySelector('.acc-body-inner');
+      if (head){
+        head.insertBefore(row, head.firstChild);
+        head.setAttribute('role', 'button'); head.setAttribute('tabindex', '0'); head.setAttribute('aria-expanded', card.classList.contains('open') ? 'true' : 'false');
+      }
+      if (inner) inner.insertBefore(mk('v173-acts', '<button type="button" class="btn-s" data-v173-swap="' + escapeHtml(id) + '">Swap exercise</button>'
+        + '<button type="button" class="btn-s" data-v173-help="' + escapeHtml(id) + '">How to do it</button>'), inner.firstChild);
+      card.classList.toggle('v173-flag', flag.has(id));
+    });
+  }
+  function v173Foot(){
+    return '<div class="v173-links"><button type="button" data-v173="add" aria-expanded="' + _v173Add + '">Add an exercise</button>'
+      + '<button type="button" data-v173="hist" aria-expanded="' + _v173Hist + '">History</button><button type="button" data-v173="recal">Recalibrate weights</button></div>'
+      + (_v173Add ? '<div class="v173-addrow"><span>Add your own exercise to</span>' + ['tier1', 'tier2', 'tier3'].map(t => '<button type="button" class="btn-s" data-v173-add="' + t + '">' + V173_TIER[t] + '</button>').join('') + '</div>' : '');
+  }
+
+  /* ── Your gym ── */
+  function v173GymData(){
+    const by = new Map();   // every library exercise once, by name
+    Object.keys(ACCESSORY_LIBRARY).forEach(l => ['tier1', 'tier2', 'tier3'].forEach(t => ((ACCESSORY_LIBRARY[l] || {})[t] || []).forEach(x => { if (!by.has(x.name)) by.set(x.name, x); })));
+    const all = [...by.values()], cnt = f => all.filter(f).length;
+    return { total:all.length, fit:cnt(x => exerciseAvailable(x)), eq:k => cnt(x => x.equip === k), prop:k => cnt(x => exerciseProps(x).includes(k)) };
+  }
+  function v173Switch(attr, key, on, label, dis){
+    return '<button type="button" class="v173-switch" role="switch" aria-checked="' + !!on + '" ' + attr + '="' + escapeHtml(key) + '" aria-label="' + escapeHtml(label) + '"' + (dis ? ' disabled' : '') + '><i></i></button>';
+  }
+  function v173Gym(){
+    const G = v173GymData(), eq = state.settings.equipment || {}, pr = state.settings.props || {}, none = state.settings.propsNone === true;
+    const ex = n => n + ' exercise' + (n === 1 ? '' : 's');
+    const rows = Object.keys(V173_EQS).map(k => { const on = eq[k] !== false, n = G.eq(k);
+      return '<div class="v173-sw"><div><b>' + V173_EQS[k] + '</b><em' + (on ? '' : ' class="off"') + '>' + ex(n) + (on ? '' : ' hidden') + '</em></div>' + v173Switch('data-v173-eq', k, on, V173_EQS[k]) + '</div>'; }).join('')
+      + '<div class="v173-sw"><div><b>Bodyweight</b><em>' + ex(G.eq('bodyweight')) + '</em></div><span class="v173-always">Always</span></div>';
+    const keys = Object.keys(PROP_CATALOG), offK = keys.filter(k => pr[k] === false);
+    const sum = none ? 'None: bar, dumbbells, cables and machines only' : offK.length ? offK.length + ' off: ' + v173Join(offK.map(k => PROP_CATALOG[k].short)) : keys.length + ' extras, all on';
+    const extras = !_v173Extras ? '' : '<div class="v173-sw"><div><b>No extras</b><em>Bar, dumbbells, cables and machines only</em></div>' + v173Switch('data-v173-none', 'none', none, 'No extras') + '</div>'
+      + keys.map(k => { const on = pr[k] !== false, n = G.prop(k);
+        return '<div class="v173-sw' + (none ? ' dim' : '') + '"><div><b>' + escapeHtml(PROP_CATALOG[k].label) + '</b><em' + (on && !none ? '' : ' class="off"') + '>' + ex(n) + (on && !none ? '' : ' hidden') + '</em></div>'
+          + v173Switch('data-v173-prop', k, on, PROP_CATALOG[k].label, none) + '</div>'; }).join('');
+    return '<button type="button" class="v16-back" data-v173="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Accessories</button>'
+      + '<h2 class="v173-gym-h">Your gym</h2>'
+      + '<section class="v17-slab"><div class="v173-gym-n"><b>' + G.fit + '</b><span>of ' + G.total + ' exercises fit your gym</span></div>'
+      + '<p class="v173-gym-p">Switch on what you can use. Your recommended plan and every swap list follow it. If an exercise in your plan needs something you switch off, the coach suggests the best one you can do. Nothing is swapped without your tap.</p></section>'
+      + '<section class="v17-slab v173-gym-list" aria-label="Equipment">' + rows + '</section>'
+      + '<section class="v17-slab v173-gym-list" aria-label="Extras"><button type="button" class="v173-extras" data-v173="extras" aria-expanded="' + _v173Extras + '"><div><b>Extras</b><em>' + escapeHtml(sum) + '</em></div><svg class="v173-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>' + extras + '</section>';
+  }
+
+  /* ── the screen ── */
+  function v173Bind(){
+    const view = v17$('viewAccessories'); if (!view || v17$('v173Top')) return;
+    const sel = v17$('accLiftSelect'), listEl = v17$('accessoryList'), histEl = v17$('accessoryHistoryList'), cov = v17$('accessoryCoverage');
+    const oldCard = sel ? sel.closest('.card') : null, listCard = listEl ? listEl.closest('.card') : null, histCard = histEl ? histEl.closest('.card') : null;
+    if (!oldCard || !listCard || !histCard) return;
+    oldCard.classList.add('v173-old'); if (cov) cov.classList.add('v173-old');
+    listCard.classList.add('v173-list'); histCard.classList.add('v173-hist');
+    const mk = id => { const d = document.createElement('div'); d.id = id; d.className = 'v173-only'; return d; };
+    view.insertBefore(mk('v173Top'), oldCard);
+    const warn = v17$('accOverMainWarn'); if (warn) view.insertBefore(warn, listCard);   // stays on screen when the old card is hidden
+    listCard.insertAdjacentElement('afterend', mk('v173Foot'));
+    view.appendChild(mk('v173Gym'));
+    view.addEventListener('click', e => {
+      let p; try{ p = v173Click(e); }catch(err){ p = Promise.reject(err); }
+      Promise.resolve(p).catch(err => {   // a fault in one of this layer's actions: back to the 2.2 screen, which has its own controls for everything
+        console.error('v173 click failed', err);
+        _v173Off = true; _v173Busy = false;
+        try{ renderAccessories(); }catch(_){}
+      });
+    });
+    view.addEventListener('keydown', e => {   // the exercise rows open from the keyboard too
+      if ((e.key !== 'Enter' && e.key !== ' ') || !e.target || !e.target.classList || !e.target.classList.contains('acc-header')) return;
+      e.preventDefault(); e.target.click();
+    });
+  }
+  function v173Enter(){ _v173Mode = 'plan'; _v173Hist = false; _v173Add = false; _v173Extras = false; _v173Sug = ''; renderAccessories(); }
+  function v173Accessories(){
+    const view = v17$('viewAccessories'); if (!view) return;
+    view.classList.remove('v173-on', 'v173-gym', 'v173-hist-on');
+    if (_v173Off) return;
+    if (!v17$('v173Top')) v173Bind();
+    const top = v17$('v173Top'), foot = v17$('v173Foot'), gym = v17$('v173Gym'); if (!top || !foot || !gym) return;
+    const liftId = v173Lift(), plans = {}, sugg = {}, counts = {};
+    v173Lifts().forEach(id => { plans[id] = v173Plan(id); sugg[id] = v173Suggestions(id, plans[id]); counts[id] = sugg[id].list.length; });
+    const P = plans[liftId] || v173Plan(liftId), S = sugg[liftId] || v173Suggestions(liftId, P);
+    const coach = v173Coach(S), status = v173Status(liftId, P);
+    top.innerHTML = v173Tabs(liftId, counts) + coach + (coach ? '' : status);   // with a suggestion showing, the plan comes straight after it and the status goes under the list
+    v173Rows(liftId, P, S);
+    foot.innerHTML = (coach ? status : '') + v173Foot();
+    gym.innerHTML = _v173Mode === 'gym' ? v173Gym() : '';
+    const total = Object.keys(counts).reduce((a, k) => a + counts[k], 0), open = v17$('btnAccSetup');
+    if (open) open.textContent = 'Open accessories' + (total ? ' · ' + total + ' coach suggestion' + (total === 1 ? '' : 's') : '');
+    view.classList.toggle('v173-gym', _v173Mode === 'gym');
+    view.classList.toggle('v173-hist-on', _v173Hist);
+    view.classList.add('v173-on');
+  }
+
+  /* ── actions ── */
+  async function v173Do(liftId, s){
+    if (s.kind === 'card'){ await applyCard(s.cardId); return; }
+    if (s.kind === 'equip' && s.to){ await swapExercise(s.accId, s.to, { liftId, recalibrate:true, note:'Swapped in to fit your gym.' }); return; }
+    if (s.kind === 'weak'){
+      _swapPlan = { mode:'pairs', liftId, weakPoint:s.wp, pairs:s.pairs, repeated:s.n >= 2 };   // the same plan the recap builds; Apply is its code
+      await applySwapPair(s.pairIdx);
+    }
+  }
+  async function v173KeepIt(liftId, s){
+    if (s.kind === 'card'){ await dismissCard(s.cardId); return; }
+    const st = state.settings; if (!_isObj(st.accKeep)) st.accKeep = {};
+    const live = new Set(_v173Live);   // answers about suggestions the rules no longer give are dropped here
+    const cur = (Array.isArray(st.accKeep[liftId]) ? st.accKeep[liftId] : []).filter(k => live.has(k) && k !== s.key);
+    cur.push(s.key); st.accKeep[liftId] = cur.slice(-24);
+    await saveState(); toast('Kept ' + s.keepName + '.', 'g');
+  }
+  // Reset to recommended: the recommended exercises, in order. One already in the plan stays as it is (weight, progress,
+  // last log); one that is not gets a new slot. Everything else in the plan goes. Logs are not touched.
+  function v173ResetPlan(liftId){
+    const left = accessoryLiftState(liftId).templates.slice(), next = [], added = [];
+    ['tier1', 'tier2', 'tier3'].forEach(tier => accRecommendedTier(liftId, tier).forEach(r => {
+      const i = left.findIndex(t => !isCustomAccessory(t) && t.tier === tier && t.name === r.pick.name);
+      if (i >= 0) next.push(left.splice(i, 1)[0]); else { next.push({ tier, lib:r.pick }); added.push(r.pick.name); }
+    }));
+    return { next, added, removed:left };
+  }
+  async function v173Reset(liftId){
+    const plan = v173ResetPlan(liftId);
+    if (!plan.added.length && !plan.removed.length){ toast('Already the recommended plan.', 'g'); return; }
+    const ok = await showConfirm('Reset to the recommended plan?',
+      (plan.removed.length ? 'Out: ' + plan.removed.map(t => t.name).join(', ') + '.\n' : '') + (plan.added.length ? 'In: ' + plan.added.join(', ') + '.\n' : '')
+      + '\nExercises that stay keep their weight and progress. Your logs stay in History.', 'Reset', 'btn-p');
+    if (!ok) return;
+    const bucket = accessoryLiftState(liftId), before = bucket.templates.slice();
+    bucket.templates = v173ResetPlan(liftId).next.map(x => x.lib ? newLibTemplate(liftId, x.tier, x.lib) : x);
+    plan.removed.forEach(t => _accDrafts.delete(t.id));
+    await saveState(); render();
+    toast('Plan reset to recommended.', 'g', { label:'Undo', onClick:async () => { accessoryLiftState(liftId).templates = before; await saveState(); toast('Plan restored.', 'g'); render(); } });
+  }
+  // The switches of Your gym write the same settings as Settings → Gym Equipment, and tell Hermes the same thing
+  // Save All Settings does: a settings_changed event naming what changed (no values).
+  async function v173SetGym(kind, key, on){
+    const st = state.settings, before = settingsFingerprint();
+    if (kind === 'eq' && Object.prototype.hasOwnProperty.call(V173_EQS, key)) st.equipment = { ...(st.equipment || {}), [key]:on };
+    else if (kind === 'prop' && Object.prototype.hasOwnProperty.call(PROP_CATALOG, key)) st.props = { ...(st.props || {}), [key]:on };
+    else if (kind === 'none') st.propsNone = on;
+    else return;
+    const after = settingsFingerprint();
+    if (after !== before) hermesQueueEvent('settings_changed', { changed:settingsDiffKeys(before, after) });
+    await saveState(); render();
+  }
+  // The swap sheet: the same purpose first, then other purposes, then what the gym rules out (with what it needs).
+  async function v173Swap(liftId, accId){
+    const item = findAccessory(liftId, accId); if (!item) return;
+    const tier = item.tier || 'tier2', cur = isCustomAccessory(item) ? null : accLibEntry(liftId, item), pur = cur ? accPurpose(liftId, tier, item.name) : null;
+    const { available, blocked } = swapCandidates(liftId, item), rec = accRecommendedTier(liftId, tier);
+    const g = x => { const p = accPurpose(liftId, tier, x.name); return p ? p.g : null; };
+    const tagOf = x => rec.some(r => r.top && r.top.name === x.name) ? '<span class="v173-tag top">Top pick</span>' : rec.some(r => r.pick.name === x.name) ? '<span class="v173-tag gym">Best for your gym</span>' : '';
+    const same = pur ? available.filter(x => g(x) === pur.g) : [], other = available.filter(x => !same.includes(x));
+    const about = x => { const p = accPurpose(liftId, tier, x.name), props = exerciseProps(x).map(k => PROP_CATALOG[k] ? PROP_CATALOG[k].short : k);
+      return [(p ? p.line : (x.category || '')), (V173_EQ[x.equip] || '') + (props.length ? ' + ' + props.join(' + ') : '')].filter(Boolean); };
+    const opt = x => { const w = calibratedSwapWeight(liftId, x, tier);
+      return '<button type="button" class="v173-opt" role="radio" aria-checked="false" data-v173-pick="' + escapeHtml(x.name) + '"><span><b>' + escapeHtml(x.name) + tagOf(x) + '</b><em>'
+        + escapeHtml(about(x).concat(w > 0 ? ['starts at ' + formatWeight(w)] : []).join(' · ')) + '</em></span><i class="v173-radio"></i></button>'; };
+    const lock = x => { const p = accPurpose(liftId, tier, x.name);
+      return '<div class="v173-opt lock"><span><b>' + escapeHtml(x.name) + tagOf(x) + '</b><em>' + escapeHtml([(p ? p.line : (x.category || '')), 'needs ' + v173Needs(x)].filter(Boolean).join(' · ')) + '</em></span>' + V173_LOCK + '</div>'; };
+    const more = other.slice(3);
+    const html = '<div class="v173-sh"><p class="v173-sh-sub">' + escapeHtml((getLiftMeta(liftId) || {}).name + ' day · ' + V173_TIER[tier] + ' · ' + v173SlotPlan(item)) + '</p>'
+      + '<div class="v173-opt cur"><span><b>' + escapeHtml(item.name) + '</b><em>In your plan now' + (item.weight > 0 ? ' · ' + escapeHtml(formatWeight(item.weight)) : '') + '</em></span></div>'
+      + '<p class="v173-sh-note">A swap takes this slot and starts at the weight shown. Your ' + escapeHtml(item.name) + ' logs stay in History.</p>'
+      + '<div role="radiogroup" aria-label="Swap to">'
+      + (same.length ? '<h4 class="v173-sh-h">Same purpose</h4>' + same.map(opt).join('') : '')
+      + (other.length ? '<h4 class="v173-sh-h">' + (same.length || pur ? 'Different focus' : 'Fits your gym') + '</h4>' + other.slice(0, 3).map(opt).join('')
+        + (more.length ? '<button type="button" class="v173-link" data-v173-more="1">Show ' + more.length + ' more</button><div class="v173-sh-more" hidden>' + more.map(opt).join('') + '</div>' : '') : '')
+      + (!same.length && !other.length ? '<p class="v173-sh-none">Nothing else in ' + V173_TIER[tier] + ' fits your gym.</p>' : '') + '</div>'
+      + (blocked.length ? '<h4 class="v173-sh-h">Needs equipment that is switched off</h4>' + blocked.map(lock).join('') : '')
+      + '<button type="button" class="v173-link" data-v173-gym="1">Edit your gym</button></div>';
+    const noun = pur ? accGroupNoun(liftId, tier, pur.g) : '';
+    const done = showConfirm('Swap ' + (noun || item.name), '', 'Pick an exercise', 'btn-p');
+    const cardEl = el.confirmModal.querySelector('.confirm-card');
+    let pick = '', toGym = false;
+    const onClick = e => {
+      const t = e.target, m = t.closest('[data-v173-more]'), o = t.closest('[data-v173-pick]');
+      if (t.closest('[data-v173-gym]')){ toGym = true; closeConfirm(false); return; }
+      if (m){ const box = el.confirmMsg.querySelector('.v173-sh-more'); if (box) box.hidden = false; m.hidden = true; return; }
+      if (!o) return;
+      pick = o.getAttribute('data-v173-pick');
+      el.confirmMsg.querySelectorAll('[data-v173-pick]').forEach(b => b.setAttribute('aria-checked', b === o ? 'true' : 'false'));
+      el.confirmOk.disabled = false; el.confirmOk.textContent = 'Swap in ' + pick;
+    };
+    let ok = false;
+    try{
+      if (cardEl) cardEl.classList.add('v173-sheet');
+      el.confirmMsg.innerHTML = html; el.confirmOk.disabled = true;
+      el.confirmMsg.addEventListener('click', onClick);
+      ok = await done;
+    } finally {
+      el.confirmMsg.removeEventListener('click', onClick);
+      if (cardEl) cardEl.classList.remove('v173-sheet');
+      el.confirmOk.disabled = false;
+    }
+    if (toGym){ _v173Mode = 'gym'; renderAccessories(); window.scrollTo(0, 0); document.body.scrollTop = 0; return; }
+    if (ok && pick) await swapExercise(accId, pick, { liftId, recalibrate:true, note:'Swapped in on the Accessories screen.' });
+  }
+  // "How to do it": the sheet the "?" button opens (cues, tutorial link, the slot's numbers), without its "Swap for" chips.
+  // On this screen a swap goes through the swap sheet, which shows what each choice is for and where it starts.
+  function v173Help(accId){
+    showExerciseHelp(accId);
+    const cardEl = el.confirmModal.querySelector('.confirm-card'), prev = _confirmResolve;
+    if (!cardEl || typeof prev !== 'function') return;   // the sheet did not open ("Exercise not found")
+    cardEl.classList.add('v173-help');
+    _confirmResolve = r => { cardEl.classList.remove('v173-help'); prev(r); };
+  }
+  async function v173Click(e){
+    const t = e.target; if (!t || !t.closest) return;
+    const view = v17$('viewAccessories'), q = sel => t.closest(sel);
+    let b = q('.acc-header');
+    if (b){ const c = b.closest('.acc-card'); b.setAttribute('aria-expanded', (c && c.classList.contains('open')) ? 'true' : 'false'); return; }   // the list's own handler has already opened or closed it
+    if (_v173Busy || !view.classList.contains('v173-on')) return;
+    const liftId = v173Lift(), again = (focus) => {
+      try{ renderAccessories(); }catch(err){ console.error('v173 redraw failed', err); }
+      if (focus){ const f = view.querySelector(focus); if (f) try{ f.focus({ preventScroll:true }); }catch(_){} }
+    };
+    const run = async fn => { _v173Busy = true; try{ await fn(); } finally { _v173Busy = false; } };
+    if ((b = q('[data-v173-lift]'))){ const id = b.getAttribute('data-v173-lift'); el.accLiftSelect.value = id; _v173Sug = ''; _v173Add = false; again('[data-v173-lift="' + id + '"]'); return; }
+    if ((b = q('[data-v173-show]'))){ const s = _v173List[Number(b.getAttribute('data-v173-show'))]; if (s){ _v173Sug = s.key; again('.v173-coach-b button'); } return; }
+    if ((b = q('[data-v173-do]'))){ const s = _v173List[Number(b.getAttribute('data-v173-do'))]; if (s) await run(async () => { await v173Do(liftId, s); again(); }); return; }
+    if ((b = q('[data-v173-keep]'))){ const s = _v173List[Number(b.getAttribute('data-v173-keep'))]; if (s) await run(async () => { await v173KeepIt(liftId, s); again(); }); return; }
+    if ((b = q('[data-v173-swap]'))){ const id = b.getAttribute('data-v173-swap'); await run(async () => { await v173Swap(liftId, id); again(); }); return; }
+    if ((b = q('[data-v173-help]'))){ v173Help(b.getAttribute('data-v173-help')); return; }
+    if ((b = q('[data-v173-add]'))){
+      const tier = b.getAttribute('data-v173-add');
+      await run(async () => { await addAccessory(tier); const ts = accessoryLiftState(liftId).templates, last = ts[ts.length - 1]; _v173Add = false; if (last){ accExpandedIds.add(last.id); again();
+        const node = el.accessoryList.querySelector('.acc-card[data-acc-id="' + last.id + '"]'); if (node && node.scrollIntoView) node.scrollIntoView({ block:'center' }); } });
+      return;
+    }
+    const sw = q('[data-v173-eq]') || q('[data-v173-prop]') || q('[data-v173-none]');
+    if (sw){
+      const kind = sw.hasAttribute('data-v173-eq') ? 'eq' : sw.hasAttribute('data-v173-prop') ? 'prop' : 'none', key = sw.getAttribute('data-v173-' + kind), on = sw.getAttribute('aria-checked') !== 'true';
+      await run(async () => { await v173SetGym(kind, key, on); const f = view.querySelector('[data-v173-' + kind + '="' + key + '"]'); if (f) try{ f.focus({ preventScroll:true }); }catch(_){} });
+      return;
+    }
+    if (!(b = q('[data-v173]'))) return;
+    const what = b.getAttribute('data-v173');
+    if (what === 'gym'){ _v173Mode = 'gym'; again('#v173Gym [data-v173="plan"]'); window.scrollTo(0, 0); document.body.scrollTop = 0; }
+    else if (what === 'plan'){ _v173Mode = 'plan'; again('.v173-gymline'); window.scrollTo(0, 0); document.body.scrollTop = 0; }
+    else if (what === 'extras'){ _v173Extras = !_v173Extras; again('[data-v173="extras"]'); }
+    else if (what === 'add'){ _v173Add = !_v173Add; again(_v173Add ? '[data-v173-add]' : '[data-v173="add"]'); }
+    else if (what === 'hist'){ _v173Hist = !_v173Hist; again('[data-v173="hist"]'); if (_v173Hist){ const h = view.querySelector('.v173-hist'); if (h && h.scrollIntoView) h.scrollIntoView({ block:'start' }); } }
+    else if (what === 'recal') openCalibrationSheet();
+    else if (what === 'reset') await run(() => v173Reset(liftId));
   }
 
   boot()
