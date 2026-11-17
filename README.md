@@ -1,4 +1,15 @@
-# Juggernaut 2.4
+# Juggernaut 2.4.1
+
+Current release: **Juggernaut 2.4.1 (internal build 17.4.1)**. Published November 17, 2026 with owner approval, as-is with documented limitations. The 2.4 section below is historical.
+
+- Exact Claude Code candidate; HTML SHA-256 `a404f137d16636fddc9477feccdef1e264ac585853a79bc5c76588d014a1795b`.
+- Worker unchanged: `6523411a5fc5aedc09a17b3ddd813ca5907ee040304dab479638e93f8705169f`.
+- [2.4.1 fixes, builder results and remaining limitations](CHANGELOG-Juggernaut-2.4.1.md).
+- Claude reports 310 regression checks, 15 mutation controls, 134 static checks and 90 built-in self-tests passing. These are builder results, not independently rerun for publication.
+- Use one window. Export a backup from History. Do not clear storage or reinstall. Real iPhone/Safari, installed-app behavior, bridge delivery and offline navigation remain unverified for this candidate.
+- Existing repository, Pages URL and bridge configuration are unchanged.
+
+## Historical 2.4 release — superseded
 
 Current release: **Juggernaut 2.4 (internal build 17.4.0, r3)**, November 16, 2026. `index.html` and `sw.js` are the exact verified supplied artifacts. Upgrade baseline is published 2.2; the intermediate 2.3 changes are included. Older entries below are historical.
 

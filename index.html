@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut 2.4 — v17.4.0</title>
+<title>Juggernaut 2.4.1 — v17.4.1</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -3126,7 +3126,7 @@ body.v17-precheck .v171-back{display:none}
   <header>
     <div class="hdr-row">
       <div>
-        <div class="hdr-sub" id="hdrSub">Juggernaut 2.4</div>
+        <div class="hdr-sub" id="hdrSub">Juggernaut 2.4.1</div>
         <h1 class="hdr-title" id="hdrTitle">Today</h1>
       </div>
       <div class="hdr-actions">
@@ -3939,6 +3939,7 @@ body.v17-precheck .v171-back{display:none}
     <div class="guide-toc-title">Jump to Section</div>
     <div class="toc-grid">
       <div class="toc-group"><div class="toc-group-label">Getting Started</div>
+        <a href="#guide-v241" class="toc-link">What Changed in 2.4.1</a>
         <a href="#guide-v24" class="toc-link">What Changed in 2.4</a>
         <a href="#guide-v23" class="toc-link">What Changed in 2.3</a>
         <a href="#guide-v22" class="toc-link">What Changed in 2.2</a>
@@ -3977,6 +3978,17 @@ body.v17-precheck .v171-back{display:none}
         <a href="#guide-terms" class="toc-link">Key Terms</a>
       </div>
     </div>
+  </div>
+
+  <h2 id="guide-v241">What Changed in 2.4.1</h2>
+  <div class="section">
+    <p>Fixes for rare cases: a storage fault, or the app open in two windows at once. The weights and how they progress, the program, and what goes to Hermes are the same.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Reset Everything says what happened.</strong> The recovery copies are erased together with everything else, or not at all. If the app is running on backup storage, the reset does not start and asks you to close and reopen the app first. If your data changed in another window, the reset is not applied, nothing is deleted, and it says so. A reset clears what is stored when it runs. If the app is open in another window, that window can keep a recovery copy of its own data afterwards, so close other windows first. Reset Everything is not a secure erase.</li>
+      <li><strong>Two windows.</strong> A save that started from older data no longer replaces a newer save from another window. The window with the older data loads the newer data instead.</li>
+      <li><strong>Wipe history says what happened.</strong> If your data changed in another window, the wipe is not applied and it says so.</li>
+      <li><strong>One screen failing does not stop the app.</strong> A screen that cannot be drawn shows a note in its place. The other screens, Settings and export keep working.</li>
+    </ul>
   </div>
 
   <h2 id="guide-v24">What Changed in 2.4</h2>
@@ -4597,7 +4609,7 @@ body.v17-precheck .v171-back{display:none}
   <div class="modal-card" style="text-align:left;max-height:85vh;overflow-y:auto">
     <div class="sheet-handle"></div>
     <div id="onboardStep1">
-      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.4</h2>
+      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.4.1</h2>
       <p style="font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px">A 16-week powerlifting tracker built on Chad Wesley Smith's <em>The Juggernaut Method 2.0</em>, with the 10s and 8s waves inverted (many sets × few reps) as in his JTS article. "+" sets that stop short of failure, one test-day AMRAP per wave, double-progression accessories. Three quick steps to get you training.</p>
       <div style="display:grid;gap:8px;margin-bottom:14px">
         <div class="onboard-step"><strong>Step 1</strong> — Enter your 1-rep maxes (honest, not ego)</div>
@@ -4638,6 +4650,21 @@ body.v17-precheck .v171-back{display:none}
 (() => {
   'use strict';
 
+  // v17.4.1 "2.4.1" — six fixes, approved by Reese on 2026-11-16, for cases that need a storage fault or two windows.
+  //   (R1) Reset Everything no longer treats storage it cannot reach as storage with nothing in it. If a save failed
+  //   during this run (the app is on backup storage) the reset is refused before anything is erased. If the main
+  //   storage has not worked since launch it goes ahead on the backup copy and says the recovery copies could not be
+  //   checked. (R2) The recovery copies and their index are deleted in the same transaction as the reset save
+  //   (idb.saveAll), so they change together or not at all. (R3) A reset that is not applied deletes nothing: the
+  //   revision is checked before anything is changed and again inside the write transaction; what the reset prepared
+  //   for the bridge (the queue clear, the mark on the device record) is put back, and the message says the reset was
+  //   not applied. (4) idb.saveAll compares the stored revision with the one the save started from INSIDE its write
+  //   transaction: a save from an older revision is refused (SaveConflict), the app loads the newer data, and it does
+  //   NOT move to backup storage. (5) Wipe history checks the same way and says "History was not wiped" when it was
+  //   not. (6) render() draws each main screen under its own guard (drawGuarded): a screen that cannot be drawn shows
+  //   a card in its place and logs the error; the others, Settings and export keep working. When no main screen can
+  //   be drawn at launch, the "couldn't open your data" screen is shown as before.
+  //   No bridge function, training rule, storage key, database version, export format or sw.js change.
   // v17.4.0 "2.4" — nine changes, each approved by Reese on 2026-11-16. (1) Weak points are remembered. (a) A saved
   //   answer is kept when the app reopens: the check on load accepted single words only, so every answer with a space
   //   or a slash was dropped. (b) A lift with no stored answer uses the newest answer saved on one of its sessions
@@ -4707,7 +4734,7 @@ body.v17-precheck .v171-back{display:none}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '17.4.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '17.4.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -4738,6 +4765,7 @@ body.v17-precheck .v171-back{display:none}
   // v13 A2: storage health flags
   let idbAvailable = true;
   let storageDegraded = false;
+  let _idbDownSinceLaunch = false;   // v17.4.1 (R1): IndexedDB did not open, or could not be read, when the app started
   let storageFailureToasted = false;
   let _storageBannerDismissed = false;
   const DB_NAME = 'JuggernautTrackerDB';
@@ -5813,26 +5841,57 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     put(store, value, key){ return idb._commit(store, os => key === undefined ? os.put(value) : os.put(value, key)); },
     // v14: one transaction for a save — state, revision, the bridge device record and any queued outbox changes —
     // so a packet is queued in the same save as the session that caused it and seq is never forgotten (A1, 12).
-    saveAll(stateObj, revRec, device, ops){
-      return new Promise((res, rej) => {
+    // v17.4.1 (item 4): `base` is the revision this save started from. The stored revision is read INSIDE this write
+    // transaction and nothing is written when it is newer: the transaction is aborted and the promise rejects with an
+    // error named SaveConflict. (The read the caller makes before the transaction leaves a gap in which another
+    // window can save.) Write transactions on one store run one after another in every window, so this cannot race.
+    // v17.4.1 (R2, R3): with `dropRecovery`, every "recovery:" entry is deleted and the index emptied in the same
+    // transaction as the save, so the copies, their index and the reset are committed together or not at all.
+    // The promise has cancel(): it aborts the transaction if it has not finished (used after a timeout).
+    saveAll(stateObj, revRec, device, ops, base, dropRecovery){
+      let tx = null;
+      const done = new Promise((res, rej) => {
         const stores = ops.length ? ['meta', 'outbox'] : ['meta'];
-        const tx = db.transaction(stores, 'readwrite');
+        tx = db.transaction(stores, 'readwrite');
         const meta = tx.objectStore('meta');
-        meta.put(stateObj, 'state');
-        meta.put(revRec, 'rev');
-        if (device) meta.put({ ...device }, 'device');
-        if (ops.length){
-          const ob = tx.objectStore('outbox');
-          for (const o of ops){
-            if (o.op === 'clear') ob.clear();
-            else if (o.op === 'del') ob.delete(o.id);
-            else if (o.op === 'put') ob.put(o.item);
-          }
-        }
-        tx.oncomplete = () => res();
-        tx.onabort = () => rej(tx.error || new Error('IndexedDB transaction aborted'));
-        tx.onerror = () => rej(tx.error || new Error('IndexedDB transaction failed'));
+        let stop = null, wrote = false;
+        const halt = (err) => { if (!stop) stop = err; try{ tx.abort(); }catch(_){} };
+        const write = (keys) => {
+          try{
+            meta.put(stateObj, 'state');
+            meta.put(revRec, 'rev');
+            if (device) meta.put({ ...device }, 'device');
+            if (keys){
+              for (const k of keys) if (typeof k === 'string' && k.startsWith('recovery:') && k !== RECOVERY_INDEX_KEY) meta.delete(k);
+              meta.put([], RECOVERY_INDEX_KEY);
+            }
+            if (ops.length){
+              const ob = tx.objectStore('outbox');
+              for (const o of ops){
+                if (o.op === 'clear') ob.clear();
+                else if (o.op === 'del') ob.delete(o.id);
+                else if (o.op === 'put') ob.put(o.item);
+              }
+            }
+            wrote = true;
+          }catch(err){ halt(err); }
+        };
+        const head = meta.get('rev');
+        head.onsuccess = () => {
+          try{
+            const stored = _revOf(head.result) || 0;
+            if (stored > base){ const c = new Error('A newer save from another window is stored (revision ' + stored + ')'); c.name = 'SaveConflict'; halt(c); return; }
+            if (!dropRecovery){ write(null); return; }
+            const all = meta.getAllKeys();
+            all.onsuccess = () => write(all.result || []);
+          }catch(err){ halt(err); }
+        };
+        tx.oncomplete = () => { if (wrote) res(); else rej(stop || new Error('IndexedDB save ended before it wrote')); };
+        tx.onabort = () => rej(stop || tx.error || new Error('IndexedDB transaction aborted'));
+        tx.onerror = () => rej(stop || tx.error || new Error('IndexedDB transaction failed'));
       });
+      done.cancel = () => { try{ if (tx) tx.abort(); }catch(_){} };
+      return done;
     },
     add(store, value){ return idb._commit(store, os => os.put(value)); },
     del(store, key){ return idb._commit(store, os => os.delete(key)).then(() => undefined); },
@@ -6555,15 +6614,49 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       state.rev = _baseRev;
       if (state.settings?.ai?.openrouterKey) sessionApiKey = state.settings.ai.openrouterKey;
       try{ render(); }catch(err){ console.error(err); }
-      toast(reason === 'conflict'
+      // v17.4.1: 'refused' is a Reset Everything or Wipe history that was not applied. Its own message follows, and no
+      // recovery copy is made (the copies on the device stay exactly as they were).
+      if (reason !== 'refused') toast(reason === 'conflict'
         ? 'Juggernaut was changed in another window, so this one loaded the latest data. Its previous copy was kept.'
         : 'Updated with changes from another Juggernaut window.', 'w');
       return true;
     }catch(err){ console.error('Could not load newer data', err); return false; }
   }
 
+  // v17.4.1: what the bridge code prepared before a save that may be refused (the queue changes; for a reset, the mark
+  // on the device record). _bridgeRestore puts them back. No bridge function is edited; installId is never touched
+  // and seq is left where it is (it only ever goes up).
+  function _bridgeSnapshot(){
+    return { ops:_pendingOutboxOps.slice(), mem:_memOutbox.slice(), count:_outboxCount, queued:{ ..._queuedSessionItem },
+      device:_device ? JSON.parse(JSON.stringify(_device)) : null, flags:[_health, _versionBlocked, _authBlocked] };
+  }
+  function _bridgeRestore(snap){
+    _pendingOutboxOps = snap.ops; _memOutbox = snap.mem; _outboxCount = snap.count;
+    for (const k of Object.keys(_queuedSessionItem)) delete _queuedSessionItem[k];
+    Object.assign(_queuedSessionItem, snap.queued);
+    if (_device && snap.device){
+      _device.pendingPairing = snap.device.pendingPairing;
+      if ('mirror' in snap.device) _device.mirror = snap.device.mirror; else delete _device.mirror;
+      _writeDeviceLs();
+    }
+    [_health, _versionBlocked, _authBlocked] = snap.flags;
+  }
+  // v17.4.1 (R3, item 5): before Reset Everything or Wipe history changes anything, has another window saved newer
+  // data? If so it is loaded here, nothing is deleted, and the answer is true: the action is not applied.
+  async function _newerSaveAdopted(){
+    if (!idbAvailable || !db) return false;
+    let storedRev = 0;
+    try{ storedRev = _revOf(await _withTimeout(idb.get('meta', 'rev'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB')) || 0; }
+    catch(err){ console.error(err); return false; }   // storage that does not answer is the following save's to deal with
+    if (storedRev <= _baseRev) return false;
+    return _adoptNewerSave('refused');
+  }
+
   function saveState(){ return _withStorageLock(_saveStateNow); }
-  async function _saveStateNow(){
+  // v17.4.1: resolves to how the save ended. 'saved': written to main storage. 'conflict': another window had saved
+  // newer data, nothing was written and this window loaded that data. 'backup': written to backup storage.
+  // 'failed': written nowhere. `adoptAs` is the reason given to _adoptNewerSave on a conflict ('conflict' when absent).
+  async function _saveStateNow(adoptAs){
     state.appVersion = APP_VERSION;
     _syncDeviceMirror();   // v14 (B23)
     ensureAccessoryPhaseRecorded();   // v13.2.1 (F19): an open accessory phase survives a reload
@@ -6574,32 +6667,46 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (_pendingOutboxOps.length){ const ops = _pendingOutboxOps; _pendingOutboxOps = []; _applyOpsToMemory(ops); }
       state.rev = Math.max(_baseRev, _lsRev()) + 1; state.savedAt = nowISO();
       _baseRev = state.rev;
-      try{ _writeFallback(); }
+      try{ _writeFallback(); return 'backup'; }
       catch(err){
         if (!storageFailureToasted){ storageFailureToasted = true; toast('Storage unavailable — export a backup now.', 'b'); }
+        return 'failed';
       }
-      return;
     }
     let rev = 0;
     try{
-      // v13.2.1 (F07): compare-and-swap on the revision — never overwrite newer data from another window
-      const storedRev = _revOf(await _withTimeout(idb.get('meta', 'rev'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB')) || 0;
-      if (storedRev > _baseRev){
-        if (await _adoptNewerSave('conflict')) return;
-        _baseRev = storedRev;   // the newer copy couldn't be shown (it was kept) — save over it
-      }
-      rev = Math.max(storedRev, _baseRev) + 1;
-      state.rev = rev; state.savedAt = nowISO();
-      const ops = _pendingOutboxOps; _pendingOutboxOps = [];
-      try{
-        await _withTimeout(idb.saveAll(state, { rev, savedAt:state.savedAt, tab:TAB_ID }, _device, ops), IDB_SAVE_TIMEOUT_MS, 'IndexedDB');
-      }catch(err){
-        _applyOpsToMemory(ops);   // degraded from here on: the queue continues in memory
-        throw err;
+      for (let attempt = 0; ; attempt++){
+        // v13.2.1 (F07): compare-and-swap on the revision — never overwrite newer data from another window
+        // v17.4.1 (item 4): this read is only the early way out. The check that decides is inside idb.saveAll's
+        // write transaction; when another window saves between this read and that write, saveAll rejects with
+        // SaveConflict and the loop comes back here, where the newer save is loaded.
+        const storedRev = _revOf(await _withTimeout(idb.get('meta', 'rev'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB')) || 0;
+        if (storedRev > _baseRev){
+          if (await _adoptNewerSave(adoptAs || 'conflict')) return 'conflict';
+          _baseRev = storedRev;   // the newer copy couldn't be shown (it was kept) — save over it
+        }
+        rev = Math.max(storedRev, _baseRev) + 1;
+        state.rev = rev; state.savedAt = nowISO();
+        const ops = _pendingOutboxOps; _pendingOutboxOps = [];
+        try{
+          await _withTimeout(idb.saveAll(state, { rev, savedAt:state.savedAt, tab:TAB_ID }, _device, ops, rev - 1), IDB_SAVE_TIMEOUT_MS, 'IndexedDB');
+          break;
+        }catch(err){
+          if (err && err.name === 'SaveConflict'){
+            // v17.4.1: not a storage failure. Nothing was written; the queue changes wait for the next save.
+            _pendingOutboxOps = ops.concat(_pendingOutboxOps); rev = 0;
+            if (attempt < 3) continue;
+            console.error('Save gave way to newer saves from another window', err);
+            return 'conflict';
+          }
+          _applyOpsToMemory(ops);   // degraded from here on: the queue continues in memory
+          throw err;
+        }
       }
       _baseRev = rev;
       announceSave(rev);
       writeLocalBackup(false); // throttled: skips if last write was <60s ago
+      return 'saved';
     }catch(err){
       // v13 patch (Blocker 1): a runtime IDB write failure proves IDB unusable.
       // Flip BOTH flags so all future saves route to the localStorage branch,
@@ -6611,10 +6718,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       // launch restores it instead of the stale primary.
       if (!rev){ state.rev = Math.max(_baseRev, _lsRev()) + 1; state.savedAt = nowISO(); }
       _baseRev = state.rev;
-      try{ _writeFallback(); }
+      try{ _writeFallback(); return 'backup'; }
       catch(_){
         // Toast only when BOTH persistence layers fail (banner covers the IDB-only case)
         if (!storageFailureToasted){ storageFailureToasted = true; toast('Storage unavailable — export a backup now.', 'b'); }
+        return 'failed';
       }
     }
   }
@@ -6623,7 +6731,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     let stored = null, head = null;
     if (idbAvailable){
       try{ stored = await idb.get('meta', 'state'); head = await idb.get('meta', 'rev'); }
-      catch(err){ idbAvailable = false; storageDegraded = true; console.error('IDB read failed', err); }
+      catch(err){ idbAvailable = false; storageDegraded = true; _idbDownSinceLaunch = true; console.error('IDB read failed', err); }   // v17.4.1 (R1)
     }
     // v13.2.1 (F01): read the backup copy too — after a failed save it can hold newer work than the primary.
     let fallback = null;
@@ -9672,7 +9780,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const tabName = Object.prototype.hasOwnProperty.call(V16_TAB_OF, name) ? V16_TAB_OF[name] : name;
     const tabEl = tabName ? document.querySelector('.tab[data-tab="' + tabName + '"]') : null;
     if (tabEl) tabEl.classList.add('active');
-    if (name === 'Coach') renderCoachChat(); // v12
+    if (name === 'Coach') drawGuarded('Coach', 'renderCoachChat', renderCoachChat); // v12; v17.4.1 (item 6): guarded
     try{ v16OnView(name); }catch(err){ console.error('v16 view failed', err); }   // r3: a fault here must not stop the tab change
     try{ v17OnView(name); }catch(err){ console.error('v17 view failed', err); }   // 2.0
   }
@@ -10435,6 +10543,48 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
   // Follow-up renders after async work must never surface as unhandled errors.
   function renderSafely(){ try{ render(); }catch(err){ console.error('Render failed', err); } }
+  // v17.4.1 (item 6, owner decision 2026-11-16): each main screen is drawn under its own guard. A screen that cannot
+  // be drawn shows this card in its own place (the top of that screen; the rest of the screen is left as it is, so the
+  // Export button on History stays within reach), and the error is written to the console. No pop-up. The other
+  // screens are drawn as usual. A healthy draw adds nothing to the page.
+  const DRAW_FAILED_TEXT = 'This screen could not be drawn. Your data is safe. Export a backup in Settings, then close and reopen the app.';
+  const MAIN_DRAWS = ['renderLiftSelects', 'renderSettings', 'renderProgramSummary', 'renderProgramChart', 'renderDashboard', 'renderSessionBadges', 'renderSession', 'renderAccessories', 'renderHistory'];
+  const _drawFailed = {};   // draw name → the screen it belongs to, while that draw is failing
+  function _drawCard(view){
+    const host = document.getElementById('view' + view); if (!host) return;
+    let card = null; for (const c of host.children) if (c.classList.contains('draw-failed')){ card = c; break; }
+    const failing = Object.keys(_drawFailed).some(k => _drawFailed[k] === view);
+    if (failing && !card){
+      card = document.createElement('div'); card.className = 'card draw-failed'; card.setAttribute('role', 'status');
+      card.style.cssText = 'order:-99;border-color:var(--warn);background:var(--warn-dim);font-size:13px;line-height:1.5';
+      card.textContent = DRAW_FAILED_TEXT;
+      host.insertBefore(card, host.firstChild);
+    } else if (!failing && card) card.remove();
+  }
+  function _drawMark(name, view, failed){
+    if (!view) return;
+    if (failed) _drawFailed[name] = view; else if (_drawFailed[name]) delete _drawFailed[name]; else return;
+    try{ _drawCard(view); }catch(_){}
+  }
+  function drawGuarded(view, name, fn){
+    try{ fn(); _drawMark(name, view, false); }
+    catch(err){ console.error('Screen could not be drawn: ' + view + ' (' + name + ')', err); _drawMark(name, view, true); }
+  }
+  // render() no longer throws for one screen, so the places that relied on that ask these two. Both look only at
+  // FATAL_DRAWS: the draws whose failure made render() throw in 17.4.0. The display layers (v16, v17) and the Coach
+  // chat were caught and only logged then; a failure there shows its card and never rejects data or changes the save.
+  // renderClean: at launch, and for each copy tried there. Throws when one of those draws is failing.
+  // renderOrThrow: for data about to replace the live data (Import, Undo import). Throws when one of those draws
+  // fails that was not failing before, so a backup that cannot be drawn is still rejected, and a screen that fails
+  // for every save does not block imports.
+  const FATAL_DRAWS = MAIN_DRAWS.concat(['renderInlineAccessories']);
+  function renderClean(){ render(); const bad = FATAL_DRAWS.filter(n => _drawFailed[n]); if (bad.length) throw new Error('Could not be drawn: ' + bad.join(', ')); }
+  function renderOrThrow(){
+    const was = new Set(FATAL_DRAWS.filter(n => _drawFailed[n]));
+    render();
+    const fresh = FATAL_DRAWS.filter(n => _drawFailed[n] && !was.has(n));
+    if (fresh.length) throw new Error('Could not be drawn: ' + fresh.join(', '));
+  }
 
   function getEffectiveAccSets(item){
     let sets = item.sets;
@@ -13881,8 +14031,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const _keepY = window.scrollY;
     // v13 A2: storage-degraded banner (page-load dismiss only)
     if (el.storageBanner) el.storageBanner.hidden = !(storageDegraded && !_storageBannerDismissed);
-    renderLiftSelects(); renderSettings(); renderProgramSummary(); renderProgramChart(); renderDashboard();
-    renderSessionBadges(); renderSession(); renderAccessories(); renderHistory();
+    // v17.4.1 (item 6): one guard per draw; the same draws in the same order
+    drawGuarded('Workout', 'renderLiftSelects', renderLiftSelects); drawGuarded('Settings', 'renderSettings', renderSettings); drawGuarded('Workout', 'renderProgramSummary', renderProgramSummary); drawGuarded('Program', 'renderProgramChart', renderProgramChart); drawGuarded('Workout', 'renderDashboard', renderDashboard);
+    drawGuarded('Workout', 'renderSessionBadges', renderSessionBadges); drawGuarded('Workout', 'renderSession', renderSession); drawGuarded('Accessories', 'renderAccessories', renderAccessories); drawGuarded('History', 'renderHistory', renderHistory);
     // Hide coaching card on re-render if no active session
     if (!state.activeSession && el.coachingCard) el.coachingCard.hidden = true;
     // Hide summary when session is active
@@ -13910,7 +14061,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (el.dashboardCard) el.dashboardCard.style.display = 'none';
       if (el.liftIntelCard) el.liftIntelCard.style.display = 'none';
       if (el.weeklyPlanCard) el.weeklyPlanCard.style.display = 'none';
-      renderInlineAccessories(inlineAccLiftId());
+      drawGuarded('Workout', 'renderInlineAccessories', () => renderInlineAccessories(inlineAccLiftId()));   // v17.4.1 (item 6)
     }
     // v13.0.4/v13.0.9: restore the lifter's position — last statement so it wins
     // over every layout change this pass made. The rAF double-tap re-asserts it
@@ -14867,9 +15018,23 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       '\n\nYou go back to week 1, cycle 1.',
       'Wipe history', 'btn-d');
     if (!ok) return false;
-    applyHistoryWipe();
+    // v17.4.1 (item 5): the wipe and its save run as one step in this window, and the wipe is not applied when another
+    // window has saved newer data: checked before anything is changed, and again inside the save's write transaction.
+    // A wipe that is not applied leaves the queue as it was and says so. On backup storage it runs as it did.
+    const outcome = await _withStorageLock(async () => {
+      if (await _newerSaveAdopted()) return 'conflict';
+      const undo = _bridgeSnapshot();
+      applyHistoryWipe();
+      const how = await _saveStateNow('refused');
+      if (how === 'conflict') _bridgeRestore(undo);
+      return how;
+    });
+    if (outcome === 'conflict'){
+      toast('History was not wiped. Your data changed in another window. Check it, then try again.', 'w');
+      render();
+      return false;
+    }
     stopSessionTimer();
-    await saveState();
     writeLocalBackup(true);   // v17.4 (approved 2026-11-16): the backup copy in localStorage is replaced at once, as Reset Everything does (it is otherwise refreshed at most once a minute, so it still held the wiped sessions)
     toast('History wiped — week 1. Your TMs and Settings are kept.', 'g');
     render();
@@ -14880,45 +15045,113 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // kept before an update or an import, and after a save conflict or an unreadable save. They hold the sessions from
   // before the reset, and History could still export them or restore one (Undo import). Every "recovery:" entry is
   // deleted, whether the index lists it or not. Wipe history keeps them, as its sheet says.
-  // Returns false when the store could not be cleared. (Reset Everything also removes the two display records in
-  // localStorage and replaces the backup copy there at once, so nothing from before the reset is left on the device
-  // except the bridge's device record, which Hermes needs: installId and seq.)
-  async function dropAllRecoveryCopies(){
-    if (!idbAvailable || !db) return true;   // recovery copies exist only in IndexedDB
-    try{
-      const keys = await new Promise((res, rej) => {
-        const r = db.transaction('meta', 'readonly').objectStore('meta').getAllKeys();
-        r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error);
-      });
-      for (const k of keys) if (typeof k === 'string' && k.startsWith('recovery:') && k !== RECOVERY_INDEX_KEY) await idb.del('meta', k);
-      _recoveryIndex = [];
-      await idb.put('meta', [], RECOVERY_INDEX_KEY);
-      refreshRecoveryRow();
-      return true;
-    }catch(err){
-      console.error('Recovery copies not cleared', err);
-      try{ await loadRecoveryIndex(); }catch(_){}
-      return false;
-    }
-  }
+  // (Reset Everything also removes the two display records in localStorage and replaces the backup copy there at
+  // once. What an applied reset clears is what is stored when it commits. The bridge's device record stays, which
+  // Hermes needs: installId and seq. NOT covered: a copy another open window makes afterwards. A window that has not
+  // yet loaded the reset keeps its own previous data as recovery:conflict when its next save is refused, and at a
+  // later launch a newer backup copy can leave recovery:stale-primary. Those hold data from before the reset.
+  // Reset Everything is not a secure erase.)
+  // v17.4.1 (R1, R2, R3): the copies are no longer deleted by a function of their own before the save
+  // (dropAllRecoveryCopies, 17.4.0). They are deleted inside the reset's write transaction: see idb.saveAll.
 
   // "Reset Everything" also wipes Settings. The device record (installId, seq) lives outside
   // the state and survives; a new historyGeneration starts, the send queue is cleared, and pendingPairing makes the
   // next save of the Hermes URL and token announce bridge_paired with reason reset_everything (BRIDGE_SPEC 6, C2).
+  // v17.4.1: the reset has one of these outcomes, and the message is the outcome's (owner's words, 2026-11-16):
+  //   'complete'    saved, and the recovery copies and their index deleted in the same transaction.
+  //   'copies-kept' that transaction failed; the reset alone was then saved. The copies and index are untouched.
+  //   'local-kept'  saved and the copies deleted, but something in localStorage stays: a display record or the
+  //                 backup copy could be neither replaced nor removed, or a backup copy with a higher revision
+  //                 was kept. The message does not say everything was cleared.
+  //   'unchecked'   main storage has not worked since launch: saved to the backup copy only.
+  //   'conflict'    another window saved newer data: not applied, nothing deleted, that data is loaded.
+  //   'refused'     the app is on backup storage after a save that failed in this run (or main storage failed during
+  //                 the reset, or nothing could be written): not applied, nothing deleted.
+  // A reset that is not applied puts back what it prepared: the state in memory, the queue, the device record's mark.
   async function resetAll(){
     const ok = await showConfirm('Reset Everything', 'This will erase all settings, history, program state, accessories and the recovery copies on this phone. This cannot be undone.', 'Reset All', 'btn-d');   // v17.4: names the recovery copies
     if (!ok) return;
-    const copiesGone = await dropAllRecoveryCopies();   // v17.4: first, so the reset below runs exactly as it did
-    // v17.4: the two display records kept outside the save go too: the plate style, and today's check-in with any units round trip
-    try{ localStorage.removeItem(V16_UI_KEY); localStorage.removeItem(V17_UI_KEY); v16ApplyPlateStyle(); }catch(err){ console.error('Display records not cleared', err); }
-    const prevGen = state.hermes?.historyGeneration || null;
+    const outcome = await _withStorageLock(_resetAllNow);
+    if (outcome === 'conflict'){ toast('Reset was not applied. Your data changed in another window. Check it, then try again.', 'w'); render(); return; }
+    if (outcome === 'refused'){ toast('Reset can’t run right now. The app is on backup storage. Close and reopen the app, then try again.', 'w'); render(); return; }
+    stopSessionTimer(); stopRestMiniBadge(); releaseWakeLock();
+    toast(outcome === 'complete' ? 'Reset complete.'
+      : outcome === 'unchecked' ? 'Reset complete. Recovery copies could not be checked.'
+      : outcome === 'local-kept' ? 'Reset complete. Some older data on this phone could not be cleared.'
+      : 'Reset complete. The recovery copies could not be deleted.', outcome === 'complete' ? 'g' : 'w');
+    render();
+  }
+  // Main storage failed while the reset was being saved. As after any failed save, the app moves to backup storage
+  // and keeps the data it had (the caller has put it back). The backup copy gets a revision above the one the reset
+  // tried, so a transaction that still completes late cannot pass for newer data at the next launch.
+  function _resetStorageFailed(triedRev){
+    idbAvailable = false; storageDegraded = true;
+    state.rev = Math.max(_baseRev, _lsRev(), triedRev) + 1; state.savedAt = nowISO();
+    _baseRev = state.rev;
+    try{ _writeFallback(); }
+    catch(_){ if (!storageFailureToasted){ storageFailureToasted = true; toast('Storage unavailable — export a backup now.', 'b'); } }
+    return 'refused';
+  }
+  async function _resetAllNow(){
+    const mainStorage = idbAvailable && !!db;
+    if (!mainStorage && !_idbDownSinceLaunch) return 'refused';   // R1: a save failed in this run. The recovery copies cannot be reached, so nothing is erased
+    if (mainStorage){
+      // R3: has another window saved since this one last loaded? Asked before anything is changed
+      let storedRev = 0;
+      try{ storedRev = _revOf(await _withTimeout(idb.get('meta', 'rev'), IDB_SAVE_TIMEOUT_MS, 'IndexedDB')) || 0; }
+      catch(err){ console.error('Reset not started', err); return _resetStorageFailed(0); }
+      if (storedRev > _baseRev){
+        if (await _adoptNewerSave('refused')) return 'conflict';
+        _baseRev = storedRev;   // the newer copy couldn't be shown (it was kept as an unreadable copy)
+      }
+    }
+    const before = state, undo = _bridgeSnapshot(), prevGen = state.hermes?.historyGeneration || null;
+    const putBack = () => { state = before; _bridgeRestore(undo); };
     state = deepClone(DEFAULT_STATE);
     ensureHistoryGeneration(state);
     hermesResetEverything(prevGen);
-    stopSessionTimer(); stopRestMiniBadge(); releaseWakeLock();
-    await saveState();
-    writeLocalBackup(true);   // v17.4: the backup copy in localStorage is replaced at once (it is otherwise refreshed at most once a minute, so it could still hold the old data)
-    toast(copiesGone ? 'Reset complete.' : 'Reset complete. The recovery copies could not be deleted.', copiesGone ? 'g' : 'w'); render();   // v17.4: says so if the copies stayed
+    state.appVersion = APP_VERSION;
+    _syncDeviceMirror();
+    // the two display records kept outside the save: the plate style, and today's check-in with any units round trip
+    const dropDisplayRecords = () => { try{ localStorage.removeItem(V16_UI_KEY); localStorage.removeItem(V17_UI_KEY); v16ApplyPlateStyle(); return true; }catch(err){ console.error('Display records not cleared', err); return false; } };
+    if (!mainStorage){
+      // R1: main storage has not worked since launch. The reset is saved to the backup copy, the only storage there is
+      state.rev = Math.max(_baseRev, _lsRev()) + 1; state.savedAt = nowISO();
+      try{ _writeFallback(); }
+      catch(err){ console.error('Reset not saved', err); putBack(); return 'refused'; }
+      _baseRev = state.rev; _lastLocalBackupAt = Date.now();
+      const ops = _pendingOutboxOps; _pendingOutboxOps = []; _applyOpsToMemory(ops);
+      dropDisplayRecords();
+      return 'unchecked';
+    }
+    const ops = _pendingOutboxOps; _pendingOutboxOps = [];
+    let rev = 0, copiesKept = false;
+    for (const dropRecovery of [true, false]){
+      rev = _baseRev + 1; state.rev = rev; state.savedAt = nowISO();
+      const write = idb.saveAll(state, { rev, savedAt:state.savedAt, tab:TAB_ID }, _device, ops, _baseRev, dropRecovery);
+      try{ await _withTimeout(write, IDB_SAVE_TIMEOUT_MS, 'IndexedDB'); copiesKept = !dropRecovery; break; }
+      catch(err){
+        write.cancel();   // after a timeout: it must not complete later
+        if (err && err.name === 'SaveConflict'){ putBack(); await _adoptNewerSave('refused'); return 'conflict'; }   // R3: another window saved after the first check
+        console.error(dropRecovery ? 'Reset with the recovery copies could not be saved' : 'Reset could not be saved', err);
+        if (!dropRecovery){ putBack(); return _resetStorageFailed(rev); }
+      }
+    }
+    _baseRev = rev;
+    announceSave(rev);
+    if (!copiesKept){ _recoveryIndex = []; refreshRecoveryRow(); }
+    // localStorage cannot be part of the transaction: it follows the commit. A crash between the two leaves the
+    // older backup copy and display records until the next save; the reset itself is already the stored save.
+    let localGone = dropDisplayRecords();
+    try{
+      if (_lsRev() <= rev){ _writeFallback(); _lastLocalBackupAt = Date.now(); }
+      else localGone = false;   // a backup copy with a higher revision (written by a window on backup storage) is kept, as writeLocalBackup keeps it: not everything was cleared
+    }
+    catch(err){
+      console.error('Backup copy not replaced', err);
+      try{ localStorage.removeItem(LS_BACKUP_KEY); localStorage.removeItem(LS_REV_KEY); }catch(_){ localGone = false; }
+    }
+    return copiesKept ? 'copies-kept' : localGone ? 'complete' : 'local-kept';
   }
 
   function exportData(){
@@ -14996,7 +15229,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       // v14: the bridge belongs to this device: keep its settings and pairing (the queue is untouched until the
       // import is known to display; see below)
       hermesKeepDeviceBridge(previous);
-      try{ render(); }
+      try{ renderOrThrow(); }   // v17.4.1 (item 6): render() no longer throws for one screen; a backup that cannot be drawn is still rejected
       catch(err){
         console.error(err);
         state = previous;
@@ -15032,7 +15265,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     state = restored;
     if (currentKey && !state.settings.ai.openrouterKey){ state.settings.ai.openrouterKey = currentKey; sessionApiKey = currentKey; }
     hermesKeepDeviceBridge(previous);
-    try{ render(); }
+    try{ renderOrThrow(); }   // v17.4.1 (item 6): as in importData
     catch(err){
       console.error(err);
       state = previous;
@@ -16530,7 +16763,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     for (const c of candidates){
       try{
         state = mergeState(c.raw);
-        render();
+        renderClean();   // v17.4.1 (item 6): a copy is taken only when every screen draws with it
         await keepUnreadableCopy(unreadable, 'render');
         await saveState();
         _bootNotice = { kind:'recovered', label:c.label };
@@ -16538,6 +16771,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       }catch(err){ console.error('Recovery candidate failed', err); }
     }
     state = unreadable;
+    try{ render(); }catch(_){}   // v17.4.1 (item 6): the screen shows the live save again, not the last copy tried
     return false;
   }
   function showBootNotice(){
@@ -16606,7 +16840,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     document.body.setAttribute('data-plates', style);
     const s = v16$('v16PlateStyle'); if (s && s.value !== style) s.value = style;
   }
-  function v16Safe(name, fn){ try{ fn(); }catch(err){ console.error('v16 ' + name + ' failed', err); } }
+  const V16_SCREEN_OF = { program:'Program', recovery:'Recovery', due:'History', tiles:'Workout' };   // v17.4.1 (item 6): the screen a failed draw belongs to
+  function v16Safe(name, fn){ try{ fn(); _drawMark('v16 ' + name, V16_SCREEN_OF[name], false); }catch(err){ console.error('v16 ' + name + ' failed', err); _drawMark('v16 ' + name, V16_SCREEN_OF[name], true); } }
   function v16Day(iso){ const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }); }
   function v16Wt(w){ return escapeHtml(formatWeight(w)); }
   function v16Num(w){ return escapeHtml(String(formatWeight(w)).replace(/\s*(lb|kg)$/i, '')); }
@@ -16641,7 +16876,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const session = state.activeSession;
     t.textContent = (_v16View === 'Workout' && session) ? ((getLiftMeta(session.liftId) || {}).name || 'Session') : (V16_TITLES[_v16View] || _v16View);
     s.textContent = _v16View === 'Workout' ? new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' })
-      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.4';
+      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.4.1';
     const micro = currentMicrocycle();
     document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8FA8FF' : (V16_WAVE_COLOR[micro.wave] || '#FFE45C'));
   }
@@ -16970,7 +17205,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
     const L = 80, R = W - 80;
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.1', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 150, true); ctx.fillText(wave + ' wave', L - 6, 300);
     const ds = rows.map(r => Date.parse(r.date)).filter(Number.isFinite), passed = rows.filter(r => r.reps >= r.standard).length;
     F(600, 38);
@@ -17121,7 +17356,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     c.width = W; c.height = H;
     ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#FFE45C'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.1', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 130, true);
     let size = 130; while (ctx.measureText(r.title).width > R - L && size > 60){ size -= 6; F(800, size, true); }
     ctx.fillText(r.title, L - 5, 300);
@@ -17214,7 +17449,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function v17Ic(name, size){ return '<svg class="v17-ic" width="' + (size || 20) + '" height="' + (size || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + V17_I[name] + '</svg>'; }
   function v17Ui(){ try{ const u = JSON.parse(localStorage.getItem(V17_UI_KEY) || '{}'); return (u && typeof u === 'object') ? u : {}; }catch(_){ return {}; } }
   function v17SetUi(k, v){ const u = v17Ui(); u[k] = v; try{ localStorage.setItem(V17_UI_KEY, JSON.stringify(u)); }catch(_){} }
-  function v17Safe(name, fn){ try{ fn(); }catch(err){ console.error('v17 ' + name + ' failed', err); } }
+  const V17_SCREEN_OF = { hero:'Workout', 'home map':'Workout', weeks:'Workout', maxes:'Workout', session:'Workout', program:'Program', progress:'History', tools:'Tools', coach:'Coach' };   // v17.4.1 (item 6)
+  function v17Safe(name, fn){ try{ fn(); _drawMark('v17 ' + name, V17_SCREEN_OF[name], false); }catch(err){ console.error('v17 ' + name + ' failed', err); _drawMark('v17 ' + name, V17_SCREEN_OF[name], true); } }
   function v17Ymd(d){ const x = new Date(d); return Number.isNaN(x.getTime()) ? '' : x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
   function v17Col(wk){ return wk.phase === 'deload' ? V17_DELOAD : (V17_WAVE[wk.wave] || '#FFE45C'); }
   function v17Num(x){ return escapeHtml(Number.isFinite(x) ? weightDigits(x) : '—'); }   // v17.1 (L12): as formatWeight, without the unit
@@ -18190,7 +18426,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     wireOnboarding(); // v10: attach onboarding modal handlers
     try{ db = await idb.open(); }
     catch(err){
-      idbAvailable = false; storageDegraded = true;
+      idbAvailable = false; storageDegraded = true; _idbDownSinceLaunch = true;   // v17.4.1 (R1)
       console.error('IDB open failed — running degraded', err);
     }
     await loadState();
@@ -18221,10 +18457,16 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }catch(_){}
     // v13.2.1: a save that can't be displayed no longer bricks the app. Try the backup copy and the
     // pre-import copy; if nothing renders, open safe mode (export / import / start fresh).
-    try{ render(); }
+    // v17.4.1 (item 6): as in 17.4.0, a save that cannot be drawn is first tried against the backup copy and the
+    // pre-import copy (recoverAfterRenderFailure); a copy that draws cleanly is opened and the save is kept. When no
+    // copy does better (a fault that is not in the data), the app now opens with the card on the screens that fail,
+    // and shows "couldn't open your data" only when none of the main screens could be drawn.
+    try{ renderClean(); }
     catch(err){
       console.error('Render failed after load', err);
-      if (!(await recoverAfterRenderFailure())){ showSafeMode(); return; }
+      if (!(await recoverAfterRenderFailure())){
+        if (MAIN_DRAWS.every(n => _drawFailed[n])){ showSafeMode(); return; }   // v17.4.1 (item 6): otherwise the app opens, with the card on the screens that could not be drawn
+      }
     }
     if (_bootNotice) showBootNotice();
     if (_v171ResumeNote){ const note = _v171ResumeNote; _v171ResumeNote = null; setTimeout(() => { try{ toast(note, 'g'); }catch(_){} }, 500); }   // v17.1 (H2)
