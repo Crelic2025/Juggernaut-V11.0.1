@@ -1,6 +1,10 @@
-# Juggernaut 2.4.1
+# Juggernaut 2.4.2
 
-Current release: **Juggernaut 2.4.1 (internal build 17.4.1)**. Published November 17, 2026 with owner approval, as-is with documented limitations. The 2.4 section below is historical.
+Current release: **Juggernaut 2.4.2 (17.4.2 r3)**. [Changes and known limitations](CHANGELOG-Juggernaut-2.4.2.md).
+
+## Historical release: Juggernaut 2.4.1
+
+Previous release: **Juggernaut 2.4.1 (internal build 17.4.1)**. Published November 17, 2026 with owner approval, as-is with documented limitations. The 2.4 section below is historical.
 
 - Exact Claude Code candidate; HTML SHA-256 `a404f137d16636fddc9477feccdef1e264ac585853a79bc5c76588d014a1795b`.
 - Worker unchanged: `6523411a5fc5aedc09a17b3ddd813ca5907ee040304dab479638e93f8705169f`.

@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut 2.4.1 — v17.4.1</title>
+<title>Juggernaut 2.4.2 — v17.4.2</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -3119,6 +3119,17 @@ body.v17-precheck .v171-back{display:none}
 .v173-sh-note{margin:8px 2px 0;font-size:13px;line-height:18px;color:var(--muted)}
 .v173-extras[aria-expanded="true"] .v173-chev{transform:rotate(180deg)}
 .confirm-card.v173-help .help-body>div:has(>.ex-swap-list){display:none}
+/* v17.4.2: a 3px left edge on a box with rounded corners drew as a curved sliver. The edge is gone on the four
+   light-blue notes (Weekly Plan, warm-up, Accessories, first-launch tips) and the three amber warning notes
+   (Accessories, a session ended early, no recent test); each keeps its tinted box. */
+.wp-rec,.onboard-tip,.warmup-coach,.acc-authority-note,.acc-overmain-warn,.summary-partial{border-left:0}
+.dash-stale-warning{border-left:0 !important}
+/* v17.4.2 (r3): the same curved edge, drawn by a 3px inset shadow, on the current set's row, the current warm-up set's
+   row and starred (weak-point) accessory cards in a workout. The rows keep their thin outline, tint and "Now"; the
+   cards keep their star. In 2.x the Accessories screen cards and the test-week preview already had no edge. */
+.set-row.active{box-shadow:inset 0 0 0 1px var(--accent-mid)}
+.set-row.ramp-set.active{box-shadow:inset 0 0 0 1px var(--blue-mid)}
+.acc-weak-match{box-shadow:none}
 </style>
 </head>
 <body>
@@ -3126,7 +3137,7 @@ body.v17-precheck .v171-back{display:none}
   <header>
     <div class="hdr-row">
       <div>
-        <div class="hdr-sub" id="hdrSub">Juggernaut 2.4.1</div>
+        <div class="hdr-sub" id="hdrSub">Juggernaut 2.4.2</div>
         <h1 class="hdr-title" id="hdrTitle">Today</h1>
       </div>
       <div class="hdr-actions">
@@ -3939,6 +3950,7 @@ body.v17-precheck .v171-back{display:none}
     <div class="guide-toc-title">Jump to Section</div>
     <div class="toc-grid">
       <div class="toc-group"><div class="toc-group-label">Getting Started</div>
+        <a href="#guide-v242" class="toc-link">What Changed in 2.4.2</a>
         <a href="#guide-v241" class="toc-link">What Changed in 2.4.1</a>
         <a href="#guide-v24" class="toc-link">What Changed in 2.4</a>
         <a href="#guide-v23" class="toc-link">What Changed in 2.3</a>
@@ -3978,6 +3990,15 @@ body.v17-precheck .v171-back{display:none}
         <a href="#guide-terms" class="toc-link">Key Terms</a>
       </div>
     </div>
+  </div>
+
+  <h2 id="guide-v242">What Changed in 2.4.2</h2>
+  <div class="section">
+    <p>Two small fixes to how things look and read. The weights and how they progress, the program, and what goes to Hermes are the same.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>No curved edge down the left side.</strong> Seven notes had one: the Weekly Plan note on Home, the warm-up note, the two notes on the Accessories screen, the first-launch tips, the note on a workout ended early and the warning about a lift with no recent test. So did the current set’s row in a workout and starred accessory cards. It is gone. Each note keeps its tinted box, amber for warnings; the current set keeps its thin outline and “Now”; starred cards keep their star.</li>
+      <li><strong>The note on a screen that cannot be drawn points to Export.</strong> It now says to export a backup on the Progress tab. Before, it said Settings, where there is no Export button.</li>
+    </ul>
   </div>
 
   <h2 id="guide-v241">What Changed in 2.4.1</h2>
@@ -4609,7 +4630,7 @@ body.v17-precheck .v171-back{display:none}
   <div class="modal-card" style="text-align:left;max-height:85vh;overflow-y:auto">
     <div class="sheet-handle"></div>
     <div id="onboardStep1">
-      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.4.1</h2>
+      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.4.2</h2>
       <p style="font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px">A 16-week powerlifting tracker built on Chad Wesley Smith's <em>The Juggernaut Method 2.0</em>, with the 10s and 8s waves inverted (many sets × few reps) as in his JTS article. "+" sets that stop short of failure, one test-day AMRAP per wave, double-progression accessories. Three quick steps to get you training.</p>
       <div style="display:grid;gap:8px;margin-bottom:14px">
         <div class="onboard-step"><strong>Step 1</strong> — Enter your 1-rep maxes (honest, not ego)</div>
@@ -4734,7 +4755,7 @@ body.v17-precheck .v171-back{display:none}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '17.4.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '17.4.2';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -10547,7 +10568,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // be drawn shows this card in its own place (the top of that screen; the rest of the screen is left as it is, so the
   // Export button on History stays within reach), and the error is written to the console. No pop-up. The other
   // screens are drawn as usual. A healthy draw adds nothing to the page.
-  const DRAW_FAILED_TEXT = 'This screen could not be drawn. Your data is safe. Export a backup in Settings, then close and reopen the app.';
+  const DRAW_FAILED_TEXT = 'This screen could not be drawn. Your data is safe. Export a backup on the Progress tab, then close and reopen the app.';   // v17.4.2: Export is on the Progress tab, not Settings
   const MAIN_DRAWS = ['renderLiftSelects', 'renderSettings', 'renderProgramSummary', 'renderProgramChart', 'renderDashboard', 'renderSessionBadges', 'renderSession', 'renderAccessories', 'renderHistory'];
   const _drawFailed = {};   // draw name → the screen it belongs to, while that draw is failing
   function _drawCard(view){
@@ -16876,7 +16897,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const session = state.activeSession;
     t.textContent = (_v16View === 'Workout' && session) ? ((getLiftMeta(session.liftId) || {}).name || 'Session') : (V16_TITLES[_v16View] || _v16View);
     s.textContent = _v16View === 'Workout' ? new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' })
-      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.4.1';
+      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.4.2';
     const micro = currentMicrocycle();
     document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8FA8FF' : (V16_WAVE_COLOR[micro.wave] || '#FFE45C'));
   }
@@ -17205,7 +17226,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
     const L = 80, R = W - 80;
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.1', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.2', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 150, true); ctx.fillText(wave + ' wave', L - 6, 300);
     const ds = rows.map(r => Date.parse(r.date)).filter(Number.isFinite), passed = rows.filter(r => r.reps >= r.standard).length;
     F(600, 38);
@@ -17356,7 +17377,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     c.width = W; c.height = H;
     ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#FFE45C'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.1', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.2', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 130, true);
     let size = 130; while (ctx.measureText(r.title).width > R - L && size > 60){ size -= 6; F(800, size, true); }
     ctx.fillText(r.title, L - 5, 300);
