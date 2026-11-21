@@ -1,6 +1,6 @@
 # Juggernaut 2.4.2
 
-Current release: **Juggernaut 2.4.2 (17.4.2 r3)**. [Changes and known limitations](CHANGELOG-Juggernaut-2.4.2.md).
+Current release: **Juggernaut v18 (build 18.0.0, r2)**. [Changes and known limitations](CHANGELOG-Juggernaut-v18.md).
 
 ## Historical release: Juggernaut 2.4.1
 

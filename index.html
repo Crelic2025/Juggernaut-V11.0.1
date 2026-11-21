@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut 2.4.2 — v17.4.2</title>
+<title>Juggernaut v18 — 18.0.0</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -2495,20 +2495,26 @@ button{font-family:var(--font)}
 
 /* ── Home: what the new blocks replace ── */
 #viewWorkout:has(#v17MapCard:not(:empty)) > #programTimeline{display:none}
-#viewWorkout:has(#v17Hero:not([hidden]):not(:empty)) #todayTiles .v16-tile{display:none}
+#viewWorkout #todayTiles .v16-tile{display:none}   /* v18: the recovery tiles take their place whether or not a readiness block is drawn */
 #todayTiles{display:block;margin:0}
-#viewWorkout:has(#v17Hero:not([hidden]):not(:empty)) > #readinessCard{display:none !important}
-#dashboardCard{margin-top:26px}
+#viewWorkout > #readinessCard{display:none !important}
+/* v18: Home opens on the day's lift. The readiness block and the Weekly Plan card are no longer drawn here; the
+   week's lifts, the notices, last time and the recovery tiles follow the card, then the cycle map. */
+#dashboardCard{margin-top:14px}
 #viewWorkout>#tmConfirmCards{order:2}
-#viewWorkout>#v17Hero{order:3}
-#viewWorkout>#v17MapCard{order:4}
-#viewWorkout>#dashboardCard,#viewWorkout>#sessionSection,#viewWorkout>#sessionCompleteOverlay,#viewWorkout>#sessionSummary{order:5}
-#viewWorkout>#todayTiles{order:6}
-#viewWorkout>#v17Cal{order:7}
-#viewWorkout>#v17Maxes{order:8}
-#viewWorkout>#weeklyPlanCard{order:9}
-#viewWorkout>*{order:10}
+#viewWorkout>#dashboardCard,#viewWorkout>#sessionSection,#viewWorkout>#sessionCompleteOverlay,#viewWorkout>#sessionSummary{order:3}
+#viewWorkout>#v18Lifts{order:4}
+#viewWorkout>#todayTiles{order:5}
+#viewWorkout>#deloadBanner,#viewWorkout>#backupNudge{order:6}
+#viewWorkout>#v18Last{order:7}
+#viewWorkout>#v18Tiles{order:8}
+#viewWorkout>#v17MapCard{order:9}
+#viewWorkout>#v17Cal{order:10}
+#viewWorkout>#v17Maxes{order:11}
+#viewWorkout>#insightCards{order:12}
+#viewWorkout>*{order:13}
 #viewWorkout>#programTimeline{order:1}
+#viewWorkout>#v17Hero,#viewWorkout>#weeklyPlanCard{display:none !important}
 
 /* ── Program ── */
 #viewProgram:has(#v17PgMap:not([hidden]):not(:empty)) > #pgProg,#viewProgram:has(#v17PgMap:not([hidden]):not(:empty)) > #pgGrid{display:none !important}
@@ -2928,9 +2934,8 @@ body.v17-live[data-v17-view="Workout"] header{position:sticky;top:0;background:v
 /* ═══════════════ Juggernaut 2.1 (build 17.1.0): audit fixes ═══════════════ */
 /* L4: the cards that ask for a decision (deload, backup) sit right under the readiness block instead of below four
    screens of Home, and the goal lines sit under the max tiles. Only while Home is idle: never above a set screen. */
-body.v17-idle #viewWorkout>#v17Hero{order:2}
-body.v17-idle #viewWorkout>#deloadBanner,body.v17-idle #viewWorkout>#backupNudge{order:3}
-body.v17-idle #viewWorkout>#insightCards{order:9}
+/* v18: these three lines put the readiness block second and the notices third. The order is set once now, with the
+   other Home rules: the notices sit under the week's lifts, never above the day's lift. */
 /* L17: a toast no longer swallows taps on the header buttons under it (its own action button still takes them) */
 .toast.show{pointer-events:none}
 .toast.show .toast-action{pointer-events:auto}
@@ -3130,6 +3135,371 @@ body.v17-precheck .v171-back{display:none}
 .set-row.active{box-shadow:inset 0 0 0 1px var(--accent-mid)}
 .set-row.ramp-set.active{box-shadow:inset 0 0 0 1px var(--blue-mid)}
 .acc-weak-match{box-shadow:none}
+
+/* ═══════════════ Juggernaut v18 (build 18.0.0): Home opens on the day's lift ═══════════════
+   One session card, the week's lifts, last time, the consistency and recovery tiles, then the cycle map with a week
+   summary under its key. Everything uses the 2.x tokens. Rules for the card apply only while it carries .v18-on, which
+   the v18 layer sets after it has drawn; without it the 2.4 card shows as before (cycle complete, or a draw fault). */
+
+/* ── the session card ── */
+#dashboardCard.v18-on{margin-top:14px;padding:16px 18px 18px;border-radius:24px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
+#dashboardCard.v18-on>.dash-preview-banner{order:0 !important}
+#dashboardCard.v18-on>#v18Top{order:1 !important}
+#dashboardCard.v18-on>#v18Body{order:2 !important}
+#dashboardCard.v18-on>.dash-stale-warning{order:3 !important;margin:14px 0 0 !important}
+#dashboardCard.v18-on>#v18Ready{order:4 !important}
+#dashboardCard.v18-on>.dash-start-row{order:5 !important;margin:14px 0 0 !important;gap:8px}
+#dashboardCard.v18-on #dashPhaseTitle,#dashboardCard.v18-on #dashPhaseSub,#dashboardCard.v18-on>#dashPreview,#dashboardCard.v18-on>#dashLast{display:none !important}
+#viewWorkout:has(#v18Lifts:not([hidden]):not(:empty)) #dashboardCard.v18-on>#dashLifts{display:none !important}   /* the lifts row under the card is the picker; without it the 2.4 chips stay */
+#dashboardCard.v18-on>#dashLifts{order:6 !important;margin-top:14px}
+#dashboardCard.v18-handled>.dash-start-row{display:none !important}
+#dashboardCard:not(.v18-on)>#v18Top,#dashboardCard:not(.v18-on)>#v18Body,#dashboardCard:not(.v18-on)>#v18Ready,#v18Top[hidden],#v18Body[hidden],#v18Ready[hidden]{display:none !important}
+#dashboardCard.v18-on .dash-start-row .btn-p{min-height:52px;border-radius:16px;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+#dashboardCard.v18-on .dash-start-row .btn-s{flex:0 0 84px;min-height:52px;border-radius:16px;padding:0;font-size:15px;font-weight:700}
+
+/* cycle complete: the 2.4 card, drawn as the same panel. Its disabled "Cycle complete" button and Skip (which does nothing
+   once the cycle is over) are not shown; "Start next cycle" is the one action. */
+#dashboardCard:not(.v18-on):has([data-dash-next-cycle]){margin-top:14px;padding:16px 18px 18px;border-radius:24px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
+#dashboardCard:not(.v18-on):has([data-dash-next-cycle])>.dash-start-row{display:none !important}
+#viewWorkout>#deloadBanner:not([hidden]),#viewWorkout>#backupNudge:not([hidden]){margin-top:12px}   /* the notices stand clear of the lifts row's last line */
+
+.v18-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2px 8px}
+.v18-top h2{margin:0;font-size:24px;line-height:28px;font-weight:800;letter-spacing:-.02em;color:var(--text);min-width:0}
+.v18-top h2.long{font-size:21px}
+.v18-wave{height:44px;margin:-8px -6px -8px auto;padding:0 6px;display:flex;align-items:center;border:none;background:none;font:inherit;color:inherit}
+.v18-wave>span{display:flex;align-items:center;gap:6px;height:30px;padding:0 8px 0 11px;border-radius:15px;background:color-mix(in srgb, var(--c) 14%, transparent);color:var(--c);font-size:13px;font-weight:700;white-space:nowrap}
+.v18-wave i{width:7px;height:7px;border-radius:4px;background:var(--c);flex:none}
+.v18-about{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--panel2)}
+.v18-about b{display:block;font-size:13px;line-height:18px;font-weight:800;color:var(--text)}
+.v18-about p{margin:2px 0 0;font-size:13px;line-height:18px;font-weight:500;color:var(--text2)}
+
+.v18-load{margin-top:6px;display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px 16px}
+.v18-load-n{display:flex;align-items:baseline;gap:5px}
+.v18-load-n span{font-size:clamp(52px,17.4vw,68px);line-height:.86;font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--text)}
+.v18-load-n span.long{font-size:clamp(44px,14.2vw,56px)}
+.v18-load-n small{font-size:22px;line-height:26px;font-weight:700;color:var(--text2)}
+.v18-load-s{padding-bottom:3px;display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:18px;font-weight:600;color:var(--text2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v18-load-s>div{display:flex;align-items:center;gap:5px}
+.v18-load-s b{font-size:18px;line-height:22px;font-weight:800;color:var(--sky)}
+.v18-load-s>div:nth-child(2){font-size:14px;font-weight:700}
+.v18-tm{display:inline-block;padding:1px 5px;margin-right:1px;border-radius:5px;background:var(--panel3);font-style:normal;font-size:10px;line-height:14px;font-weight:800;letter-spacing:.04em;color:var(--text2);vertical-align:1px}
+.v18-fine{font-size:11px !important;line-height:14px;font-weight:500 !important;color:var(--muted)}
+.v18-rule{height:1px;margin:14px 0;background:var(--line)}
+.v18-rule.full{margin:14px -18px}
+
+.v18-lad-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.v18-lad-h h3{margin:0;font-size:17px;line-height:22px;font-weight:800;color:var(--text)}
+.v18-link{flex:none;height:44px;margin:-11px -6px -11px 0;padding:0 6px;display:inline-flex;align-items:center;gap:4px;border:none;background:none;color:var(--sky);font:inherit;font-size:14px;font-weight:700;white-space:nowrap}
+.v18-link.in{margin:-14px -6px;font-size:13px}
+.v18-lad{margin-top:8px;display:flex;align-items:center;gap:5px}
+.v18-c{flex:1 1 0;min-width:0;height:36px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1.5px solid #5B6B93;border-radius:9px;background:var(--panel2);font-style:normal;font-size:15px;line-height:17px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.v18-c small{font-size:10px;line-height:12px;font-weight:700;color:var(--text2);letter-spacing:-.02em}
+.v18-c.lead{border-style:dashed;border-color:var(--line2);background:none;color:var(--text2)}
+.v18-c.wt{height:46px}
+.v18-c.plus{flex:0 0 46px;height:44px;border:2px solid var(--sky);border-radius:11px;background:var(--panel3);box-shadow:0 0 0 3px rgba(127,170,255,.18);font-size:17px}
+.v18-c.plus.wt{flex-basis:62px;height:52px}
+.v18-c.plus small{color:var(--sky)}
+.v18-c.drop{border:1.5px dashed var(--line2);background:repeating-linear-gradient(135deg, var(--panel) 0 4px, var(--panel3) 4px 7px);color:var(--muted);text-decoration:line-through}
+.v18-c.ghost{flex:0 0 30px;border:1.5px dashed color-mix(in srgb, var(--mint) 60%, transparent);background:none;color:var(--mint);font-size:12px;line-height:13px}
+.v18-c.ghost small{font-size:10px;line-height:11px;color:var(--mint)}
+.v18-c.ghost.on{border-style:solid;background:color-mix(in srgb, var(--mint) 14%, transparent)}
+.v18-c.done{border-color:color-mix(in srgb, var(--mint) 45%, transparent);background:color-mix(in srgb, var(--mint) 12%, var(--panel))}
+.v18-c.done.plus{border-color:var(--mint);box-shadow:0 0 0 3px color-mix(in srgb, var(--mint) 16%, transparent);background:color-mix(in srgb, var(--mint) 18%, var(--panel))}
+.v18-cap{margin:8px 0 0;font-size:13px;line-height:18px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.v18-cap b{font-weight:800;color:var(--sky)}
+.v18-cap b.w{color:var(--text)}
+
+.v18-list{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.v18-list-r{display:grid;grid-template-columns:76px max-content minmax(0,1fr);align-items:center;column-gap:8px;padding:9px 12px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}   /* the load keeps its width; a long plate list wraps in what is left */
+.v18-list-r>span{font-size:12px;line-height:16px;font-weight:600;color:var(--text2)}
+.v18-list-r>span:last-child{text-align:right}
+.v18-list-r>b{font-size:13px;line-height:16px;font-weight:800;color:var(--text);white-space:nowrap}
+.v18-list-r>b small{display:block;font-size:11px;line-height:14px;font-weight:500;color:var(--muted)}
+.v18-list-r.h{padding-top:8px;padding-bottom:8px;border-top:none;background:#080C16}
+.v18-list-r.h>span{font-size:11px;line-height:14px;color:var(--muted)}
+.v18-list-r.p{background:rgba(127,170,255,.07)}
+.v18-list-r.p>b{color:var(--sky)}
+.v18-list-r.x>span:first-child,.v18-list-r.x>b{color:var(--mint)}
+.v18-note{margin:8px 0 0;font-size:12px;line-height:16px;font-weight:500;color:var(--text2)}
+.v18-note b{font-weight:800;color:var(--text)}
+
+.v18-pr{display:flex;align-items:stretch;gap:14px}
+.v18-pr-p{flex:1 1 auto;min-width:0}
+.v18-pr-r{flex:none;display:flex;flex-direction:column;align-items:flex-end;padding-left:14px;border-left:1px solid var(--line)}
+.v18-pr-h{font-size:13px;line-height:16px;font-weight:500;color:var(--muted)}
+.v18-pr-h b{font-weight:700;color:var(--text)}
+.v18-chips{margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.v18-pl{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.v18-chips u{text-decoration:none;font-size:11px;font-weight:700;color:var(--muted)}
+.v18-chips.many u{display:none}
+.v18-chips.many .v18-chip{min-width:32px;padding:0 5px;font-size:14px}
+/* plate chips: one flat colour each, the plate's own. No second colour on any edge. */
+.v18-chip{min-width:36px;height:30px;padding:0 6px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;background:#6F767C;color:#fff}
+body[data-plates="color"] .v18-chip.p45{background:#C8402F;color:#fff}body[data-plates="color"] .v18-chip.p35{background:#F2C230;color:#05070D}
+body[data-plates="color"] .v18-chip.p25{background:#2B6FB8;color:#fff}body[data-plates="color"] .v18-chip.p10{background:#23824A;color:#fff}
+body[data-plates="color"] .v18-chip.p5{background:#6F767C;color:#fff}body[data-plates="color"] .v18-chip.p2_5{background:#B9BEC2;color:#05070D}
+body[data-plates="color"] .v18-chip.p1_25{background:#E4E6E8;color:#05070D}
+body[data-plates="iron"] .v18-chip{color:#05070D}
+body[data-plates="iron"] .v18-chip.p45{background:#E9EDF3}body[data-plates="iron"] .v18-chip.p35{background:#D5DBE5}body[data-plates="iron"] .v18-chip.p25{background:#C2C9D6}
+body[data-plates="iron"] .v18-chip.p10{background:#B0B8C7}body[data-plates="iron"] .v18-chip.p5{background:#A1A9B9}body[data-plates="iron"] .v18-chip.p2_5{background:#939CAD}body[data-plates="iron"] .v18-chip.p1_25{background:#8892A4}
+.v18-baronly{height:30px;display:flex;align-items:center;font-size:14px;font-weight:700;color:var(--text2)}
+.v18-rest{margin-top:8px;height:30px;padding:0 12px;box-sizing:border-box;display:flex;align-items:center;border:1px solid var(--line2);border-radius:9px;font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.v18-fit{margin-top:8px;font-size:12px;line-height:16px;font-weight:600;color:var(--warn)}
+
+.v18-rd{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:#080C16}
+.v18-rd-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;line-height:16px;font-weight:700;color:var(--text2)}
+.v18-rd-h em,.v18-rd-w{font-style:normal;font-size:12px;line-height:16px;font-weight:600;color:var(--muted)}
+.v18-rd-w{display:flex;align-items:center;gap:2px}
+.v18-rd-w .v18-link.in{margin-left:0}   /* a little air between the time and Edit */
+.v18-rd-row{margin-top:4px;display:flex;align-items:center;flex-wrap:wrap;gap:0 10px;min-height:34px}
+.v18-rd-n{display:flex;align-items:baseline;gap:2px;font-variant-numeric:tabular-nums}
+.v18-rd-n b{font-size:30px;line-height:34px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.v18-rd-n small{font-size:14px;font-weight:700;color:var(--muted)}
+.v18-rd-n.none b,.v18-tile-n.none b{font-weight:500;color:var(--muted)}
+.v18-zone{display:flex;align-items:center;gap:4px;font-size:16px;font-weight:800;color:var(--mint);white-space:nowrap}
+.v18-zone.lo{color:var(--lav)}
+.v18-zone.was{color:var(--text2)}
+.v18-delta{margin-left:auto;font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v18-delta b{font-weight:800;color:var(--mint)}
+.v18-delta.dn b{color:var(--lav)}
+.v18-checkin{height:44px;margin:-5px -6px -5px auto;padding:0 6px;display:flex;align-items:center;border:none;background:none;font:inherit}
+.v18-checkin span{display:flex;align-items:center;height:32px;padding:0 14px;border-radius:16px;border:1.5px solid var(--sky);color:var(--sky);font-size:14px;font-weight:700;white-space:nowrap}
+.v18-track{position:relative;margin-top:8px;display:flex;gap:4px}
+.v18-track i{height:6px;border-radius:3px;background:var(--panel3)}
+.v18-track i.on{background:var(--mint)}
+.v18-track i.on.lo{background:var(--lav)}
+.v18-track u{position:absolute;top:-4px;width:4px;height:14px;margin-left:-2px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px #080C16}
+.v18-track.flat i.on{background:var(--edge)}
+.v18-track-l{margin-top:6px;display:flex;gap:4px;font-size:11px;line-height:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+.v18-track-l span{min-width:0}
+.v18-track-l span.on{color:var(--text);font-weight:700}
+.v18-rd p{margin:6px 0 0;font-size:12px;line-height:16px;font-weight:500;color:var(--text2)}
+.v18-rd.off p{margin-top:4px}
+
+.v18-done{margin-top:10px}
+.v18-done>b{display:block;font-size:44px;line-height:48px;font-weight:900;letter-spacing:-.03em;color:var(--mint)}
+.v18-done>b.skip{color:var(--muted)}
+.v18-done>b.early{color:var(--warn)}
+.v18-done p{margin:4px 0 0;font-size:14px;line-height:20px;font-weight:500;color:var(--text2)}
+.v18-lad.logged{margin-top:14px}
+
+/* ── the week's lifts ── */
+.v18-sec{margin-top:16px}
+.v18-sec[hidden],.v18-slab[hidden]{display:none}
+.v18-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.v18-sec-h h3{margin:0;font-size:17px;line-height:22px;font-weight:800;color:var(--text)}
+.v18-sec-h>span{font-size:12px;line-height:16px;font-weight:600;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v18-sec-h.big{align-items:flex-end}
+.v18-sec-h.big h2{margin:0;font-size:clamp(16px,4.6vw,20px);line-height:24px;font-weight:800;letter-spacing:-.01em;color:var(--text)}
+.v18-sec-h.big .v18-link{margin:-10px -6px -10px 0;gap:2px}
+.v18-lifts{margin-top:8px;display:grid;gap:6px}
+.v18-lift{min-width:0;min-height:72px;padding:9px 7px;box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;text-align:left;border-radius:14px;border:1.5px dashed #5B6B93;background:none;color:var(--text);font:inherit;font-variant-numeric:tabular-nums}
+.v18-lift em{display:flex;align-items:center;gap:3px;max-width:100%;font-style:normal;font-size:11px;line-height:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+.v18-lift b{margin-top:3px;max-width:100%;font-size:14px;line-height:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v18-lift>span{margin-top:2px;max-width:100%;font-size:12.5px;line-height:16px;font-weight:700;letter-spacing:-.01em;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v18-lift>span.n10{font-size:12px}      /* ten characters, "292.5 × 8+" */
+.v18-lift>span.n11{font-size:11px}      /* eleven, "272.5 × 10+": sized so the widest digits still fit a 375 px phone's tile */
+.v18-lift>span.w{white-space:normal;overflow:visible;line-height:14px}   /* "Ended early" */
+.v18-lift.done{border:1px solid color-mix(in srgb, var(--mint) 40%, transparent);background:#0E2620}
+.v18-lift.done em{color:var(--text2)}
+.v18-lift.done em>svg:first-child{color:var(--mint)}
+.v18-lift.done>span{color:var(--text)}
+.v18-lift.skip{border:1px dashed var(--line2)}
+.v18-lift.skip b,.v18-lift.skip>span{color:var(--muted)}
+.v18-lift.sel{border:2px solid var(--sky);padding:8px 6px}
+.v18-lift.today{background:var(--panel2)}
+.v18-lift.today em{font-weight:700;color:var(--sky)}
+.v18-lift.today>span{color:var(--sky)}
+.v18-warn{margin-left:auto;padding-left:2px;text-decoration:none;color:var(--warn);display:flex}
+.v18-lift em:has(.v18-warn)>svg:first-child{display:none}   /* with a warning mark the first icon gives way, so "Mon 16" and the mark both fit */
+.v18-pace{margin:8px 0 0;font-size:12px;line-height:16px;font-weight:500;color:var(--text2)}
+.v18-pace b{font-weight:700;color:var(--sky)}
+.v18-pace b.done{color:var(--mint)}
+.v18-pace b.tight{color:var(--warn)}
+.v18-pace b.behind{color:var(--bad)}
+.v18-stale{margin-top:8px;padding:8px 10px;border-radius:12px;border:1px solid var(--warn-mid);background:var(--warn-dim);font-size:12px;line-height:18px;color:var(--warn)}
+#viewWorkout>#todayTiles:has(.v16-rest){margin-top:12px}
+#viewWorkout>#todayTiles:not(:has(.v16-rest)){display:none}   /* without the rest-day note it holds only the two 2.x tiles, which are not shown: no empty gap */
+
+/* ── last time ── */
+.v18-slab{margin-top:16px;padding:14px 16px 4px;box-sizing:border-box;background:var(--panel);border-radius:20px;box-shadow:inset 0 0 0 1px var(--line)}
+.v18-sec-h.in{padding-bottom:10px}
+.v18-last-r{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.v18-last-r b{display:flex;align-items:center;gap:7px;font-size:14px;line-height:18px;font-weight:800;color:var(--text);white-space:nowrap}
+.v18-last-r b i{width:7px;height:7px;border-radius:4px;background:var(--mint);flex:none}
+.v18-last-r em{display:block;margin:2px 0 0 14px;font-style:normal;font-size:12px;line-height:16px;font-weight:500;color:var(--muted)}
+.v18-last-r .r{text-align:right;min-width:0}
+.v18-last-r .r b{justify-content:flex-end}
+.v18-last-r .r em{margin-left:0}
+.v18-last-m{margin:-5px 0 0;padding:0 0 11px 14px;font-size:12px;line-height:16px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.v18-vs{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.v18-vs>span{font-size:12px;line-height:16px;font-weight:600;color:var(--muted)}
+.v18-vs>b{display:flex;align-items:center;gap:8px;font-size:14px;line-height:18px;font-weight:800;color:var(--sky);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v18-vs>b i{width:1px;height:14px;background:var(--line2)}
+
+/* ── consistency and recovery ── */
+#v18Tiles{margin-top:26px}
+.v18-sev{margin-top:8px}
+.v18-tiles{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v18-tile{position:relative;min-width:0;padding:14px;box-sizing:border-box;display:flex;flex-direction:column;background:var(--panel);border-radius:20px;box-shadow:inset 0 0 0 1px var(--line);font-variant-numeric:tabular-nums}
+.v18-tile-h{display:flex;align-items:center;gap:6px;font-size:13px;line-height:16px;font-weight:700;color:var(--text2)}
+.v18-tile-h>svg{color:var(--sky)}
+.v18-tile-n{margin-top:8px;display:flex;align-items:baseline;gap:3px}
+.v18-tile-n b{font-size:30px;line-height:34px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.v18-tile-n small{font-size:14px;font-weight:700;color:var(--muted)}
+.v18-tile p{margin:4px 0 0;font-size:12px;line-height:16px;font-weight:600;color:var(--text2)}
+.v18-tile p b{font-weight:800}.v18-tile p b.up{color:var(--mint)}.v18-tile p b.dn{color:var(--lav)}
+.v18-tile p.fine{margin-top:6px;font-size:11.5px;line-height:15px}
+.v18-tile-f{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;line-height:14px;font-weight:600;color:var(--muted)}
+.v18-heat{margin-top:10px;display:flex;justify-content:space-between}
+.v18-heat span{display:flex;flex-direction:column;gap:3px}
+.v18-heat i{width:9px;height:9px;border-radius:2.5px;box-sizing:border-box;border:1px solid var(--line2)}
+.v18-heat i.on{border:none;background:var(--mint)}
+.v18-heat i.now{border:1.5px solid var(--sky)}
+.v18-heat i.on.now{border:none;box-shadow:0 0 0 1.5px var(--sky)}
+.v18-heat i.fut{border:none;background:#0F1524}
+.v18-spark-w{margin-top:10px}
+.v18-spark{display:block;width:100%;height:50px}
+.v18-spark.sky{height:44px}
+.v18-spark polygon{fill:var(--mint);fill-opacity:.12}.v18-spark polyline{fill:none;stroke:var(--mint);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.v18-spark.sky polygon{fill:var(--sky)}.v18-spark.sky polyline{stroke:var(--sky)}
+.v18-bars{margin-top:10px;height:44px;display:flex;align-items:flex-end;gap:5px}
+.v18-bars i{flex:1 1 0;border-radius:3px;background:var(--lav)}
+.v18-plus{position:absolute;top:1px;right:1px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;border:none;background:none;color:var(--sky)}
+.v18-plus span{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:14px;border:1.5px solid var(--line2)}
+.v18-bw{margin-top:10px;display:flex;gap:6px}
+.v18-bw input{flex:1 1 0;min-width:0;height:44px;padding:0 10px;box-sizing:border-box;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font:inherit;font-size:16px;font-weight:700}
+.v18-bw button{flex:none;height:44px;padding:0 14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font:inherit;font-size:14px;font-weight:800}
+.v18-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── the cycle map on Home: the week picked, under the key ── */
+.v18-wk{padding:14px 2px 0;border-top:1px solid var(--line)}
+.v18-wk-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.v18-wk-h h3{margin:0;font-size:16px;line-height:20px;font-weight:800;color:var(--text)}
+.v18-wk-h>span{font-size:12.5px;line-height:16px;font-weight:600;color:var(--muted);white-space:nowrap}
+.v18-wk-s{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));font-variant-numeric:tabular-nums}
+.v18-wk-s>div+div{padding-left:14px;border-left:1px solid var(--line)}
+.v18-wk-s b{display:flex;align-items:baseline;gap:1px;height:32px;font-size:28px;line-height:32px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.v18-wk-s b small{font-size:14px;line-height:1;font-weight:800;letter-spacing:0}
+.v18-wk-s span{display:block;margin-top:2px;font-size:12px;line-height:16px;font-weight:500;color:var(--muted)}
+.v18-wk-w{margin-top:14px;padding:12px 14px 13px;border:1px solid var(--line);border-radius:14px;background:#080C16;font-variant-numeric:tabular-nums}
+.v18-wk-wh{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.v18-wk-wh>b{font-size:14px;line-height:18px;font-weight:800;color:var(--text)}
+.v18-wk-wh span b{font-size:22px;line-height:26px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.v18-wk-wh span small{margin-left:3px;font-size:13px;font-weight:700;color:var(--muted)}
+.v18-wk-bar{margin-top:10px;display:flex;gap:4px}
+.v18-wk-bar i{flex:1 1 0;height:7px;border-radius:4px;box-sizing:border-box;border:1.5px solid var(--line2)}
+.v18-wk-bar i.done{border:none;background:var(--mint)}
+.v18-wk-bar i.today{border-color:var(--sky)}
+.v18-wk-bar i.skipped,.v18-wk-bar i.missed{border-style:dashed}
+.v18-wk-w p{margin:8px 0 0;font-size:12.5px;line-height:16px;font-weight:500;color:var(--text2)}
+
+/* ── estimated maxes ── */
+.v18-approx{margin-right:2px;font-style:normal;font-size:.5em;font-weight:700;color:var(--muted);vertical-align:.32em;letter-spacing:0}
+.v17-tile-s .v18-tm{margin-right:5px}
+
+/* ── Progress: sets as chips; This Week's note ── */
+.v18-setchips{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.v18-setchips i{min-width:26px;height:24px;padding:0 6px;box-sizing:border-box;display:inline-flex;align-items:baseline;justify-content:center;border-radius:7px;background:var(--panel2);font-style:normal;font-size:13px;line-height:24px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.v18-setchips i small{font-size:10px;font-weight:600;color:var(--muted)}
+.v18-setchips i.plus{box-shadow:inset 0 0 0 1.5px var(--sky)}
+.v18-setchips i.short{color:var(--warn)}
+.v18-ws-note{grid-column:1/-1;margin-top:2px;font-size:12px;line-height:16px;font-weight:500;color:var(--muted)}
+
+/* ── Program: all sixteen weeks ── */
+.v18-plan{margin-top:16px}
+.v18-plan[hidden]{display:none}
+.v18-plan details{border-radius:20px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.v18-plan summary{list-style:none;display:block;padding:0 16px;font-size:15px;font-weight:800;color:var(--text);cursor:pointer}
+.v18-plan summary::-webkit-details-marker{display:none}
+.v18-sum{display:flex;align-items:center;justify-content:space-between;min-height:52px}
+.v18-plan summary svg{color:var(--sky);transition:transform .15s ease}
+.v18-plan details[open] summary svg{transform:rotate(180deg)}
+.v18-pt{border-top:1px solid var(--line)}
+.v18-pt-r{display:block;width:100%;padding:0 14px;box-sizing:border-box;border:none;border-top:1px solid var(--line);border-radius:0;background:none;color:var(--text2);font:inherit;font-size:13px;font-weight:600;text-align:left;font-variant-numeric:tabular-nums}
+.v18-pt-g{display:grid;grid-template-columns:20px 38px minmax(0,1fr) minmax(0,1.2fr) 56px;align-items:center;column-gap:4px;min-height:44px}   /* 56 px: "40–60%" in bold is 53.6 */
+.v18-pt-r.h{border-top:none;font-size:11px;color:var(--muted)}
+.v18-pt-r.h .v18-pt-g{min-height:32px}
+.v18-pt-g>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v18-pt-g>span:last-child{text-align:right}
+.v18-pt-g>span i{display:inline-block;width:7px;height:7px;margin-right:5px;border-radius:4px;vertical-align:1px}
+.v18-pt-r small{font-size:11px;font-weight:500;color:var(--muted)}
+.v18-pt-r.past{color:var(--muted)}
+.v18-pt-r.cur{color:var(--text);font-weight:800}
+.v18-pt-r.sel{background:rgba(127,170,255,.12)}   /* the week shown above: a tint across the whole row, no bar on one edge */
+.v18-plan p{margin:0;padding:10px 16px 14px;border-top:1px solid var(--line);font-size:12px;line-height:16px;font-weight:500;color:var(--muted)}
+
+/* ── short phones: Start stays on the first screen, above the readiness panel ── */
+@media (max-height:700px) and (max-width:559px){
+  #dashboardCard.v18-on>.dash-start-row{order:3 !important}
+  #dashboardCard.v18-on>.dash-stale-warning{order:4 !important}
+  #dashboardCard.v18-on>#v18Ready{order:5 !important}
+}
+@media (max-width:374px){
+  .v18-pt-r{font-size:12px;padding:0 10px}
+  .v18-pt-r small{font-size:10px}
+  .v18-pt-g{grid-template-columns:20px 38px minmax(0,1fr) minmax(0,1.2fr) 52px}
+  .v18-lift b{font-size:13px}
+  .v18-lift em>svg:first-child{width:11px;height:11px}
+  .v18-lift>span.n10{font-size:11px}.v18-lift>span.n11{font-size:10.5px}
+}
+@media (max-width:339px){
+  .v18-pt-r{font-size:11px;padding:0 8px}
+  .v18-pt-g{grid-template-columns:20px 33px minmax(0,1fr) minmax(0,1.2fr) 48px;column-gap:3px}
+  .v18-pt-r.h{font-size:10px}
+  .v18-lifts .v18-lift{padding:8px 4px}.v18-lifts .v18-lift.sel{padding:7px 3px}
+  .v18-lift em{gap:2px}.v18-warn{padding-left:0}.v18-warn svg{width:11px;height:11px}   /* "Wed 30" and a warning mark side by side */
+  .v18-list-r{grid-template-columns:64px max-content minmax(0,1fr);column-gap:6px;padding:9px 10px}
+  .v18-lift>span.n10{font-size:10.5px}.v18-lift>span.n11{font-size:10px}
+}
+@media (max-width:359px){
+  .v18-rd{padding:10px 12px}
+  .v18-rd-row{gap:0 7px}
+  .v18-rd-n b{font-size:26px;line-height:32px}
+  .v18-zone{font-size:14px}
+  .v18-delta{font-size:12px}
+  .v18-track-l{font-size:10px}
+  .v18-tile-h>svg{display:none}
+  #dashboardCard.v18-on{padding:14px 14px 16px}
+  .v18-rule.full{margin:14px -14px}
+  .v18-lad{gap:3px}
+  .v18-c{font-size:14px;border-radius:8px}
+  .v18-lift{padding:8px 5px}.v18-lift.sel{padding:7px 4px}
+  .v18-lift b{font-size:13px}.v18-lift>span{font-size:11.5px}
+  .v18-tile{padding:12px}
+}
+
+/* ── iPad and other wide screens: the card on the left; the week's lifts, the notices and last time beside it; the four
+   tiles in one row; then the cycle map beside the last five weeks and the estimated maxes. Only while Home is idle and
+   the v18 card is drawn: a workout, the finish screens and "cycle complete" keep the 640 px column they had. ── */
+@media (min-width:720px){
+  body.v17-idle main:has(#viewWorkout.active #dashboardCard.v18-on){max-width:1000px}
+  body.v17-idle[data-v17-view="Workout"]:has(#viewWorkout.active #dashboardCard.v18-on) header{padding-left:max(16px, calc((100% - 968px) / 2));padding-right:max(16px, calc((100% - 968px) / 2))}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on){display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);column-gap:20px;align-items:start;
+    grid-template-rows:auto repeat(5,auto) 1fr}   /* row 1: test-weight confirmations; rows 2 to 6: the right column; row 7 takes up whatever the card is taller by */
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)::before{content:"";grid-column:1/-1;grid-row:1}   /* keeps row 1 for the confirmations: nothing else is placed there */
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>*{grid-column:1/-1}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#tmConfirmCards{grid-row:1}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#dashboardCard{grid-column:1;grid-row:2 / span 6}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v18Lifts{grid-column:2;grid-row:2;margin-top:14px}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#todayTiles{grid-column:2;grid-row:3}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#deloadBanner{grid-column:2;grid-row:4}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#backupNudge{grid-column:2;grid-row:5}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v18Last{grid-column:2;grid-row:6}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v18Tiles{grid-row:8}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v17MapCard{grid-column:1;grid-row:9 / span 2;margin-left:0;margin-right:0}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v17Cal{grid-column:2;grid-row:9}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v17Maxes{grid-column:2;grid-row:10}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#v17Maxes .v17-tiles{margin:0}
+  body.v17-idle #viewWorkout.active:has(#dashboardCard.v18-on)>#insightCards{grid-row:11}
+  .v18-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+/* the narrowest two-column screens (an iPad mini upright is 744): the lift tiles are as narrow as on a 360 px phone */
+@media (min-width:720px) and (max-width:767px){
+  .v18-lift b{font-size:13px}
+  .v18-lift em{gap:2px}.v18-lift em>svg:first-child{width:11px;height:11px}.v18-warn{padding-left:0}.v18-warn svg{width:11px;height:11px}
+  .v18-lift>span{font-size:12px}.v18-lift>span.n10{font-size:11px}.v18-lift>span.n11{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -3137,7 +3507,7 @@ body.v17-precheck .v171-back{display:none}
   <header>
     <div class="hdr-row">
       <div>
-        <div class="hdr-sub" id="hdrSub">Juggernaut 2.4.2</div>
+        <div class="hdr-sub" id="hdrSub">Juggernaut v18</div>
         <h1 class="hdr-title" id="hdrTitle">Today</h1>
       </div>
       <div class="hdr-actions">
@@ -3950,6 +4320,7 @@ body.v17-precheck .v171-back{display:none}
     <div class="guide-toc-title">Jump to Section</div>
     <div class="toc-grid">
       <div class="toc-group"><div class="toc-group-label">Getting Started</div>
+        <a href="#guide-v18" class="toc-link">What Changed in v18</a>
         <a href="#guide-v242" class="toc-link">What Changed in 2.4.2</a>
         <a href="#guide-v241" class="toc-link">What Changed in 2.4.1</a>
         <a href="#guide-v24" class="toc-link">What Changed in 2.4</a>
@@ -3990,6 +4361,21 @@ body.v17-precheck .v171-back{display:none}
         <a href="#guide-terms" class="toc-link">Key Terms</a>
       </div>
     </div>
+  </div>
+
+  <h2 id="guide-v18">What Changed in v18</h2>
+  <div class="section">
+    <p>Home is rebuilt around the day’s lift. The weights and how they progress, the program, and what goes to Hermes are the same. Two older notes below no longer hold: Home does not open on the readiness score, and a week tapped on Home’s map does not open Program.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>The session card comes first.</strong> It shows the lift you have picked, its weight and share of your training max, the planned sets as a row of boxes, plates per side as flat colour chips, rest, readiness, and Start. The chip beside the lift’s name opens the note about this week. The bar pinned above the tabs steps aside while the card’s Start is on screen.</li>
+      <li><strong>The set row follows your check-in.</strong> Check in on the card and the boxes change before you start: a hatched box is a working set a low score takes off, and “+1” is the extra set a score of 23 or more offers. It is the rule a workout already used (below 8 two sets, below 15 one, never on a test day or a deload). <strong>Set list</strong> shows every set with its warm-ups and plates.</li>
+      <li><strong>The week’s lifts sit under the card</strong> and are the lift picker: tap one to see it in the card. Each shows the day and result once it is logged, or the planned weight. The heading and the line under the row say what the Weekly Plan card said: lifts logged, days left, pace and the next-up suggestion, rest days included. The Weekly Plan card is no longer on Home.</li>
+      <li><strong>Readiness moved.</strong> Today’s score, its zone, the change since the last check-in and Edit are in the card. The last ten check-ins, which answers got better or worse, the Recovery link and the deload signal are under <strong>Consistency and recovery</strong>, beside your training days, sleep answers and bodyweight. The + on the bodyweight tile logs a weigh-in.</li>
+      <li><strong>Last time.</strong> The latest session of the lift picked, the latest one from the same kind of week, and how today’s plan differs from it.</li>
+      <li><strong>Cycle map.</strong> The drawing is the same. Under its key is a summary of one week: sets and reps per lift, the top share of the training max, and the work logged that week. Tap a week on the map to see it; you stay on Home, and “Back to week” returns to the current one. The Program link opens Program as before.</li>
+      <li><strong>Smaller changes.</strong> Rest reads as minutes and seconds (1:45) on Home, as on Program. Estimated maxes are marked ≈ and show the last top set. The session log shows each set as a chip. Program lists all sixteen weeks in a table.</li>
+      <li><strong>Fixes.</strong> Progress, This Week, compares with last week up to the same weekday and time, and a drop in tonnage has its minus sign. A lift whose max was tested and held says so; it said “complete test days to track it”. A check-in score is saved exact (27, where it could be 26.999999999999996). The early fatigue note on Home is about the lift you have picked, or about every lift.</li>
+    </ul>
   </div>
 
   <h2 id="guide-v242">What Changed in 2.4.2</h2>
@@ -4182,26 +4568,26 @@ body.v17-precheck .v171-back{display:none}
   <h2 id="guide-schedule">Scheduling Your Training Week</h2>
   <div class="section">
     <p>You train <strong>4 sessions per week — one lift per session.</strong> Each session you pick one of your four lifts (Squat, Bench, Deadlift, OHP), do the main lift, then that lift's accessories. A typical split: <strong>Monday</strong> Squat · <strong>Tuesday</strong> Bench · <strong>Thursday</strong> Deadlift · <strong>Friday</strong> OHP.</p>
-    <p>Two habits help: <strong>avoid training two days in a row</strong>, and <strong>separate squat and deadlift by at least two days</strong>. The Weekly Plan’s next-up suggestion follows this: after a session today or yesterday it offers a lift for the other half of the body (upper or lower) first, and when every lift left would break one of these it suggests a rest day instead, and you can still pick any lift. A program week means <strong>completing all 4 lifts once</strong>; when every lift chip is checked, the program moves to the next week. Order within the week doesn't matter.</p>
+    <p>Two habits help: <strong>avoid training two days in a row</strong>, and <strong>separate squat and deadlift by at least two days</strong>. The next-up line under the week’s lifts on Home follows this: after a session today or yesterday it offers a lift for the other half of the body (upper or lower) first, and when every lift left would break one of these it suggests a rest day instead, and you can still pick any lift. A program week means <strong>completing all 4 lifts once</strong>; when every lift chip is checked, the program moves to the next week. Order within the week doesn't matter.</p>
   </div>
 
   <h2 id="guide-dashboard">Dashboard</h2>
   <div class="section">
-    <p>With no session active, the <strong>dashboard</strong> shows where you are (cycle, wave, phase), which lifts are done this week (tap a chip to preview), and the workout preview with weight, plates, scheme, rest and percentage. <strong>Last Session</strong> shows your most recent result for that lift, including the test result on test days.</p>
+    <p>With no session active, <strong>Home</strong> opens on the session card for the lift you have picked: its weight and percentage, the planned sets, plates per side, rest and readiness, with Start under them. The header says which week you are in, and the chip on the card names the wave and the kind of week. The week’s lifts are under the card: tap one to pick it. <strong>Last time</strong> shows your most recent result for that lift, including the test result on test days.</p>
     <p><strong>Cards that can appear:</strong> a <strong>TM confirmation</strong> after a test lifted at a different weight than planned (Apply TM change / Keep TM); <strong>Hermes suggestion cards</strong> with Apply and Dismiss; the deload banner; goal ETA cards once a lift has 3 tests; and, at the end of a cycle, <strong>Start next cycle</strong>.</p>
-    <p><strong>Readiness card:</strong> shown under the workout preview once you have a scored check-in and readiness is switched on. It shows your latest score out of 30, the change from the check-in before, your last seven scores, and what that check-in did to its session: working sets dropped, full volume restored by you, an extra set taken or not taken, or no change; on a test day it says readiness did not change the session. For an older check-in whose record does not say, it shows the rule for that score instead (below 8 two working sets are dropped, below 15 one, and at 23 and above an extra set is offered). A score that is not a whole number shows one decimal (7.5/30), wherever the score is shown. It only informs; nothing on it changes your training. Deload-week check-ins are left out, as in the Readiness Trend.</p>
-    <h3>Timeline Bar</h3>
-    <p>The pills at the top show all 16 weeks. <strong>Tap any week</strong> to preview its weights for every lift; "Back to current" returns. The Program tab shows the same 16 weeks as a grid, with a volume bar and a top-set bar in every week.</p>
+    <p><strong>Readiness:</strong> the session card shows today’s check-in: the score out of 30, its zone, the change from the check-in before, and what it does to today’s sets (below 8 two working sets are dropped, below 15 one, and at 23 and above an extra set is offered; never on a test day or a deload). Check in, or Edit, opens the five questions; the answer is kept for the day and used once, for the next session you start. Under <strong>Consistency and recovery</strong> the Readiness tile shows the last ten scores and which answers got better or worse. A score that is not a whole number shows one decimal (7.5/30), wherever the score is shown. Deload-week check-ins are left out of the trend, as in the Readiness Trend.</p>
+    <h3>Cycle Map</h3>
+    <p>The map on Home shows all 16 weeks. <strong>Tap any week</strong> to see its summary under the map: sets and reps per lift, the top percentage, and the work logged that week; “Back to week” returns to the current one. The Program tab shows the same 16 weeks, one week at a time with its weights for each lift, and all sixteen in a table.</p>
     <h3>Lift Intelligence</h3>
     <p>Per-lift weekly hard sets against the MEV/MRV targets for that phase (warm-up and ramp sets excluded). Your Tier 1 accessories are the volume lever.</p>
-    <h3>Weekly Plan</h3>
-    <p>Lifts done vs. remaining, days left, a pace badge, and a "Next up" suggestion that respects squat/deadlift spacing.</p>
+    <h3>The Week’s Lifts</h3>
+    <p>Under the session card: each lift with its day and result once logged, or its planned weight. The heading counts lifts logged and days left; the line under the row gives the pace and a "Next up" suggestion that respects squat/deadlift spacing.</p>
   </div>
 
   <h2 id="guide-workout">Daily Workout Flow</h2>
   <div class="section">
     <h3>Readiness Check</h3>
-    <p>Tap <strong>Start Workout</strong> and rate Sleep, Motivation, Nutrition, Soreness and Performance 1–5 (a "Same as Last" button fills them from your last session). The app turns them into a 0–30 score. <em>App rule:</em> below 15 drops one working set, below 8 drops two; "Train Full Volume Anyway" overrides. Never on test days or deloads.</p>
+    <p>Tap <strong>Start</strong> on the session card (it names the lift, for example “Start deadlift”) and rate Sleep, Motivation, Nutrition, Soreness and Performance 1–5 (a "Same as Last" button fills them from your last session). The app turns them into a 0–30 score. <em>App rule:</em> below 15 drops one working set, below 8 drops two; "Train Full Volume Anyway" overrides. Never on test days or deloads.</p>
     <h3>Logging Sets</h3>
     <p>Tap a set row to log it when the reps match the target, or use the hero card's stepper. The hero card shows the weight, a plate diagram with each plate’s weight on it (iron or colour-coded: Settings → Program → Plate drawing), target reps and % of TM.</p>
     <h3>Changing the Weight</h3>
@@ -4308,10 +4694,10 @@ body.v17-precheck .v171-back{display:none}
   <h2 id="guide-walkthrough">Your Workout: Start to Finish</h2>
   <div class="section">
     <h3>Step 1 — Check the Dashboard</h3>
-    <p>Settings open from the sliders button in the header. The Today tab shows the cycle, wave, phase and week (e.g. "5S · Intensification · Wk 10/16"), the lift buttons (this week's top weight under each name, or Done once it is), the workout preview with plates, your last session and the Weekly Plan. Lift Intelligence is on the Recovery screen (tap the Recovery tile). Any TM confirmation or Hermes card waits here.</p>
+    <p>Settings open from the sliders button in the header. Home shows the week in the header (e.g. "Week 10 of 16"), the session card for the lift you have picked (its chip names the wave and the kind of week, e.g. "5s intensification"), the week’s lifts under it (the planned weight under each name, or the result once it is logged) and your last session for that lift. Lift Intelligence is on the Recovery screen (tap Recovery beside "Consistency and recovery"). Any TM confirmation or Hermes card waits here.</p>
 
     <h3>Step 2 — Start Workout</h3>
-    <p>Tap <strong>Start Workout</strong> and rate readiness. Below 15/30 the app drops a working set (app rule; not on test days or deloads); "Train Full Volume Anyway" overrides. 23+/30 offers a fire-day set (app rule).</p>
+    <p>Tap <strong>Start</strong> on the session card and rate readiness. Below 15/30 the app drops a working set (app rule; not on test days or deloads); "Train Full Volume Anyway" overrides. 23+/30 offers a fire-day set (app rule).</p>
 
     <h3>Step 3 — Warm Up and Work</h3>
     <p>If guided warmup is on, rate each warm-up set. Then work through the sets: lead-ins first on 5s/3s intensification days, then the working sets. Tap a row to log it, or tap the weight to change it and pick a reason.</p>
@@ -4630,7 +5016,7 @@ body.v17-precheck .v171-back{display:none}
   <div class="modal-card" style="text-align:left;max-height:85vh;overflow-y:auto">
     <div class="sheet-handle"></div>
     <div id="onboardStep1">
-      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut 2.4.2</h2>
+      <h2 style="font-size:22px;margin-bottom:8px">Welcome to Juggernaut v18</h2>
       <p style="font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:14px">A 16-week powerlifting tracker built on Chad Wesley Smith's <em>The Juggernaut Method 2.0</em>, with the 10s and 8s waves inverted (many sets × few reps) as in his JTS article. "+" sets that stop short of failure, one test-day AMRAP per wave, double-progression accessories. Three quick steps to get you training.</p>
       <div style="display:grid;gap:8px;margin-bottom:14px">
         <div class="onboard-step"><strong>Step 1</strong> — Enter your 1-rep maxes (honest, not ego)</div>
@@ -4671,6 +5057,23 @@ body.v17-precheck .v171-back{display:none}
 (() => {
   'use strict';
 
+  // v18 (18.0.0) — Home rebuilt around the day's lift ("concept A"), decided with Reese on 2026-11-20. Display only:
+  //   no training rule, weight, set count, training max, storage key, database version, export format, bridge function
+  //   or packet field changes, and sw.js is untouched. The layer is at the end of this script (v18Home and the
+  //   functions above it) and at the end of the stylesheet; the edits to 2.4 lines carry a "v18" comment.
+  //   (1) Home's order: the session card, the week's lifts (also the lift picker), the notices, last time, the
+  //   consistency and recovery tiles, the cycle map, the last five weeks, the estimated maxes. The readiness block
+  //   (v17Hero) and the Weekly Plan card are no longer drawn on Home; what they said is in the card, the lifts row
+  //   (weeklyPlanFacts) and the tiles. (2) The card's set ladder reads readinessSetPlan and readinessDropIndexes, which
+  //   applyFatigueManagement and shouldOfferFireDayExtension now call too: one statement of the thresholds (under 8 two
+  //   work sets off, under 15 one, 23 and over an extra set offered, never on a test day or a deload). Behaviour is the
+  //   same as 2.4.2. (3) The cycle map keeps its drawing; a week tapped on Home shows that week's summary under the key
+  //   and stays on Home (2.2 to 2.4 opened Program). (4) Four 2.4.2 faults fixed: This Week compared a week in progress
+  //   with the whole of last week and dropped the minus on tonnage; a lift whose max was tested and held said "complete
+  //   test days to track it"; calcReadinessScore saved 26.999999999999996 for 27 (the zone a score falls in is
+  //   unchanged for every possible answer); the early fatigue note on Home named a lift other than the one picked.
+  //   (5) Smaller: rest as m:ss on Home (restWords), estimated-max tiles (≈, TM tag, last top set), session-log sets
+  //   as chips, all sixteen weeks as a table on Program, one bodyweight logger (logBodyweight) for Settings and Home.
   // v17.4.1 "2.4.1" — six fixes, approved by Reese on 2026-11-16, for cases that need a storage fault or two windows.
   //   (R1) Reset Everything no longer treats storage it cannot reach as storage with nothing in it. If a save failed
   //   during this run (the app is on backup storage) the reset is refused before anything is erased. If the main
@@ -4755,7 +5158,7 @@ body.v17-precheck .v171-back{display:none}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '17.4.2';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.0.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -7278,13 +7681,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     return null; // No realization weeks have passed yet
   }
 
-  function renderWeeklyPlanCard(){
-    if (!el.weeklyPlanCard) return;
-    if (state.activeSession){ el.weeklyPlanCard.style.display = 'none'; return; }
+  // v18: the week's facts (lifts done, days left, pace, what to do next), worked out once. Home's lifts row shows them.
+  // They were the first half of renderWeeklyPlanCard; the wording and the rules are unchanged.
+  function weeklyPlanFacts(){
     const tl = buildTimeline();
     const realMicro = currentMicrocycle();
     const micro = (_previewWeekIdx !== null && _previewWeekIdx !== realMicro.index) ? tl[_previewWeekIdx] : realMicro;
-    if (!micro || micro.index >= tl.length){ el.weeklyPlanCard.innerHTML = ''; el.weeklyPlanCard.style.display = 'none'; return; }
+    if (!micro || micro.index >= tl.length) return null;
     const active = LIFTS.filter(l => isActiveLift(l.id));
     const statuses = active.map(l => ({ lift:l, status:getWeeklyLiftPlanStatus(l.id) }));
     const dueCount = statuses.filter(s => s.status === 'due').length;
@@ -7323,45 +7726,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       }
     }
 
-    let html = '<h3>Weekly Plan</h3>';
-    // Summary stats
-    html += '<div class="wp-summary">';
-    html += '<div class="wp-stat"><div class="wp-stat-val">' + doneCount + '/' + active.length + '</div><div class="wp-stat-label">Lifts Done</div></div>';
-    html += '<div class="wp-stat"><div class="wp-stat-val">' + daysLeft + '</div><div class="wp-stat-label">' + (daysLeft === 1 ? 'Day Left' : 'Days Left') + '</div></div>';
-    html += '<div class="wp-stat"><div class="wp-stat-val" style="font-size:13px">' + micro.wave.toUpperCase() + '</div><div class="wp-stat-label">' + capitalize(micro.phase) + '</div></div>';
-    html += '</div>';
-    // Pace badge
-    html += '<div class="wp-pace ' + paceCls + '">' + paceLabel + '</div>';
-    // Lift rows with colored dots
-    html += '<div class="wp-lifts">';
-    statuses.forEach(s => {
-      const dotCls = s.status;
-      const label = s.status === 'na' ? 'Not scheduled' : capitalize(s.status);
-      const color = s.status === 'done' ? 'var(--accent)' : s.status === 'due' ? 'var(--blue)' : 'var(--muted)';
-      // Check for missed realization
-      const stale = liftTestWarning(s.lift.id);
-      const staleTag = stale ? ' <span style="font-size:12px;color:var(--warn);font-weight:800">⚠ ' + (stale.endedEarly ? 'TEST NOT DONE' : 'SKIPPED TEST') + '</span>' : '';   // v15 (round 10, D1)
-      html += '<div class="wp-row"><span class="wp-lift">' + escapeHtml(s.lift.name) + staleTag + '</span>';
-      html += '<span class="wp-status" style="color:' + color + '"><span class="wp-dot ' + dotCls + '"></span>' + label + '</span></div>';
-    });
-    html += '</div>';
-    // Stale 1RM warnings
-    let staleWarnings = [];
-    statuses.forEach(s => {
-      const stale = liftTestWarning(s.lift.id);
-      if (stale){
-        staleWarnings.push(escapeHtml(s.lift.name) + ': the ' + stale.wave.toUpperCase() + (stale.endedEarly ? ' test was not done ' : ' test was skipped ') + stale.weeksAgo + ' week' + (stale.weeksAgo !== 1 ? 's' : '') + ' ago, so the TM hasn\u2019t moved since.');
-      }
-    });
-    if (staleWarnings.length){
-      html += '<div style="margin-top:8px;padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--warn-mid);background:var(--warn-dim);font-size:12px;color:var(--warn);line-height:1.5">';
-      staleWarnings.forEach(w => { html += '<div>' + w + '</div>'; });
-      html += '</div>';
-    }
-    // Recommendation
-    if (rec) html += '<div class="wp-rec">' + rec + '</div>';
-    el.weeklyPlanCard.innerHTML = html;
-    el.weeklyPlanCard.style.display = '';
+    return { micro, active, statuses, dueCount, doneCount, daysLeft, nextId, nextName, paceLabel, paceCls, rec };
+  }
+  // v18: the Weekly Plan card is not drawn. Everything it said is in Home's lifts row (v18Lifts, from weeklyPlanFacts):
+  // lifts done, days left, pace, each lift's status, test warnings and the next-up line.
+  function renderWeeklyPlanCard(){
+    if (!el.weeklyPlanCard) return;
+    el.weeklyPlanCard.innerHTML = ''; el.weeklyPlanCard.style.display = 'none';
   }
 
   /* ═══ PROGRAM LOGIC ═══ */
@@ -7854,8 +8225,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function calcReadinessScore(r){
     const { sleep, motivation, nutrition, soreness, performance } = r;
     if (!sleep || !motivation || !nutrition || !soreness || !performance) return NaN;
-    const avg = (sleep + motivation + nutrition + soreness + performance) / 5;
-    return ((avg - 1) * 7.5); // Maps 1..5 → 0..30
+    // Maps 1..5 → 0..30. v18: the same sum as (average − 1) × 7.5, written so that it is exact for whole answers.
+    // Dividing by 5 first gave 26.999999999999996 for a 27, and that number went into the saved session.
+    return (sleep + motivation + nutrition + soreness + performance - 5) * 1.5;
   }
 
   function showReadinessModal(){
@@ -7913,6 +8285,24 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     v16Safe('readiness note', v16ReadinessNote);   // v16: wording only, on days the set rules do not apply
   }
 
+  // v18: the one statement of what a readiness score does to the day's sets. applyFatigueManagement and
+  // shouldOfferFireDayExtension read it when a session starts, and Home's set ladder reads it before that, so the
+  // picture on Home cannot disagree with the session. Under 8: two work sets come off. Under 15: one. 23 and over:
+  // one extra set is offered. Never on a test day or a deload.
+  function readinessSetPlan(phase, score){
+    const applies = phase !== 'deload' && phase !== 'realization';
+    const v = normalizeReadinessScore(score, 2);
+    if (!applies || !Number.isFinite(v)) return { applies, drop:0, offerExtra:false };
+    return { applies, drop:v < 8 ? 2 : v < 15 ? 1 : 0, offerExtra:v >= 23 };
+  }
+  // The sets a readiness drop takes off: the last work sets, never a lead-in or the "+" set. Indexes into `sets`,
+  // highest first, so they can be spliced in the order given.
+  function readinessDropIndexes(sets, drop){
+    const out = [];
+    for (let i = sets.length - 1; i >= 0 && out.length < drop; i--) if (sets[i] && sets[i].role === 'work') out.push(i);
+    return out;
+  }
+
   function applyFatigueManagement(session, score){
     if (!session || !Number.isFinite(score)) return;
     _sessionReadiness = { ..._readinessState, score, scoreV:2, fatigueManaged:false };
@@ -7927,10 +8317,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       return;
     }
 
-    const normalized = normalizeReadinessScore(score, 2); // score is always v10+ here
     // Threshold: only trigger below 15/30 (avg factor ~3/5).
     // An "all 3s" day (15/30) is normal — not bad enough to drop sets.
-    if (normalized >= 15){
+    const plan = readinessSetPlan(session.phase, score);   // v18: the thresholds live there; score is always v10+ here
+    if (!plan.drop){
       el.badgeFatigue.style.display = 'none';
       return;
     }
@@ -7939,14 +8329,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     session.readiness = { ..._sessionReadiness };
     el.badgeFatigue.style.display = '';
 
-    const workingSets = session.sets.filter(s => s.role === 'work');   // v14: never lead-ins or the "+" set
-    // Drop 2 sets only on very bad days (<8/30, avg factor ~2/5)
-    const dropCount = normalized < 8 ? 2 : 1;
-    let dropped = 0;
-    for (let i = workingSets.length - 1; i >= 0 && dropped < dropCount; i--){
-      const idx = session.sets.indexOf(workingSets[i]);
-      if (idx !== -1){ session.sets.splice(idx, 1); dropped++; }
-    }
+    // v14: never lead-ins or the "+" set. Two sets come off only on very bad days (<8/30, avg factor ~2/5).
+    const dropIdx = readinessDropIndexes(session.sets, plan.drop);   // v18: the same sets Home's ladder hatches
+    dropIdx.forEach(idx => session.sets.splice(idx, 1));
+    const dropped = dropIdx.length;
     session.sets.forEach((s, i) => s.index = i);
 
     // Store details for autoreg card
@@ -7959,10 +8345,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   // v11: Fire day detection — offers to extend volume on exceptional readiness days
   function shouldOfferFireDayExtension(session, score){
     if (!session || !Number.isFinite(score)) return false;
-    if (session.phase === 'deload') return false;
-    if (session.phase === 'realization') return false; // never extend realization — AMRAP is the progression
-    const normalized = normalizeReadinessScore(score, 2);
-    return normalized >= 23;
+    // never on a deload, never on a test day (the AMRAP is the progression); 23 and over offers the set.
+    return readinessSetPlan(session.phase, score).offerExtra;   // v18: all three rules are stated once, there
   }
 
   async function maybeOfferFireDayExtension(session, score){
@@ -10339,6 +10723,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     } // end !isPreviewing
     renderLiftIntelligence();
     renderWeeklyPlanCard();
+    v18HomeSoon();   // v18: the new card follows this one. render() draws it straight after (renderV17); this covers the few paths that call renderDashboard alone
   }
 
   function renderProgramSummary(){
@@ -10942,7 +11327,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 7);
     const prevStart = new Date(weekStart); prevStart.setDate(prevStart.getDate() - 7);
     const thisWeek = items.filter(h => { const d = new Date(h.completedAt); return d >= weekStart && d < weekEnd; });
-    const prevWeek = items.filter(h => { const d = new Date(h.completedAt); return d >= prevStart && d < weekStart; });
+    // v18: last week up to the same weekday and time. A week in progress was compared with the whole of last week, so a
+    // Thursday with two of four lifts done read "Sessions 2 −2" in red.
+    const prevCut = new Date(prevStart.getTime() + (now.getTime() - weekStart.getTime()));
+    const prevWeek = items.filter(h => { const d = new Date(h.completedAt); return d >= prevStart && d < prevCut; });
     if (!thisWeek.length && !prevWeek.length){ el.weeklySummaryCard.hidden = true; return; }
     el.weeklySummaryCard.hidden = false;
     const calc = (ss) => {
@@ -10959,14 +11347,16 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
       const sign = diff > 0 ? '+' : '';
       const val = isWeight ? formatWeight(roundToIncrement(Math.abs(diff), 5)) : Math.abs(Math.round(diff));
-      return ' <span class="ws-delta ' + cls + '">' + sign + (diff < 0 && !isWeight ? '-' : '') + val + '</span>';
+      if ((isWeight ? roundToIncrement(Math.abs(diff), 5) : Math.abs(Math.round(diff))) === 0) return ' <span class="ws-delta flat">same</span>';   // v18: it printed a bare 0 beside the number ("2 0")
+      return ' <span class="ws-delta ' + cls + '">' + sign + (diff < 0 ? '\u2212' : '') + val + '</span>';   // v18: a drop in tonnage has its minus sign too (it read as a second, unlabelled number)
     }
     el.weeklyTitle.textContent = 'This Week (' + (weekStart.getMonth()+1) + '/' + weekStart.getDate() + ' \u2013 ' + (weekEnd.getMonth()+1) + '/' + (weekEnd.getDate()-1) + ')';
     el.weeklyStats.innerHTML =
       '<div class="weekly-stat"><div class="ws-k">Sessions</div><div class="ws-v">' + tw.count + delta(tw.count, pw.count, false) + '</div></div>' +
       '<div class="weekly-stat"><div class="ws-k">Total Sets</div><div class="ws-v">' + tw.sets + delta(tw.sets, pw.sets, false) + '</div></div>' +
       '<div class="weekly-stat"><div class="ws-k">Tonnage</div><div class="ws-v">' + formatWeight(roundToIncrement(tw.ton, 5)) + delta(tw.ton, pw.ton, true) + '</div></div>' +
-      '<div class="weekly-stat"><div class="ws-k">Avg Readiness</div><div class="ws-v">' + (Number.isFinite(tw.avgR) ? readinessScoreText(tw.avgR) + '/30' : '\u2014') + '</div></div>';
+      '<div class="weekly-stat"><div class="ws-k">Avg Readiness</div><div class="ws-v">' + (Number.isFinite(tw.avgR) ? readinessScoreText(tw.avgR) + '/30' : '\u2014') + '</div></div>' +
+      (pw.count ? '<div class="v18-ws-note">Changes are against last week at this point.</div>' : '');   // v18
   }
 
   function renderSparklines(){
@@ -10982,6 +11372,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (!points.length || points[points.length-1] !== currentTm) points.push(currentTm);
       if (points.length < 1) return;
       hasAny = true;
+      const nTests = liftTests(lift.id).length;   // v18: a max that was tested and held is one point on the chart, not "no tests"
 
       const first = points[0];
       const last = points[points.length - 1];
@@ -11004,7 +11395,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           <span class="spark-label">${formatWeight(first)}</span>
           <span class="spark-label">${points.length} data point${points.length > 1 ? 's' : ''}</span>
           <span class="spark-label">${formatWeight(last)}</span>
-        </div>` : '<div class="spark-label-row"><span class="spark-label">Current TM — complete test days to track it</span></div>'}`;
+        </div>` : '<div class="spark-label-row"><span class="spark-label">' + (nTests ? 'Held at ' + escapeHtml(formatWeight(last)) + ' through ' + nTests + ' test' + (nTests === 1 ? '' : 's') : 'Current TM — complete test days to track it') + '</span></div>'}`;
       liftCardControl(card, lift);   // v15 (round 8, L1)
       el.sparklineContainer.appendChild(card);
     });
@@ -11690,6 +12081,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (totalSessions < DELOAD_RULES.minSessionsGlobal) return { severity:'none', score:0, evidence:[], fatigueLifts:[], digest };
 
     let score = 0; const evidence = []; const fatigueLifts = new Set();
+    const about = [];   // v18: the lift each line of evidence is about (null: every lift), in step with `evidence`
     for (const f of (digest.flags || [])){
       const parsed = parseCoachFlag(f); if (!parsed) continue;
       const wt = DELOAD_RULES.weights[parsed.kind] || 0;
@@ -11698,6 +12090,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const d = digest.lifts[parsed.liftId]; if (!d) continue;
       if (parsed.kind !== 'e1rm_stalled') fatigueLifts.add(parsed.liftId);
       const pc = d.plusVsLastCycle;
+      about.push({ liftId:parsed.liftId, kind:parsed.kind });
       evidence.push(
         parsed.kind === 'readiness_downtrend' ? (d.name + ': readiness trending down') :
         parsed.kind === 'missed_standard'      ? (d.name + ': last test ' + d.lastTest.reps + ' reps vs a standard of ' + d.lastTest.standard) :
@@ -11711,10 +12104,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const slope = _linregSlopePerWeek(pts);
     if (pts.length >= 4 && slope <= DELOAD_RULES.globalSlopeThreshold){
       score += DELOAD_RULES.globalSlopeBonus;
+      about.push({ liftId:null, kind:'global_slope' });
       evidence.push('Overall readiness falling ' + slope + '/wk');
     }
     const severity = deloadSeverityFor(score);
-    return { severity, score:Math.round(score*10)/10, evidence, slope, fatigueLifts:[...fatigueLifts], digest };
+    return { severity, score:Math.round(score*10)/10, evidence, about, slope, fatigueLifts:[...fatigueLifts], digest };
   }
 
   function findNextDeloadIndex(){
@@ -11897,8 +12291,17 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       return;
     }
     if (a.severity === 'watch' && !cutOk.length && !cutWait.length){
+      // v18: on Home the early note is about the lift picked, or about every lift. A note about another lift waits on
+      // the Recovery screen: it read "Fatigue watch: Overhead Press" above a deadlift day. A readiness trend is worded
+      // as what it is, check-ins on that lift's days, not a fault in the lift.
+      const sel = selectedLiftId(), abt = Array.isArray(a.about) ? a.about : [];
+      const at = abt.findIndex(x => x && (!x.liftId || x.liftId === sel));
+      if (abt.length && at < 0){ node.hidden = true; node.innerHTML = ''; return; }
+      const what = (at >= 0 && abt[at].kind === 'readiness_downtrend')
+        ? 'readiness has trended down on recent ' + ((getLiftMeta(abt[at].liftId) || {}).name || 'training') + ' days'
+        : (a.evidence[Math.max(0, at)] || 'early signals');
       node.hidden = false;
-      node.innerHTML = '<div class="install-help" style="margin:0 0 10px">Fatigue watch: ' + escapeHtml(a.evidence[0] || 'early signals') + '.</div>';
+      node.innerHTML = '<div class="install-help" style="margin:0 0 10px">Fatigue watch: ' + escapeHtml(what) + '.</div>';
       return;
     }
     const isDeload = a.severity === 'deload';
@@ -13923,7 +14326,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           <div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(wave.toUpperCase())} ${escapeHtml(capitalize(phase))}${outcomeBadge}${partialBadge}</div>
           <div class="sm mt">${fmtDate(item.completedAt)}${cycleTag}${upd}</div>
           <div class="hist-tonnage">${formatWeightAs(roundToIncrement(tonnage, 5), item.units)} tonnage · ${workingSets.length} set${workingSets.length === 1 ? '' : 's'}${readinessStr}${difficultyStr}</div>
-          <div class="xs mt" style="margin-top:4px">${workingSets.map(s => numText(s.performedReps, '?') + '/' + numText(s.targetReps, '?')).join(' · ')}</div>${partialNote}${weightNote}${review}
+          ${v18SetChips(workingSets, item.phase)}${partialNote}${weightNote}${review}
           ${item.note ? '<div class="xs mt" style="margin-top:4px;opacity:.7">' + escapeHtml(item.note) + '</div>' : ''}
           ${item.userNote ? '<div class="xs mt" style="margin-top:4px;opacity:.7;font-style:italic">' + escapeHtml(item.userNote) + '</div>' : ''}
           ${item.coachingInsight ? '<div class="hist-coaching" data-coaching-toggle><strong>' + escapeHtml(coachLabelFor(item)) + '</strong> <span style="opacity:.5;font-size:12px">tap to expand</span><div class="hist-coaching-text" style="display:none;margin-top:4px;color:var(--text2)">' + escapeHtml(item.coachingInsight) + '</div></div>' : ''}
@@ -14284,7 +14687,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (def && Number.isFinite(def.restSeconds)) return def.restSeconds;
     return Number.isFinite(PROGRAM.defaultRestMatrix[key]) ? PROGRAM.defaultRestMatrix[key] : 120;
   }
-  function restWords(sec){ return sec > 0 ? sec + 's rest' : 'Rest: your call'; }
+  function restWords(sec){ return sec > 0 ? formatDuration(sec) + ' rest' : 'Rest: your call'; }   // v18: 1:45, as Program shows it (it said 105s)
   function restSecondsForSession(session){
     const key = session.wave + '_' + session.phase;
     const userVal = state.settings.restMatrix?.[key];
@@ -16448,17 +16851,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     // v10: Bodyweight logging
     if (el.btnLogBW){
-      el.btnLogBW.addEventListener('click', async () => {
-        const w = n(el.bwInput.value);
-        if (!Number.isFinite(w) || w <= 0){ toast('Enter a valid weight.', 'w'); return; }
-        if (!Array.isArray(state.bodyweight)) state.bodyweight = [];
-        state.bodyweight.push({ date:nowISO(), weight:w });
-        // Keep last 365 entries max
-        if (state.bodyweight.length > 365) state.bodyweight = state.bodyweight.slice(-365);
-        el.bwInput.value = '';
-        await saveState();
-        toast('Logged ' + formatWeight(w) + '.', 'g');
-        renderBW();
+      el.btnLogBW.addEventListener('click', async () => {   // v18: the logging itself is logBodyweight, which Home's tile calls too
+        if (await logBodyweight(n(el.bwInput.value))) el.bwInput.value = '';
       });
     }
     el.btnResetAll.addEventListener('click', resetAll);
@@ -16897,7 +17291,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const session = state.activeSession;
     t.textContent = (_v16View === 'Workout' && session) ? ((getLiftMeta(session.liftId) || {}).name || 'Session') : (V16_TITLES[_v16View] || _v16View);
     s.textContent = _v16View === 'Workout' ? new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' })
-      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut 2.4.2';
+      : _v16View === 'Settings' ? 'v' + APP_VERSION + ' — Book Rules + Hermes' : 'Juggernaut v18';
     const micro = currentMicrocycle();
     document.body.style.setProperty('--heat', micro.phase === 'deload' ? '#8FA8FF' : (V16_WAVE_COLOR[micro.wave] || '#FFE45C'));
   }
@@ -17226,7 +17620,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
     const L = 80, R = W - 80;
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.2', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut v18', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 150, true); ctx.fillText(wave + ' wave', L - 6, 300);
     const ds = rows.map(r => Date.parse(r.date)).filter(Number.isFinite), passed = rows.filter(r => r.reps >= r.standard).length;
     F(600, 38);
@@ -17377,7 +17771,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     c.width = W; c.height = H;
     ctx.fillStyle = V16_WAVE_COLOR[r.wave] || '#FFE45C'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = INK; ctx.textBaseline = 'alphabetic';
     const F = (wt, px, wide) => { ctx.font = wt + ' ' + px + 'px Montserrat, "Helvetica Neue", Arial, sans-serif'; };
-    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut 2.4.2', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
+    F(700, 36); ctx.textAlign = 'left'; ctx.fillText('Juggernaut v18', L, 120); ctx.textAlign = 'right'; ctx.fillText('Cycle ' + r.cycle, R, 120);
     ctx.textAlign = 'left'; F(800, 130, true);
     let size = 130; while (ctx.measureText(r.title).width > R - L && size > 60){ size -= 6; F(800, size, true); }
     ctx.fillText(r.title, L - 5, 300);
@@ -17566,7 +17960,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         v17SetUi('pre', { day:v17Ymd(Date.now()), at:new Date().toISOString(), sleep:r.sleep, motivation:r.motivation, nutrition:r.nutrition, soreness:r.soreness, performance:r.performance, score:r.score });
         toast('Check-in saved for today.', 'g');
       }
-    } finally { _v17Pre = false; document.body.classList.remove('v17-precheck'); _v17Sig.hero = null; v17Safe('hero', v17Hero); }
+    } finally { _v17Pre = false; document.body.classList.remove('v17-precheck'); v18Home(); }   // v18: the check-in shows in the session card
   }
   function v17ApplyPre(){   // a session is starting and today's check-in exists: type it into the sheet and continue
     if (_v17Pre || !el.readinessModal || el.readinessModal.hidden) return;
@@ -17676,9 +18070,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const pc = (v, of) => (v / of * 100).toFixed(3) + '%';
       taps = '<div class="v17-taps">' + D.tl.map((wk, i) => {
         const cell = o.home ? null : document.querySelector('#pgGrid .v16-cell[data-v16-week="' + i + '"]');
-        const said = o.home ? 'Week ' + (i + 1) + ', ' + wk.wave + ' ' + wk.phase + '. Opens this week in Program.'   // v17.2: on Home a week button opens Program on that week
+        const said = o.home ? 'Week ' + (i + 1) + ', ' + wk.wave + ' ' + wk.phase + '. Shows this week under the map.'   // v18: on Home a week button shows that week's summary (in 2.2 to 2.4 it opened Program)
           : (cell && cell.getAttribute('aria-label')) || ('Week ' + (i + 1) + ', ' + wk.wave + ' ' + wk.phase);
-        return '<button type="button" data-v16-week="' + i + '" aria-label="' + escapeHtml(said) + '"' + (o.home ? '' : ' aria-pressed="' + (i === sel) + '"') + (i === D.cur ? ' aria-current="true"' : '')
+        return '<button type="button" data-v16-week="' + i + '" aria-label="' + escapeHtml(said) + '"' + ' aria-pressed="' + (i === sel) + '"' + (i === D.cur ? ' aria-current="true"' : '')
           + ' style="left:' + pc(xs[i] - 2.5, W) + ';width:' + pc(bw + 5, W) + ';top:' + pc(y0 - 6, H) + ';height:' + pc(H - y0 + 6, H) + '"></button>';
       }).join('') + '</div>';
     }
@@ -17702,7 +18096,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const tm = trainingMax(lift), w = workingWeightFromPctTM(lift, pct);
       // v17.2: the lift picked and the weight on the bar, not only the percent (it read "10 or more at 75%. 14 raises your squat max.")
       at = escapeHtml(V17_SHORT[id] || getLiftMeta(id).name) + ': ' + std + ' or more at ' + v16Wt(w) + ' (' + escapeHtml(formatPercent(pct)) + ')';
-      for (let r = std + 1; r <= std + TM_RULE.maxExtraReps; r++) if (bookTmUpdate(tm, w, r, std, isLowerBody(id)).amount > 0){ raise = r + ' reps raises your max'; break; }
+      const up = testRaiseReps(id, wk.wave); if (up) raise = up + ' reps raises your max';   // v18: Home's test-week card says the same number
     }
     const when = t === D.cur ? 'Test this week' : t === D.cur + 1 ? 'Test next week' : 'Test in ' + (t - D.cur) + ' weeks';
     return '<button type="button" class="v17-next" data-v17="program"><span class="v17-next-ic" style="color:' + V17_WAVE[wk.wave] + '">' + v17Ic('target', 22) + '</span>'
@@ -17712,12 +18106,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const box = v17$('v17MapCard'); if (!box) return;
     box.hidden = !v17Idle(); if (box.hidden) return;
     const D = v17MapData(''); if (!D){ box.hidden = true; return; }
-    const sig = JSON.stringify([D.cur, D.cycle, D.hist.length, state.program.completion, selectedLiftId(), D.act.map(l => trainingMax(state.lifts[l.id])), D.gains]);
+    const sig = JSON.stringify([D.cur, D.cycle, D.hist.length, state.program.completion, selectedLiftId(), D.act.map(l => trainingMax(state.lifts[l.id])), D.gains, _v18Week, unitLabel()]);   // v18: and the week picked
     v17Once('homeMap', sig, () => {
       const N = D.tl.length, total = N * D.act.length, done = D.tl.reduce((a, _, i) => a + D.act.filter(l => v17StateOf(D.tl, D.cur, D.hist, i, l.id) === 'done').length, 0), left = Math.max(0, N - D.cur - 1);
       box.innerHTML = '<div class="v17-slab-h"><div><h2>Cycle ' + D.cycle + '</h2><p>' + (D.cur >= N ? 'Complete' : 'Week ' + (D.cur + 1) + ' of ' + N) + ' · ' + done + ' of ' + total + ' sessions</p></div>'
         + '<button type="button" class="v17-link" data-v17="program">Program' + v17Ic('right', 18) + '</button></div>'
-        + v17MapSvg(D, { sel:D.cur < N ? D.cur : -1, tap:true, home:true, anim:_v17Anim, uid:'hm' }) + v17MapKey(D) + v17NextTest(D);   // v17.2: 'Week N of 16' (it said 'N weeks to go'); week buttons over the map
+        + v17MapSvg(D, { sel:v18MapSel(D), tap:true, home:true, anim:_v17Anim, uid:'hm' }) + v17MapKey(D) + v18WeekSummary(D) + v17NextTest(D);   // v18: the week picked, and its summary under the key   // v17.2: 'Week N of 16' (it said 'N weeks to go'); week buttons over the map
       _v17Anim = false;
     });
   }
@@ -17786,11 +18180,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         + facts.map(x => {
           const pct = x.goal ? Math.max(0, Math.min(100, (x.est - x.start) / Math.max(1, x.goal - x.start) * 100)) : 0, left = x.goal ? x.goal - x.est : 0;
           return '<button type="button" class="v17-tile' + (x.goal ? ' goal' : '') + '" data-v17="lift:' + x.id + '"><span class="v17-tile-h"><b>' + escapeHtml(V17_SHORT[x.id] || getLiftMeta(x.id).name) + '</b>' + v17Steps(x.path, 64, 26) + '</span>'
-            + '<span class="v17-tile-n">' + v17Num(Math.round(x.est)) + '<small>' + escapeHtml(state.settings.units || 'lb') + '</small></span>'
-            + (Math.round(x.up) > 0 ? '<span class="v17-tile-up">' + v17Ic('up', 14) + v16Wt(Math.round(x.up)) + ' this cycle</span>' : '<span class="v17-tile-up flat">No change this cycle yet</span>')
+            + '<span class="v17-tile-n"><i class="v18-approx" aria-hidden="true">≈</i>' + v17Num(Math.round(x.est)) + '<small>' + escapeHtml(state.settings.units || 'lb') + '</small></span>'   // v18: marked as an estimate
+            + (Math.round(x.up) > 0 ? '<span class="v17-tile-up">' + v17Ic('up', 14) + v16Wt(Math.round(x.up)) + ' this cycle</span>' : '')   // v18: no line when there is nothing to say
             + (x.goal ? '<span class="v17-bar"><i style="width:' + pct.toFixed(0) + '%"></i></span><span class="v17-tile-s">' + (left > 0 ? v16Wt(Math.round(left)) + ' to ' + v17Num(x.goal) : 'Goal of ' + v17Num(x.goal) + ' reached') + '</span>'
                 + (left > 0 ? '<span class="v17-tile-s dim">' + escapeHtml(goalEtaWords(x.id, x.eta)) + '</span>' : '')   // v17.1 (L12)
-              : '<span class="v17-tile-s dim">Training max ' + v16Num(x.tm) + '</span>') + '</button>';
+              : '<span class="v17-tile-s dim"><b class="v18-tm">TM</b>' + v16Num(x.tm) + '</span>') + v18TopSetLine(x.id) + '</button>';   // v18
         }).join('') + '</div>';
     });
   }
@@ -17824,6 +18218,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         + '<em>' + escapeHtml(st ? 'Pick another lift on Home' : numeric ? scheme + ' at ' + wt : scheme) + '</em></span>'
         + (st || preview ? (onToday ? '' : '<button type="button" class="v17-go ghost" data-v17="home">Home</button>') : '<button type="button" class="v17-go" data-v17="start"' + (el.btnStartResume && el.btnStartResume.disabled ? ' disabled' : '') + '>' + v17Ic('play', 16) + 'Start</button>');
     }
+    if (show && onToday && !s && _sessionPhase === 'idle' && _v18StartOn) show = false;   // v18: the card's Start is on screen
     document.body.classList.toggle('v17-strip-on', show);
     box.hidden = !show;
     if (show) v17Once('strip', html, () => { box.innerHTML = html; }); else _v17Sig.strip = null;
@@ -17840,7 +18235,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     let chipText = '';
     if (_v17View === 'Workout' && !session){
       t.textContent = mc.phase === 'complete' ? 'Cycle ' + v17Cycle() + ' complete' : 'Week ' + (mc.index + 1) + ' of ' + mc.total;
-      if (mc.phase !== 'complete') chipText = mc.wave + ' ' + ({ accumulation:'accumulate', intensification:'intensify', realization:'test', deload:'deload' }[mc.phase] || mc.phase);
+      // v18: the wave and phase are on the session card (the chip that opens "About this week"), not repeated here
     } else if (_v17View === 'Workout' && session){
       s.textContent = 'Week ' + (weekIndexOf(session.wave, session.phase) + 1) + ', ' + session.wave + ' wave';
     } else if (_v17View === 'History'){ t.textContent = 'Progress'; const nH = (state.history || []).length; s.textContent = v17Cycle() + ' cycle' + (v17Cycle() === 1 ? '' : 's') + ', ' + nH + ' session' + (nH === 1 ? '' : 's'); }
@@ -17888,6 +18283,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       }).join('') + '</div>').join('');
       tt.innerHTML = '<div class="v17-sec-h"><div><h2>Tests this cycle</h2><p>Reps on the test set, and what they did to each training max</p></div></div><div class="v17-slab v17-tt">' + head + rows + '</div>';
     });
+    try{ v18PlanTable(D, sel); }catch(err){ console.error('v18 plan table failed', err); }   // v18: all sixteen weeks, under the tests
   }
 
   /* ── the session: where you are in it, and the log button says what it will log ── */
@@ -18133,7 +18529,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function renderV17(){
     v17Safe('header', v17Header);
     v17Safe('strip', v17Strip);
-    if (_v17View === 'Workout'){ v17Safe('hero', v17Hero); v17Safe('home map', v17HomeMap); v17Safe('weeks', v17Weeks); v17Safe('maxes', v17Maxes); v17Safe('session', v17Session); }
+    if (_v17View === 'Workout'){ v18Home(); v17Safe('home map', v17HomeMap);   // v18: the session card, lifts row, last time and tiles; the readiness block is no longer drawn on Home
+      v17Safe('weeks', v17Weeks); v17Safe('maxes', v17Maxes); v17Safe('session', v17Session); }
     if (_v17View === 'Program') v17Safe('program', v17Program);
     if (_v17View === 'History') v17Safe('progress', v17Progress);
     if (_v17View === 'Tools') v17Safe('tools', v17Tools);
@@ -18142,6 +18539,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
   function v17OnView(name){
     _v17View = name;
+    _v18Week = null;   // v18: Home's map opens on the current week
     if (name === 'Tools'){ const inp = v17$('calcPlateWeight'), ws = v17ToolWeights(); if (inp && !inp.value && ws.length) v17Safe('tool fill', () => v17PlateSet(ws[0][0])); }
     renderV17();
   }
@@ -18200,8 +18598,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const wkb = ev.target.closest && ev.target.closest('[data-v16-week]');
       if (wkb){   // v16's own handler has just moved the week; redraw, and keep the keyboard where it was
         const onMap = !!wkb.closest('.v17-taps'), i = wkb.getAttribute('data-v16-week');
-        if (wkb.closest('#v17MapCard')){   // v17.2: a week tapped on Home's map opens Program on that week. Opening Program goes to the current week, so the week is set again after
-          setView('Program'); _v16Week = Number(i); v16Safe('program', v16ProgramView);
+        if (wkb.closest('#v17MapCard')){   // v18: a week tapped on Home's map shows that week's summary under the map and stays on Home (2.2 to 2.4 opened Program)
+          v18PickWeek(Number(i));
+          return;
         }
         v17Safe('program', v17Program);
         if (onMap){ const nb = document.querySelector('#v17PgMap .v17-taps [data-v16-week="' + i + '"]'); if (nb) nb.focus({ preventScroll:true }); }
@@ -18443,6 +18842,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     try{ v17Bind(); }catch(err){ console.error('v17 bind failed', err); }   // 2.0: boot continues
     try{ v171Bind(); }catch(err){ console.error('v171 bind failed', err); }   // 2.1: boot continues
     try{ v173Bind(); }catch(err){ console.error('v173 bind failed', err); }   // 2.3: boot continues
+    try{ v18Bind(); }catch(err){ console.error('v18 bind failed', err); }   // v18: boot continues
     setupModalA11y(); // v11.0.2: dialog roles + Escape-to-close
     wireOnboarding(); // v10: attach onboarding modal handlers
     try{ db = await idb.open(); }
@@ -19236,6 +19636,531 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     else if (what === 'hist'){ _v173Hist = !_v173Hist; again('[data-v173="hist"]'); if (_v173Hist){ const h = view.querySelector('.v173-hist'); if (h && h.scrollIntoView) h.scrollIntoView({ block:'start' }); } }
     else if (what === 'recal') openCalibrationSheet();
     else if (what === 'reset') await run(() => v173Reset(liftId));
+  }
+
+  /* ═══════════════ Juggernaut v18 (build 18.0.0): HOME OPENS ON THE DAY'S LIFT ═══════════════
+     Display only. Home is rebuilt around one session card ("concept A"): the lift and its load, the planned sets as a
+     ladder that today's check-in changes, plates per side, rest, readiness, and Start. Under the card: the week's
+     lifts (also the lift picker), the notices, the last time this lift was trained, and the consistency and recovery
+     tiles. Then the cycle map as it was drawn in 2.4, with a summary of the week picked under its key.
+
+     What left Home: the large readiness block and the Weekly Plan card. Everything either one said is in the card,
+     the lifts row or the tiles (weeklyPlanFacts feeds the lifts row).
+
+     Nothing here changes a weight, a set count or a training max. The set rules are read from readinessSetPlan and
+     readinessDropIndexes, the two functions a starting session uses, so the ladder cannot disagree with the session.
+     The only thing written is a bodyweight entry, through logBodyweight, which Settings uses too.
+
+     Each draw goes through v18Safe: a fault is logged, the screen shows its "could not be drawn" card, and the rest
+     of Home still draws. */
+  const V18_SCREEN_OF = { card:'Workout', lifts:'Workout', last:'Workout', tiles:'Workout', plan:'Program' };
+  const V18_PHASE = { accumulation:'accumulation', intensification:'intensification', realization:'test', deload:'deload' };
+  const V18_KIND = { accumulation:'Accumulate', intensification:'Intensify', realization:'Test', deload:'Deload' };   // the Program tab's own names for the four kinds of week
+  const V18_I = {
+    down:'<path d="M6 9l6 6 6-6"/>', up:'<path d="M6 15l6-6 6 6"/>', right:'<path d="M9 6l6 6-6 6"/>', check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    play:'<path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor" stroke="none"/>', arrowDn:'<path d="M12 5v14M6 13l6 6 6-6"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>', dot:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>',
+    ring:'<circle cx="12" cy="12" r="8"/>', warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
+    cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>', pulse:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
+    moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>', scale:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 10a3 3 0 0 1 6 0"/>'
+  };
+  let _v18List = false, _v18About = false, _v18Bw = false, _v18Week = null, _v18StartOn = false, _v18Due = false;
+  const _v18Sig = {};
+  function v18$(id){ return document.getElementById(id); }
+  function v18Ic(name, size, sw){ return '<svg class="v17-ic" width="' + (size || 16) + '" height="' + (size || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (sw || 2.2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + V18_I[name] + '</svg>'; }
+  function v18Safe(name, fn){ try{ fn(); _drawMark('v18 ' + name, V18_SCREEN_OF[name], false); }catch(err){ console.error('v18 ' + name + ' failed', err); _drawMark('v18 ' + name, V18_SCREEN_OF[name], true); } }
+  function v18Put(id, html){ const b = v18$(id); if (!b) return; b.hidden = !html; if (_v18Sig[id] !== html){ _v18Sig[id] = html; b.innerHTML = html; } }   // draw only what changed
+  function v18Day(iso){ const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' }); }
+  function v18Wd(iso){ const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { weekday:'short' }) + ' ' + d.getDate(); }
+  function v18Md(iso){ const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { month:'short', day:'numeric' }); }
+  function v18Plates(w, id){ const p = calculatePlates(w, id); return (p && Array.isArray(p.perSide) && p.perSide.length) ? p.perSide.map(x => weightDigits(x)).join(' +\u00a0') : 'Bar only'; }   // no-break space after each +: a long list wraps before a plus, never after one
+
+  // The fewest reps on a wave's test set that raise this lift's training max, or 0. Reads bookTmUpdate; changes nothing.
+  function testRaiseReps(id, wave){
+    const lift = state.lifts[id], std = PROGRAM.waveTargetReps[wave], pct = PROGRAM.testPct[wave];
+    if (!lift || !std || !pct) return 0;
+    const tm = trainingMax(lift), w = workingWeightFromPctTM(lift, pct);
+    for (let r = std + 1; r <= std + TM_RULE.maxExtraReps; r++) if (bookTmUpdate(tm, w, r, std, isLowerBody(id)).amount > 0) return r;
+    return 0;
+  }
+
+  // One logger for the bodyweight field in Settings and the tile on Home. Same entry shape and the same 365-entry cap as before.
+  async function logBodyweight(w){
+    if (!Number.isFinite(w) || w <= 0){ toast('Enter a valid weight.', 'w'); return false; }
+    if (!Array.isArray(state.bodyweight)) state.bodyweight = [];
+    state.bodyweight.push({ date:nowISO(), weight:w });
+    if (state.bodyweight.length > 365) state.bodyweight = state.bodyweight.slice(-365);
+    await saveState();
+    toast('Logged ' + formatWeight(w) + '.', 'g');
+    renderBW();
+    try{ v18Home(); }catch(err){ console.error('v18 home failed', err); }
+    return true;
+  }
+
+  /* ── what the card shows: the lift picked, this week's planned sets, and today's check-in ── */
+  function v18Plan(){
+    const mc = currentMicrocycle(), tl = buildTimeline();
+    if (mc.phase === 'complete' || mc.index >= tl.length) return { complete:true };
+    const previewing = _previewWeekIdx !== null && _previewWeekIdx !== mc.index && !!tl[_previewWeekIdx];
+    const wk = previewing ? tl[_previewWeekIdx] : mc;
+    const id = selectedLiftId(), lift = state.lifts[id];
+    if (!lift) return { complete:true };
+    const cycle = state.program.cycle || 1, def = getPhaseDef(wk.wave, wk.phase), key = wk.wave + '_' + wk.phase;
+    const meta = getLiftMeta(id) || { name:id };
+    return { complete:false, previewing, wk, id, lift, meta, short:V17_SHORT[id] || meta.name, cycle, def, key,
+      week:weekIndexOf(wk.wave, wk.phase), total:tl.length,
+      sets:plannedSets(id, wk.wave, wk.phase, cycle),
+      st:previewing ? '' : ((state.program.completion[key] || {})[id] || ''),
+      top:weekTopWeight(id, wk),                                     // what the pinned bar and the lifts row show
+      tm:wk.phase === 'deload' ? deloadTm(id, wk.wave, cycle) : trainingMax(lift),
+      pct:wk.phase === 'deload' ? 0.60 : wk.phase === 'realization' ? def.testPctTM : def.pctTM,
+      rest:restSecondsForWeek(key, def),
+      adj:wk.phase !== 'deload' && wk.phase !== 'realization' };   // the weeks a check-in changes the sets
+  }
+  // Today's check-in as the card uses it. One taken on Home and not yet used by a session comes first. One that an
+  // earlier session today already used is shown, but changes no sets here: Start asks again for a second session.
+  function v18Ready(){
+    if (state.settings.ai?.enableReadiness === false) return { off:true };
+    const p = v17Ui().pre, today = v17Ymd(Date.now());
+    if (p && p.day === today && Number.isFinite(p.score)) return { v:p.score, at:p.at, answers:p };
+    const r = v17ReadyToday();
+    return r ? { v:r.v, at:r.at, used:true } : { none:true };
+  }
+  function v18Effect(P, R){   // what today's check-in does to the planned sets: only a fresh check-in, only on weeks the rules apply to
+    if (!P.adj || P.previewing || !R || !Number.isFinite(R.v) || R.used) return { dropIdx:[], offerExtra:false };
+    const plan = readinessSetPlan(P.wk.phase, R.v);
+    return { dropIdx:readinessDropIndexes(P.sets, plan.drop), offerExtra:plan.offerExtra };
+  }
+
+  /* ── the session card ── */
+  function v18TopHtml(P){
+    const what = P.wk.wave + ' ' + (V18_PHASE[P.wk.phase] || P.wk.phase);
+    return '<div class="v18-top"><h2' + (P.short.length > 9 ? ' class="long"' : '') + (P.short !== P.meta.name ? ' aria-label="' + escapeHtml(P.meta.name) + '"' : '') + '>' + escapeHtml(P.short) + '</h2>'
+      + '<button type="button" class="v18-wave" data-v18="about" aria-expanded="' + _v18About + '" aria-label="' + escapeHtml(what + ', week ' + (P.week + 1) + ' of ' + P.total + '. About this week') + '">'
+      + '<span style="--c:' + v17Col(P.wk) + '"><i aria-hidden="true"></i>' + escapeHtml(what) + v18Ic(_v18About ? 'up' : 'down', 14, 2.6) + '</span></button></div>'
+      + (_v18About ? '<div class="v18-about"><b>' + escapeHtml(WAVE_NAMES[P.wk.wave] || P.wk.wave) + '</b><p>Week ' + (P.week + 1) + ' of ' + P.total + '. ' + escapeHtml(PHASE_DESCRIPTIONS[P.wk.phase] || '') + '</p></div>' : '');
+  }
+  function v18LoadHtml(P){
+    const pct = P.wk.phase === 'deload' ? '40/50/60%' : escapeHtml(formatPercent(P.pct));
+    const digits = Number.isFinite(P.top) ? weightDigits(P.top) : '';   // 282.5 is drawn a size smaller than 265, so the percentage stays beside it
+    return '<div class="v18-load"><div class="v18-load-n"><span' + (digits.length >= 5 ? ' class="long"' : '') + '>' + v17Num(P.top) + '</span><small>' + escapeHtml(unitLabel()) + '</small></div>'
+      + '<div class="v18-load-s"><div><b>' + pct + '</b> of TM</div><div><i class="v18-tm">TM</i>' + v16Wt(P.tm) + '</div>'
+      + ((P.wk.phase === 'deload' && P.tm !== trainingMax(P.lift)) ? '<div class="v18-fine">from before the test increase</div>' : '') + '</div></div>';
+  }
+  function v18LadderHtml(P, R, E){
+    const sets = P.sets, phase = P.wk.phase, varied = new Set(sets.map(s => s.weight)).size > 1, lead = (P.def.leadIns || []).length;
+    const ghost = P.adj && !P.previewing && R && !R.off && !E.dropIdx.length;   // the place an extra set would take
+    let cells = '';
+    sets.forEach((s, i) => {
+      const big = s.role === 'plus' || s.role === 'test', dropped = E.dropIdx.indexOf(i) >= 0;
+      if (big && ghost) cells += '<i class="v18-c ghost' + (E.offerExtra ? ' on' : '') + '">+1<small>' + (E.offerExtra ? 'offer' : '23+') + '</small></i>';
+      cells += '<i class="v18-c ' + (big ? 'plus' : (s.role === 'leadin' || s.role === 'ramp') ? 'lead' : 'work') + (dropped ? ' drop' : '') + (varied ? ' wt' : '') + '">'
+        + s.targetReps + (big ? '+' : '') + (varied ? '<small>' + v17Num(s.weight) + '</small>' : '') + '</i>';
+    });
+    const today = P.def.sets - E.dropIdx.length, stop = PROGRAM.stopShort[phase] || PROGRAM.stopShort.accumulation;
+    let head, cap, said;
+    if (phase === 'realization'){
+      const std = PROGRAM.waveTargetReps[P.wk.wave], up = testRaiseReps(P.id, P.wk.wave);
+      head = 'Ramp, then test';
+      cap = 'Test set: max reps. Standard <b>' + std + '</b>' + (up ? ', and <b>' + up + '</b> raises your max' : '') + '.';
+      said = (sets.length - 1) + ' ramp sets, then one test set of ' + std + ' or more.';
+    } else if (phase === 'deload'){
+      head = sets.length + ' sets × ' + (sets[0] ? sets[0].targetReps : 5) + ' reps';
+      cap = 'Light and crisp, no + set. Plates below are for the top set.';
+      said = sets.length + ' light sets.';
+    } else {
+      head = P.def.sets + ' sets × ' + P.def.reps + ' reps';
+      cap = (E.dropIdx.length ? '<b class="w">' + today + ' sets today</b> · ' : '') + (lead ? lead + ' lead-in' + (lead === 1 ? '' : 's') + ' first · ' : '')
+        + '<b>' + P.def.reps + '+</b> final set · Stop ' + stop[0] + '–' + stop[1] + ' reps short';
+      said = (E.dropIdx.length ? today + ' sets today, ' + E.dropIdx.length + ' dropped for readiness. ' : P.def.sets + ' planned sets. ')
+        + 'The last set is ' + P.def.reps + ' or more.' + (E.offerExtra ? ' One extra set is offered.' : ghost ? ' One extra set is offered at readiness 23 or higher.' : '');
+    }
+    return '<div class="v18-lad-h"><h3>' + head + '</h3><button type="button" class="v18-link" data-v18="list" aria-expanded="' + _v18List + '">Set list' + v18Ic(_v18List ? 'up' : 'down', 16, 2.6) + '</button></div>'
+      + '<div class="v18-lad' + (varied ? ' wt' : '') + '" role="img" aria-label="' + escapeHtml(said) + '">' + cells + '</div>'
+      + '<p class="v18-cap">' + cap + '</p>' + (_v18List ? v18SetListHtml(P, E) : '');
+  }
+  function v18SetListHtml(P, E){   // every set of the day with its load and plates: warm-ups first, then the sets as they will run
+    const phase = P.wk.phase, sets = P.sets.filter((_, i) => E.dropIdx.indexOf(i) < 0), rows = [];
+    const guided = phase !== 'deload' && state.settings.amrap?.enableGuidedWarmup !== false;
+    let warm = [];
+    if (guided){ try{ warm = buildWarmupRamp({ liftId:P.id, sets:P.sets.map(s => ({ ...s, isRamp:s.role === 'ramp' })) }).filter(w => !w.fromRealization); }catch(_){ warm = []; } }
+    warm.forEach((w, i) => rows.push(['', 'Warm-up ' + (i + 1), v17Num(w.weight) + ' × ' + w.reps, '', v18Plates(w.weight, P.id)]));
+    let i = 0, nSet = 0, nLead = 0, nRamp = 0, lastW = NaN;
+    while (i < sets.length){
+      let j = i; while (j + 1 < sets.length && sets[j + 1].role === sets[i].role && sets[j + 1].weight === sets[i].weight && sets[j + 1].targetReps === sets[i].targetReps) j++;
+      const s = sets[i], cnt = j - i + 1, big = s.role === 'plus' || s.role === 'test';
+      let name, sub = '';
+      if (s.role === 'leadin'){ name = 'Lead-in ' + (++nLead); }
+      else if (s.role === 'ramp'){ name = 'Ramp ' + (++nRamp); }
+      else {
+        if (big && E.offerExtra) rows.push(['x', 'Extra set', v17Num(s.weight) + ' × ' + s.targetReps, 'offered at Start', 'same load']);
+        name = s.role === 'test' ? 'Test set' : (cnt === 1 ? 'Set ' + (nSet + 1) : 'Sets ' + (nSet + 1) + '–' + (nSet + cnt)) + (big ? ' (+)' : ''); nSet += cnt;
+        sub = s.role === 'test' ? 'max reps' : big ? 'stop ' + (PROGRAM.stopShort[phase] || PROGRAM.stopShort.accumulation).join('–') + ' short' : P.rest > 0 ? 'rest ' + formatDuration(P.rest) : '';
+      }
+      rows.push([big ? 'p' : '', name, v17Num(s.weight) + ' × ' + s.targetReps + (big ? '+' : ''), sub, s.weight === lastW ? 'same load' : v18Plates(s.weight, P.id)]);
+      lastW = s.weight; i = j + 1;
+    }
+    return '<div class="v18-list" role="table" aria-label="Set list"><div class="v18-list-r h" role="row"><span role="columnheader">Set</span><span role="columnheader">Load × reps</span><span role="columnheader">Plates per side</span></div>'
+      + rows.map(r => '<div class="v18-list-r' + (r[0] ? ' ' + r[0] : '') + '" role="row"><span role="cell">' + escapeHtml(r[1]) + '</span><b role="cell">' + r[2] + (r[3] ? '<small>' + escapeHtml(r[3]) + '</small>' : '') + '</b><span role="cell">' + escapeHtml(r[4]) + '</span></div>').join('') + '</div>'
+      + ((warm.length && P.adj) ? '<p class="v18-note">Two <b>Fast</b> warm-ups in a row add ' + escapeHtml(warmupStepText(P.id, 1)) + ' to the work sets. Two <b>Slow</b> take off ' + escapeHtml(warmupStepText(P.id, 2)) + '.</p>' : '');
+  }
+  const V18_PLATE_CLS = { 45:'p45', 35:'p35', 25:'p25', 10:'p10', 5:'p5', 2.5:'p2_5', 1.25:'p1_25' };   // as renderPlateSVG names them; any other size is 'p5' there too
+  function v18PlatesHtml(P){
+    const pm = calculatePlates(P.top, P.id), per = (pm && Array.isArray(pm.perSide)) ? pm.perSide : [];
+    const bar = (Number.isFinite(P.lift.barWeight) ? P.lift.barWeight : n(state.settings.barWeight)) + 2 * (Number.isFinite(P.lift.collarWeight) ? P.lift.collarWeight : 0);
+    const chips = per.length ? per.map((p, i) => '<span class="v18-pl">' + (i ? '<u aria-hidden="true">+</u>' : '') + '<b class="v18-chip ' + (V18_PLATE_CLS[p] || 'p5') + '">' + escapeHtml(weightDigits(p)) + '</b></span>').join('') : '<span class="v18-baronly">Bar only</span>';
+    const fit = (P.wk.phase === 'deload' ? plateFitNote(P.lift, P.pct, P.top, P.tm) : plateFitNote(P.lift, P.pct, P.top)) || ((pm && pm.note && per.length) ? '<span>' + escapeHtml(pm.note) + '</span>' : '');
+    return '<div class="v18-pr"><div class="v18-pr-p"><div class="v18-pr-h"><b>Plates per side</b> ' + (Number.isFinite(bar) ? v16Wt(bar) + ' bar' : '') + '</div>'
+      + '<div class="v18-chips' + (per.length >= 5 ? ' many' : '') + '" role="img" aria-label="' + (per.length ? 'Each side: ' + per.map(p => weightDigits(p)).join(', ') : 'Bar only') + '">' + chips + '</div></div>'
+      + '<div class="v18-pr-r"><div class="v18-pr-h"><b>Rest</b></div><div class="v18-rest">' + (P.rest > 0 ? escapeHtml(formatDuration(P.rest)) : 'Your call') + '</div></div></div>'
+      + (fit ? '<div class="v18-fit">' + fit + '</div>' : '');
+  }
+  function v18ReadyHtml(P, R, E){
+    if (!R || R.off) return '<div class="v18-rd off"><div class="v18-rd-h"><span>Readiness</span><em>Check is off</em></div><p>Turn it on in Settings, under AI &amp; Readiness. Sets stay as written.</p></div>';
+    const has = Number.isFinite(R.v), z = has ? v17ZoneOf(R.v) : -1, live = has && !R.used;
+    const prev = v16LastReadiness(1)[0], d = (live && prev) ? R.v - prev.v : null;
+    const time = iso => { const t = new Date(iso); return Number.isNaN(t.getTime()) ? '' : ' ' + t.toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' }).toLowerCase(); };
+    const btn = (text) => '<button type="button" class="v18-link in" data-v17="checkin">' + text + '</button>';
+    const right = live ? '<em>Checked in' + escapeHtml(time(R.at)) + '</em>' + btn('Edit') : has ? '<em>From today’s earlier session</em>' : '<em>Not checked in today</em>';
+    let note;
+    if (!has) note = P.adj ? 'Check in to see how today’s sets change. Start asks for it too.' : 'A check-in is recorded with the session. It does not change ' + (P.wk.phase === 'deload' ? 'deload' : 'test') + ' sets.';
+    else if (R.used) note = 'That check-in was for the session you already did today. Start asks again for this one.';
+    else if (!P.adj) note = P.wk.phase === 'deload' ? 'Your score is recorded. Deload sets stay as planned.' : 'Your score is recorded. The test sets stay fixed, and the result sets the next training max.';
+    else if (z === 0) note = (E.dropIdx.length === 1 ? 'One fewer working set' : 'Two fewer working sets') + ' today. The + set stays.';
+    else if (z === 1) note = E.dropIdx.length ? 'One fewer working set today. The + set stays.' : 'Sets as written.';
+    else if (z === 2) note = 'Sets as written.' + (R.v + 1.5 >= 23 ? ' One higher answer reaches fire day at 23.' : '');   // one answer up by one adds 1.5
+    else note = 'Fire day: one extra set is on offer when you start.';
+    const zoneCls = z < 0 ? '' : z < 2 ? ' lo' : '';
+    const row = '<div class="v18-rd-n' + (has ? '' : ' none') + '"><b>' + (has ? escapeHtml(readinessScoreText(R.v)) : '–') + '</b><small>/30</small></div>'
+      + (has ? '<span class="v18-zone' + zoneCls + (live ? '' : ' was') + '">' + (z < 2 ? v18Ic('arrowDn', 15, 2.8) : v18Ic('check', 15, 3)) + V17_ZONES[z][2] + '</span>' : '')
+      + (d !== null ? '<span class="v18-delta' + (d < 0 ? ' dn' : '') + '"><b>' + (d === 0 ? 'Same' : (d > 0 ? '+' : '−') + escapeHtml(readinessScoreText(Math.abs(d)))) + '</b>' + (d === 0 ? ' as ' : ' vs ') + escapeHtml(new Date(prev.at).toLocaleDateString(undefined, { weekday:'short' })) + '</span>' : '')
+      + (!live ? '<button type="button" class="v18-checkin" data-v17="checkin"><span>Check in</span></button>' : '');
+    const track = '<div class="v18-track' + (P.adj ? '' : ' flat') + '">' + V17_ZONES.map((q, i) => '<i class="' + (live && i === z ? 'on' + (i < 2 ? ' lo' : '') : '') + '" style="flex:' + (q[1] - q[0]) + ' 1 0"></i>').join('')
+      + (live ? '<u style="left:' + Math.max(1, Math.min(99, R.v / 30 * 100)).toFixed(1) + '%"></u>' : '') + '</div>'
+      + (P.adj ? '<div class="v18-track-l" aria-hidden="true">' + V17_ZONES.map((q, i) => '<span class="' + (live && i === z ? 'on' : '') + '" style="flex:' + (q[1] - q[0]) + ' 1 0">' + (i === 2 ? 'As written' : q[3]) + '</span>').join('') + '</div>' : '');
+    return '<div class="v18-rd"><div class="v18-rd-h"><span>Readiness</span><span class="v18-rd-w">' + right + '</span></div><div class="v18-rd-row">' + row + '</div>' + track + '<p>' + escapeHtml(note) + '</p></div>';
+  }
+  function v18HandledHtml(P){   // a lift already done or skipped this week: what was logged, drawn solid
+    if (P.st === 'skipped') return '<div class="v18-done"><b class="skip">Skipped</b><p>' + escapeHtml(P.meta.name) + ' was skipped this week. Pick another lift below.</p></div>';
+    const h = v17Entry(v17Hist(), P.wk, P.id), early = liftEndedEarlyInWeek(P.id, P.wk);
+    let body = '';
+    if (h){
+      const sets = historyRowSets(h), a = _sessionAmrap(h);
+      body = '<div class="v18-lad logged" role="img" aria-label="Reps logged: ' + escapeHtml(sets.map(s => numText(s.performedReps, '?')).join(', ')) + '">'
+        + sets.map(s => { const r = setRole(s, h.phase), big = r === 'plus' || r === 'test'; return '<i class="v18-c done' + (big ? ' plus' : '') + '">' + escapeHtml(numText(s.performedReps, '?')) + '</i>'; }).join('') + '</div>'
+        + '<p class="v18-cap">' + (a ? 'Top set <b>' + v17Num(n(a.w)) + ' × ' + escapeHtml(numText(a.reps, '?')) + '</b> · ' : '') + sets.length + ' set' + (sets.length === 1 ? '' : 's') + ' · ' + v16Wt(roundToIncrement(historyRowTonnage(h), 5)) + '</p>';
+    }
+    return '<div class="v18-done"><b' + (early ? ' class="early"' : '') + '>' + (early ? 'Ended early' : 'Done') + '</b><p>' + (h ? 'Logged ' + escapeHtml(v18Day(h.completedAt)) + '. ' : '') + 'Pick another lift below.</p></div>' + body;
+  }
+  function v18Card(){
+    const card = el.dashboardCard; if (!card) return;
+    try{
+      const P = v17Idle() ? v18Plan() : { complete:true };   // a workout, the finish screens and "cycle complete" keep the 2.4 card
+      if (P.complete){ card.classList.remove('v18-on', 'v18-handled'); ['v18Top', 'v18Body', 'v18Ready'].forEach(id => v18Put(id, '')); return; }
+      const top = v18TopHtml(P);
+      let body, ready = '';
+      if (P.st) body = v18HandledHtml(P);
+      else {
+        const R = v18Ready(), E = v18Effect(P, R);
+        body = v18LoadHtml(P) + '<div class="v18-rule full" aria-hidden="true"></div>' + v18LadderHtml(P, R, E) + '<div class="v18-rule" aria-hidden="true"></div>' + v18PlatesHtml(P);
+        ready = P.previewing ? '' : v18ReadyHtml(P, R, E);
+      }
+      v18Put('v18Top', top); v18Put('v18Body', body); v18Put('v18Ready', ready);
+      card.classList.add('v18-on');                      // only once every part has been built: a fault above leaves the 2.4 card showing
+      card.classList.toggle('v18-handled', !!P.st);
+      const b = el.btnStartResume, label = 'Start ' + P.short.toLowerCase();
+      if (b && !b.disabled && b.textContent.trim() !== label) b.innerHTML = v18Ic('play', 16) + '<span>' + escapeHtml(label) + '</span>';
+    }catch(err){ card.classList.remove('v18-on', 'v18-handled'); throw err; }
+  }
+
+  /* ── the week's lifts: what is logged, what is due, and the lift picker ── */
+  // Picking a lift from the row leaves the screen where it is: the tile tapped stays under the finger. The card above the
+  // row changes height with the lift (a lift already done has a much shorter card), so the page is moved by exactly as far
+  // as the tile would otherwise have moved. Nothing is scrolled to the top.
+  function v18PickLift(id){
+    if (!isActiveLift(id)) return;
+    const tile = () => document.querySelector('#v18Lifts [data-v18="pick:' + id + '"]');
+    let was = null; try{ const t = tile(); if (t) was = t.getBoundingClientRect().top; }catch(_){}   // read before anything is redrawn, while the layout is still current
+    el.liftSelect.value = id;
+    renderDashboard(); renderLiftSelects();
+    try{ renderV17(); }catch(err){ console.error('v17 render failed', err); }
+    const b = tile();
+    try{ if (b && was !== null){ const d = b.getBoundingClientRect().top - was; if (Math.abs(d) >= 0.5) v18ScrollBy(d); } }catch(_){}
+    if (b) b.focus({ preventScroll:true });
+  }
+  // Moves the page by d px. In this app the body is what scrolls; scrollBy is for a browser that scrolls the document instead.
+  function v18ScrollBy(d){
+    const b = document.body, at = b.scrollTop;
+    b.scrollTop = at + d;
+    if (b.scrollTop === at && typeof window.scrollBy === 'function') window.scrollBy(0, d);
+  }
+  function v18Lifts(){
+    const F = v17Idle() ? weeklyPlanFacts() : null;
+    if (!F){ v18Put('v18Lifts', ''); return; }
+    const wk = F.micro, sel = selectedLiftId(), hist = v17Hist(), week = weekIndexOf(wk.wave, wk.phase) + 1, reps = wk.phase === 'realization' ? PROGRAM.waveTargetReps[wk.wave] : null;
+    const def = getPhaseDef(wk.wave, wk.phase), stale = [];
+    const tiles = F.statuses.map(s => {
+      const id = s.lift.id, on = id === sel, name = V17_SHORT[id] || s.lift.name, warn = liftTestWarning(id);
+      if (warn && !on) stale.push(s.lift.name + ': the ' + warn.wave.toUpperCase() + (warn.endedEarly ? ' test was not done ' : ' test was skipped ') + warn.weeksAgo + ' week' + (warn.weeksAgo !== 1 ? 's' : '') + ' ago, so the TM hasn’t moved since.');
+      let cls, head, val, said, size = '';
+      if (s.status === 'done'){
+        const h = v17Entry(hist, wk, id), a = h ? _sessionAmrap(h) : null, early = liftEndedEarlyInWeek(id, wk);
+        cls = 'done'; head = v18Ic('check', 13, 3.2) + escapeHtml(h ? v18Wd(h.completedAt) : 'Done');
+        val = early ? 'Ended early' : a ? v17Num(n(a.w)) + ' × ' + escapeHtml(numText(a.reps, '?')) : h ? v17Num(Math.max(0, ...historyRowSets(h).map(x => n(x.weight) || 0))) + ' top' : 'Done';
+        said = 'done' + (h ? ' ' + v18Day(h.completedAt) : ''); if (early) size = 'n11 w';   // words, not a load: they may take a second line on a narrow tile
+      } else if (s.status === 'skipped'){ cls = 'skip'; head = 'Skipped'; val = '—'; said = 'skipped'; }   // no icon: the word is as wide as a narrow tile
+      else {
+        const w = weekTopWeight(id, wk), r = wk.phase === 'realization' ? reps + '+' : wk.phase === 'deload' ? '5' : def.reps + '+';
+        cls = on ? 'today' : 'due'; head = v18Ic(on ? 'dot' : 'ring', 13, 2.6) + (on ? 'Today' : 'Due');
+        val = Number.isFinite(w) && w > 0 ? v17Num(w) + ' × ' + r : '—'; said = on ? 'picked for today' : 'due';
+      }
+      if (!size) size = val.length >= 11 ? 'n11' : val.length === 10 ? 'n10' : '';   // "272.5 × 10+" is the longest a tile gets (a 10s test week): the two long lengths are set a size smaller
+      return '<button type="button" class="v18-lift ' + cls + (on ? ' sel' : '') + '" data-v18="pick:' + id + '" aria-pressed="' + on + '" aria-label="' + escapeHtml(s.lift.name + ', ' + said) + '">'
+        + '<em>' + head + (warn ? '<u class="v18-warn" title="No test since the ' + escapeHtml(warn.wave) + ' wave">' + v18Ic('warn', 12, 2.4) + '</u>' : '') + '</em><b>' + escapeHtml(name) + '</b><span' + (size ? ' class="' + size + '"' : '') + '>' + val + '</span></button>';
+    }).join('');
+    const pace = String(F.paceLabel || '').replace(/^[^A-Za-z]+/, '');
+    v18Put('v18Lifts', '<div class="v18-sec-h"><h3>Week ' + week + ' lifts</h3><span>' + F.doneCount + ' of ' + F.active.length + ' logged · ' + F.daysLeft + ' day' + (F.daysLeft === 1 ? '' : 's') + ' left</span></div>'
+      + '<div class="v18-lifts" role="group" aria-label="This week’s lifts. Pick one to see it in the card above." style="grid-template-columns:repeat(' + Math.max(1, F.statuses.length) + ',minmax(0,1fr))">' + tiles + '</div>'
+      + '<p class="v18-pace"><b class="' + escapeHtml(F.paceCls || '') + '">' + escapeHtml(pace) + '.</b> ' + escapeHtml(F.rec || '') + '</p>'
+      + (stale.length ? '<div class="v18-stale">' + stale.map(t => '<div>' + escapeHtml(t) + '</div>').join('') + '</div>' : ''));
+  }
+
+  /* ── last time: the latest session of this lift, the latest of the same kind of week, and the difference ── */
+  function v18Last(){
+    const P = v17Idle() ? v18Plan() : { complete:true };
+    if (P.complete || P.previewing){ v18Put('v18Last', ''); return; }
+    const hist = v16Dated().filter(h => h.liftId === P.id && Array.isArray(h.sets) && h.sets.length);
+    if (!hist.length){ v18Put('v18Last', ''); return; }
+    const last = hist[0], same = hist.find(h => h.phase === P.wk.phase && !(h.wave === P.wk.wave && (h.cycle || 1) === P.cycle));
+    const days = Math.max(0, v16DayDiff(last.completedAt)), ago = days === 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago';
+    const row = h => {
+      const sets = historyRowSets(h), a = _sessionAmrap(h), t = entryTest(h), u = (h.units === 'kg' || h.units === 'lb') ? h.units : unitLabel();
+      const w = a ? n(a.w) : Math.max(0, ...sets.map(x => n(x.weight) || 0)), work = sets.length ? sets[0] : null;
+      const what = h.phase === 'realization' ? 'Test at ' + escapeHtml(formatWeightAs(w, u)) : sets.length + ' × ' + escapeHtml(numText(work ? work.targetReps : '', '?')) + ' at ' + escapeHtml(formatWeightAs(w, u));
+      const sub = t ? 'test ' + t.reps + ' reps · standard ' + t.standard + (t.tmChange.awaitingConfirmation ? ' · TM change waiting' : t.tmChange.amount > 0 ? ' · TM +' + escapeHtml(formatWeightAs(t.tmChange.amount, u)) : ' · TM held')
+        : a ? '+ set ' + escapeHtml(numText(a.reps, '?')) + ' reps · target ' + escapeHtml(numText(a.target, '?'))
+        : sets.every(x => n(x.performedReps) >= n(x.targetReps)) ? 'all reps done' : 'reps ' + escapeHtml(sets.map(x => numText(x.performedReps, '?')).join('/'));
+      return '<div class="v18-last-r"><div><b><i aria-hidden="true"></i>' + escapeHtml(v18Day(h.completedAt)) + '</b><em>' + escapeHtml(h.wave + ' ' + (V18_PHASE[h.phase] || h.phase)) + ((h.cycle || 1) !== P.cycle ? ', cycle ' + (h.cycle || 1) : '') + '</em></div>'
+        + '<div class="r"><b>' + what + '</b><em>' + sub + '</em></div></div>';
+    };
+    const more = [];   // what the old "Last session for this lift" line carried and the two rows do not
+    more.push('Reps ' + historyRowSets(last).map(s => numText(s.performedReps, '?')).join('/'));
+    more.push(formatWeightAs(roundToIncrement(historyRowTonnage(last), 5), last.units));
+    if (Number.isFinite(readinessScoreAnswered(last.readiness))) more.push('readiness ' + readinessScoreText(readinessScoreAnswered(last.readiness)) + '/30');
+    const lt = entryTest(last);   // a test: the training-max change in full, as the 2.4 line gave it
+    if (lt) more.push(lt.tmChange.awaitingConfirmation ? 'TM change waiting for your OK' : lt.tmChange.amount > 0 ? 'TM ' + formatWeightAs(lt.tmChange.from, last.units) + ' → ' + formatWeightAs(lt.tmChange.to, last.units) + ' (' + lt.tmChange.step + ')' : 'TM held');
+    let html = '<div class="v18-sec-h in"><h3>' + escapeHtml(P.meta.name) + ', last time</h3><span>' + ago + '</span></div>' + row(last)
+      + '<p class="v18-last-m">' + escapeHtml(more.join(' · ')) + (last.note ? '<br>' + escapeHtml(last.note) : '') + '</p>';
+    if (same && same !== last) html += row(same);
+    if (same && P.adj && !P.st){
+      const a = _sessionAmrap(same), sw = a ? n(a.w) : NaN, sameUnits = !same.units || same.units === unitLabel();
+      const dw = P.top - sw, ds = P.def.sets - historyRowSets(same).length;
+      if (Number.isFinite(dw) && sameUnits){
+        html += '<div class="v18-vs"><span>Today vs ' + escapeHtml(v18Md(same.completedAt)) + '</span><b>' + (dw === 0 ? 'Same weight' : (dw > 0 ? '+' : '−') + v16Wt(Math.abs(dw)))
+          + (ds === 0 ? '' : '<i aria-hidden="true"></i>' + Math.abs(ds) + (ds < 0 ? ' fewer' : ' more') + ' set' + (Math.abs(ds) === 1 ? '' : 's')) + '</b></div>';
+      }
+    }
+    v18Put('v18Last', html);
+  }
+
+  /* ── consistency and recovery: training days, readiness, the sleep answer, bodyweight ── */
+  function v18Spark(vals, w, h, cls){
+    if (vals.length < 2) return '';
+    const mn = Math.min(...vals), mx = Math.max(...vals), sp = (mx - mn) || 1, pad = 5;
+    const pts = vals.map((v, i) => [(pad + i * (w - 2 * pad) / (vals.length - 1)).toFixed(1), (h - pad - (v - mn) / sp * (h - 2 * pad)).toFixed(1)]);
+    const line = pts.map(p => p.join(',')).join(' ');
+    return '<svg class="v18-spark ' + cls + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true"><polygon points="' + pts[0][0] + ',' + h + ' ' + line + ' ' + pts[pts.length - 1][0] + ',' + h + '"/>'
+      + '<polyline points="' + line + '" vector-effect="non-scaling-stroke"/></svg>';
+  }
+  function v18TopSetLine(id){   // estimated-max tiles: the heaviest counted set of the lift's latest session
+    try{
+      const h = v16Dated().find(x => x.liftId === id && Array.isArray(x.sets) && x.sets.length); if (!h) return '';
+      const a = _sessionAmrap(h), sets = historyRowSets(h); let w, r;
+      if (a){ w = n(a.w); r = a.reps; } else { const top = sets.slice().sort((x, y) => (n(y.weight) || 0) - (n(x.weight) || 0))[0]; if (!top) return ''; w = n(top.weight); r = top.performedReps; }
+      return '<span class="v17-tile-s dim">Last top set ' + escapeHtml(formatWeightAs(w, h.units).replace(/\s*(lb|kg)$/i, '')) + ' × ' + escapeHtml(numText(r, '?')) + '</span>';
+    }catch(_){ return ''; }
+  }
+  function v18Tiles(){
+    if (!v17Idle()){ v18Put('v18Tiles', ''); return; }
+    const dated = v16Dated(), now = new Date(), todayKey = v17Ymd(now), units = escapeHtml(unitLabel());
+    // training days: unique dates with a session, the last twelve weeks, Monday first
+    const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7)), start = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() - 77);
+    const on = new Set(dated.map(h => v17Ymd(h.completedAt)));
+    let cols = '', days = 0, weeks = 0;
+    for (let w = 0; w < 12; w++){
+      let any = false, col = '';
+      for (let d = 0; d < 7; d++){
+        const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7 + d), k = v17Ymd(dt), hit = on.has(k);
+        if (hit){ days++; any = true; }
+        col += '<i class="' + (hit ? 'on' : '') + (k === todayKey ? ' now' : '') + (dt > now && k !== todayKey ? ' fut' : '') + '"></i>';
+      }
+      if (any) weeks++;
+      cols += '<span>' + col + '</span>';
+    }
+    // readiness: today's check-in if there is one, else the latest; the last ten scored check-ins as a line
+    const R = v18Ready(), past = v16LastReadiness(10), hasToday = R && Number.isFinite(R.v) && !R.used;
+    const vals = past.map(x => x.v).slice(hasToday ? -9 : -10); if (hasToday) vals.push(R.v);
+    const cur = hasToday ? { v:R.v, at:R.at } : past.length ? past[past.length - 1] : null, prev = hasToday ? past[past.length - 1] : past[past.length - 2];
+    const dv = (cur && prev) ? cur.v - prev.v : null;
+    let moved = '';   // which answers went up or down since the check-in before
+    try{
+      const ans = h => (h && h.readiness) ? h.readiness : null, byDate = (state.history || []).filter(h => h && h.phase !== 'deload' && Number.isFinite(readinessScoreAnswered(h.readiness))).slice().sort(_byCompleted);
+      const a = hasToday ? R.answers : ans(byDate[byDate.length - 1]), b = hasToday ? ans(byDate[byDate.length - 1]) : ans(byDate[byDate.length - 2]);
+      if (a && b){
+        const names = { sleep:'sleep', motivation:'motivation', nutrition:'nutrition', soreness:'soreness', performance:'performance' };
+        const up = Object.keys(names).filter(k => n(a[k]) > n(b[k])).map(k => names[k]), dn = Object.keys(names).filter(k => n(a[k]) < n(b[k])).map(k => names[k]);
+        moved = [up.length ? 'Better: ' + up.join(', ') : '', dn.length ? 'Worse: ' + dn.join(', ') : ''].filter(Boolean).join('. ');   // every answer runs 1 (worst) to 5 (best), soreness included (5 = fresh)
+      }
+    }catch(_){ moved = ''; }
+    const sleep = dated.filter(h => h.readiness && Number.isFinite(n(h.readiness.sleep)) && !readinessSkipped(h.readiness)).slice(0, 7).reverse().map(h => n(h.readiness.sleep));
+    if (hasToday && R.answers && Number.isFinite(n(R.answers.sleep))){ sleep.push(n(R.answers.sleep)); if (sleep.length > 7) sleep.shift(); }
+    const bw = (Array.isArray(state.bodyweight) ? state.bodyweight : []).filter(x => x && Number.isFinite(n(x.weight)) && Number.isFinite(Date.parse(x.date))).slice().sort((a, b) => Date.parse(a.date) - Date.parse(b.date)).slice(-7);
+    const lastBw = bw[bw.length - 1], dBw = bw.length > 1 ? Math.round((n(lastBw.weight) - n(bw[0].weight)) * 10) / 10 : 0;
+    let sev = 'none'; try{ sev = computeDeloadAssessment().severity || 'none'; }catch(_){ sev = 'none'; }
+    const sevText = { watch:'Deload signals: watch', caution:'Deload signals: caution', deload:'Deload suggested' }[sev] || '';
+    const head = (icon, text, extra) => '<div class="v18-tile-h">' + v18Ic(icon, 15) + '<span>' + text + '</span>' + (extra || '') + '</div>';
+    const big = (num, unit) => '<div class="v18-tile-n' + (num === '–' ? ' none' : '') + '"><b>' + num + '</b><small>' + unit + '</small></div>';
+    const wasIn = v18$('v18BwIn'), typed = wasIn ? wasIn.value : '', hadFocus = !!wasIn && document.activeElement === wasIn;   // a redraw must not eat a half-typed weigh-in
+    v18Put('v18Tiles', '<div class="v18-sec-h big"><h2>Consistency and recovery</h2><button type="button" class="v18-link in" data-v17="recovery">Recovery' + v18Ic('right', 14, 2.6) + '</button></div>'
+      + (sevText ? '<button type="button" class="v17-pill sev ' + sev + ' v18-sev" data-v17="recovery">' + sevText + v17Ic('right', 16) + '</button>' : '')
+      + '<div class="v18-tiles">'
+      + '<div class="v18-tile">' + head('cal', 'Training days') + big(days, 'day' + (days === 1 ? '' : 's')) + '<p>' + weeks + ' active of 12 weeks</p>'
+        + '<div class="v18-heat" role="img" aria-label="' + days + ' training days in the last 12 weeks">' + cols + '</div><div class="v18-tile-f"><span>' + escapeHtml(v18Md(start)) + '</span><span>Today</span></div></div>'
+      + '<div class="v18-tile">' + head('pulse', 'Readiness') + (cur ? big(escapeHtml(readinessScoreText(cur.v)), '/30')
+          + '<p>' + (dv === null ? (hasToday ? 'Today' : escapeHtml(v18Day(cur.at))) : '<b class="' + (dv < 0 ? 'dn' : 'up') + '">' + (dv === 0 ? 'Same' : (dv > 0 ? '+' : '−') + escapeHtml(readinessScoreText(Math.abs(dv)))) + '</b>' + (dv === 0 ? ' as ' : ' vs ') + escapeHtml(v18Day(prev.at))) + '</p>'
+          + (vals.length > 1 ? '<div class="v18-spark-w" role="img" aria-label="Readiness, last ' + vals.length + ' check-ins">' + v18Spark(vals, 146, 50, 'mint') + '</div><div class="v18-tile-f"><span>Last ' + vals.length + '</span><span>' + (hasToday ? 'Today' : escapeHtml(v18Md(cur.at))) + '</span></div>' : '')
+          + (moved ? '<p class="fine">' + escapeHtml(moved) + '</p>' : '')
+        : big('–', '/30') + '<p>Shows after your first check-in</p>') + '</div>'
+      + '<div class="v18-tile">' + head('moon', 'Sleep answer') + (sleep.length ? big(sleep[sleep.length - 1], '/5') + '<p>Last ' + sleep.length + ' check-in' + (sleep.length === 1 ? '' : 's') + '</p>'
+          + '<div class="v18-bars" role="img" aria-label="Sleep answers, oldest first: ' + sleep.join(', ') + '">' + sleep.map(v => '<i style="height:' + Math.max(8, Math.min(100, v / 5 * 100)) + '%"></i>').join('') + '</div>'
+        : big('–', '/5') + '<p>Shows after your first check-in</p>') + '</div>'
+      + '<div class="v18-tile">' + head('scale', 'Bodyweight', '<button type="button" class="v18-plus" data-v18="bw" aria-expanded="' + _v18Bw + '" aria-label="Log bodyweight"><span>' + v18Ic('plus', 14, 2.8) + '</span></button>')
+        + (lastBw ? big(v17Num(n(lastBw.weight)), units) + '<p>' + (bw.length > 1 ? (dBw > 0 ? '+' : dBw < 0 ? '−' : '') + escapeHtml(weightDigits(Math.abs(dBw))) + ' ' + units + ' since ' + escapeHtml(v18Md(bw[0].date)) : 'First entry, ' + escapeHtml(v18Md(lastBw.date))) + '</p>'
+            + (bw.length > 1 ? '<div class="v18-spark-w">' + v18Spark(bw.map(x => n(x.weight)), 146, 44, 'sky') + '</div>' : '')
+          : big('–', units) + '<p>Log your first weigh-in</p>')
+        + (_v18Bw ? '<div class="v18-bw"><label class="v18-sr" for="v18BwIn">Bodyweight today, in ' + units + '</label><input id="v18BwIn" type="number" inputmode="decimal" step="0.1" min="0" placeholder="' + units + '"><button type="button" data-v18="bwsave">Save</button></div>' : '') + '</div>'
+      + '</div>');
+    const nowIn = v18$('v18BwIn');
+    if (nowIn && nowIn !== wasIn && wasIn){ nowIn.value = typed; if (hadFocus) nowIn.focus({ preventScroll:true }); }
+  }
+
+  /* ── the cycle map: the week picked on Home, and its summary under the key ── */
+  function v18MapSel(D){ const N = D.tl.length; return (_v18Week !== null && _v18Week >= 0 && _v18Week < N) ? _v18Week : (D.cur < N ? D.cur : -1); }
+  function v18PickWeek(i){
+    const N = buildTimeline().length, cur = currentMicrocycle().index;
+    _v18Week = (Number.isInteger(i) && i >= 0 && i < N && i !== cur) ? i : null;
+    v17Safe('home map', v17HomeMap);
+    const sel = _v18Week === null ? cur : _v18Week, nb = document.querySelector('#v17MapCard .v17-taps [data-v16-week="' + sel + '"]'); if (nb) nb.focus({ preventScroll:true });
+  }
+  function v18WeekSummary(D){
+    const N = D.tl.length, i = v18MapSel(D); if (i < 0 || i >= N) return '';
+    const wk = D.tl[i], def = getPhaseDef(wk.wave, wk.phase), ref = D.act[0] ? D.act[0].id : '', isCur = i === D.cur;
+    const planned = ref ? plannedSets(ref, wk.wave, wk.phase, D.cycle) : [], counted = planned.filter(s => s.role !== 'ramp' && s.role !== 'leadin');   // the Session Log's rule: ramp and lead-in sets are not counted
+    const stat = (num, unit, label) => '<div><b>' + num + (unit ? '<small>' + unit + '</small>' : '') + '</b><span>' + label + '</span></div>';
+    let stats;
+    if (wk.phase === 'realization') stats = stat(def.rampUp.length, '', 'ramp sets, then the test') + stat(PROGRAM.waveTargetReps[wk.wave], '+', 'reps is the standard') + stat(escapeHtml(formatPercent(def.testPctTM).replace('%', '')), '%', 'of TM on the test');
+    else stats = stat(counted.length, '', 'sets per lift') + stat(counted.reduce((a, s) => a + (n(s.targetReps) || 0), 0), '', 'reps per lift')
+      + stat(escapeHtml(formatPercent(planned.reduce((m, s) => Math.max(m, n(s.pctTM) || 0), 0)).replace('%', '')), '%', 'peak of TM');
+    let lb = 0, setsDone = 0, liftsDone = 0, segs = '';
+    D.act.forEach(l => {
+      const st = v17StateOf(D.tl, D.cur, D.hist, i, l.id), h = v17Entry(D.hist, wk, l.id);
+      if (h){ lb += historyRowTonnage(h); setsDone += historyRowSets(h).length; }
+      if (st === 'done') liftsDone++;
+      segs += '<i class="' + st + '"></i>';
+    });
+    const total = counted.length * D.act.length, name = wk.wave + ' ' + (V18_PHASE[wk.phase] || wk.phase);
+    return '<div class="v18-wk" aria-live="polite"><div class="v18-wk-h"><h3>Week ' + (i + 1) + ', ' + escapeHtml(name) + '</h3>'
+      + (isCur ? '<span>This week</span>' : '<button type="button" class="v18-link in" data-v18="week:cur">Back to week ' + (D.cur + 1) + '</button>') + '</div>'
+      + '<div class="v18-wk-s">' + stats + '</div>'
+      + '<div class="v18-wk-w"><div class="v18-wk-wh"><b>Week ' + (i + 1) + ' work logged</b><span><b>' + escapeHtml(Math.round(lb).toLocaleString()) + '</b><small>' + escapeHtml(unitLabel()) + '</small></span></div>'
+      + '<div class="v18-wk-bar" role="img" aria-label="' + liftsDone + ' of ' + D.act.length + ' lifts done">' + segs + '</div>'
+      + '<p>' + setsDone + ' of ' + total + ' work set' + (total === 1 ? '' : 's') + ', ' + liftsDone + ' of ' + D.act.length + ' lift' + (D.act.length === 1 ? '' : 's') + (i > D.cur ? ' · not started' : '') + '</p></div></div>';
+  }
+
+  /* ── Progress: the session log shows each counted set as a chip ── */
+  function v18SetChips(sets, phase){
+    if (!sets || !sets.length) return '';
+    return '<div class="v18-setchips" role="img" aria-label="Reps per set: ' + escapeHtml(sets.map(s => numText(s.performedReps, '?') + ' of ' + numText(s.targetReps, '?')).join(', ')) + '">'
+      + sets.map(s => { const r = setRole(s, phase), p = n(s.performedReps), t = n(s.targetReps);
+          return '<i class="' + ((r === 'plus' || r === 'test') ? 'plus' : '') + (p < t ? ' short' : '') + '">' + escapeHtml(numText(s.performedReps, '?')) + '<small>/' + escapeHtml(numText(s.targetReps, '?')) + '</small></i>'; }).join('') + '</div>';
+  }
+
+  /* ── Program: all sixteen weeks as a table, under the tests ── */
+  function v18PlanTable(D, sel){
+    const box = v18$('v18PgPlan'); if (!box || !D) return;
+    const ref = D.act[0] ? D.act[0].id : ''; if (!ref){ box.hidden = true; return; }
+    box.hidden = false;
+    const sig = JSON.stringify([D.cur, D.cycle, sel, state.settings.restMatrix || 0]);
+    if (_v18Sig.plan === sig) return; _v18Sig.plan = sig;
+    const open = !!(box.querySelector('details') || {}).open;
+    const rows = D.tl.map((wk, i) => {
+      const def = getPhaseDef(wk.wave, wk.phase);
+      const sets = wk.phase === 'deload' ? '3 × 5' : wk.phase === 'realization' ? PROGRAM.waveTargetReps[wk.wave] + '+ test' : def.sets + ' × ' + def.reps + ((def.leadIns || []).length ? ' <small>+' + def.leadIns.length + ' lead-in</small>' : '');
+      const load = wk.phase === 'deload' ? '40–60%' : formatPercent(wk.phase === 'realization' ? def.testPctTM : def.pctTM);
+      const said = 'Week ' + (i + 1) + ', ' + wk.wave + ' ' + (V18_PHASE[wk.phase] || wk.phase) + ', ' + sets.replace(/<[^>]+>/g, '').replace('×', 'by') + ', ' + load + ' of training max' + (i === D.cur ? ', this week' : '') + '. Shows this week above.';
+      return '<button type="button" class="v18-pt-r' + (i === D.cur ? ' cur' : '') + (i === sel ? ' sel' : '') + (i < D.cur ? ' past' : '') + '" data-v16-week="' + i + '" aria-pressed="' + (i === sel) + '" aria-label="' + escapeHtml(said) + '">'
+        + '<span class="v18-pt-g"><span>' + (i + 1) + '</span><span><i style="background:' + v17Col(wk) + '"></i>' + escapeHtml(wk.wave) + '</span><span>' + escapeHtml(V18_KIND[wk.phase] || capitalize(wk.phase)) + '</span><span>' + sets + '</span><span>' + escapeHtml(load) + '</span></span></button>';
+    }).join('');
+    box.innerHTML = '<details' + (open ? ' open' : '') + '><summary><span class="v18-sum"><span>All sixteen weeks</span>' + v18Ic('down', 18, 2.6) + '</span></summary>'
+      + '<div class="v18-pt" role="group" aria-label="The sixteen weeks of the program"><div class="v18-pt-r h" aria-hidden="true"><span class="v18-pt-g"><span>Wk</span><span>Wave</span><span>Week type</span><span>Sets × reps</span><span>% of TM</span></span></div>' + rows + '</div>'
+      + '<p>Sets and percentages are the same for every lift. Tap a week to see it above.</p></details>';
+  }
+
+  /* ── Home, in order ── */
+  function v18Home(){
+    _v18Due = false;
+    v18Safe('card', v18Card);
+    v18Safe('lifts', v18Lifts);
+    v18Safe('last', v18Last);
+    v18Safe('tiles', v18Tiles);
+  }
+  // The 2.4 card has just been redrawn (renderDashboard). In a full render() the 2.x layer draws the v18 blocks a moment
+  // later, in the same turn; if nothing does, they are drawn as soon as the code that is running returns. One draw either way.
+  function v18HomeSoon(){
+    if (_v18Due) return;
+    _v18Due = true;
+    Promise.resolve().then(() => { if (_v18Due) v18Home(); });
+  }
+  function v18Bind(){
+    const mk = (id, cls, tag) => { const d = document.createElement(tag || 'div'); d.id = id; if (cls) d.className = cls; d.hidden = true; return d; };
+    const card = el.dashboardCard, view = v18$('viewWorkout');
+    if (card && view){
+      card.insertBefore(mk('v18Top'), card.firstChild);
+      const body = mk('v18Body'), ready = mk('v18Ready'), start = card.querySelector('.dash-start-row');
+      // in the page in the order they are seen: body, then the 2.4 "no test since" warning (which the 2.4 code puts straight after #dashPreview), readiness, Start
+      if (el.dashPreview && el.dashPreview.parentNode === card){ card.insertBefore(body, el.dashPreview); el.dashPreview.insertAdjacentElement('afterend', ready); }
+      else { card.insertBefore(body, start || null); card.insertBefore(ready, start || null); }
+      const lifts = mk('v18Lifts', 'v18-sec', 'section'); lifts.setAttribute('aria-label', 'This week’s lifts');
+      const last = mk('v18Last', 'v18-slab', 'section'); last.setAttribute('aria-label', 'Last time');
+      const tiles = mk('v18Tiles', 'v18-sec', 'section'); tiles.setAttribute('aria-label', 'Consistency and recovery');
+      card.insertAdjacentElement('afterend', lifts); lifts.insertAdjacentElement('afterend', last); last.insertAdjacentElement('afterend', tiles);
+      if (typeof IntersectionObserver === 'function' && el.btnStartResume){   // one Start at a time: the pinned bar steps aside while the card's Start is on screen
+        // the bottom of the screen is the tab bar: a Start under it does not count as on screen. Its height is measured
+        // (an installed app's home indicator makes it taller); 76 px, the page's own bottom padding, if that fails.
+        let bar = 76;
+        try{ const t = document.querySelector('.bottom-nav .tab'); const h = t ? Math.round(window.innerHeight - t.getBoundingClientRect().top) : 0; if (h >= 44 && h <= 160) bar = h; }catch(_){}
+        // "on screen" is read from the share of the button that is visible, not from isIntersecting: browsers differ on
+        // whether isIntersecting waits for the threshold, and agree on the ratio
+        new IntersectionObserver(es => { const on = es[es.length - 1].intersectionRatio >= 0.59; if (on !== _v18StartOn){ _v18StartOn = on; v17Safe('strip', v17Strip); } }, { threshold:[0, 0.6], rootMargin:'0px 0px -' + bar + 'px 0px' }).observe(el.btnStartResume);
+      }
+    }
+    const tests = v18$('v17Tests') || v18$('v17PgWeek');
+    if (tests) tests.insertAdjacentElement('afterend', mk('v18PgPlan', 'v18-plan'));
+    document.addEventListener('click', ev => {
+      const b = ev.target.closest && ev.target.closest('[data-v18]'); if (!b) return;
+      const a = b.getAttribute('data-v18');
+      v18Safe('card', () => {
+        if (a === 'about'){ _v18About = !_v18About; v18Card(); const f = document.querySelector('#v18Top [data-v18="about"]'); if (f) f.focus({ preventScroll:true }); }
+        else if (a === 'list'){ _v18List = !_v18List; v18Card(); const f = document.querySelector('#v18Body [data-v18="list"]'); if (f) f.focus({ preventScroll:true }); }
+        else if (a.indexOf('pick:') === 0) v18PickLift(a.slice(5));
+        else if (a === 'week:cur') v18PickWeek(-1);
+        else if (a === 'bw'){ _v18Bw = !_v18Bw; v18Tiles(); const inp = v18$('v18BwIn'), plus = document.querySelector('#v18Tiles [data-v18="bw"]');
+          if (inp) inp.focus();   // the field may scroll into view: on a phone the keyboard would otherwise cover it
+          else if (plus) plus.focus({ preventScroll:true }); }
+        else if (a === 'bwsave'){ const inp = v18$('v18BwIn'); logBodyweight(n(inp ? inp.value : '')).then(ok => { if (ok){ _v18Bw = false; v18Tiles(); } }).catch(err => console.error('v18 bodyweight failed', err)); }
+      });
+    });
+    document.addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target && ev.target.id === 'v18BwIn'){ ev.preventDefault(); const s = document.querySelector('#v18Tiles [data-v18="bwsave"]'); if (s) s.click(); } });
   }
 
   boot()
