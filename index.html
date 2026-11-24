@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut v18 — 18.3.0</title>
+<title>Juggernaut v18 — 18.4.0</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -3768,6 +3768,138 @@ html[data-theme="light"] .v18-lift.done{background:color-mix(in srgb, var(--acce
 html[data-theme="light"] .v18-heat i.fut{background:var(--panel3)}
 .tour-th .v183-tcap{flex:none;margin:0 0 8px}
 
+/* ═══════════════ Juggernaut 18.4.0: Active Workout Focus, Trophy Finish, Frosted Sheets, Safe-Area Scrim ═══════════════
+   Home Screen and Cycle Map are intentionally untouched from 18.3.0. */
+
+/* 1. Top Safe-Area Fade Scrim (keeps scrolled content from clashing with iOS status bar) */
+body::before{
+  content:"";position:fixed;left:0;right:0;top:0;height:calc(18px + var(--safe-t, 0px));
+  background:linear-gradient(to bottom, var(--bg) 68%, transparent);
+  pointer-events:none;z-index:35;
+}
+
+/* 2. Subtle OLED Specular Depth on Non-Home / Non-Cycle Cards */
+.v17-slab,.history-item,.settings-group{
+  box-shadow:0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
+}
+html[data-theme="light"] .v17-slab,
+html[data-theme="light"] .history-item,
+html[data-theme="light"] .settings-group{
+  box-shadow:0 4px 16px rgba(15,23,42,.06), inset 0 1px 0 #fff;
+}
+
+/* 3. "Under the Bar" Active Workout Focus Mode */
+.v184-sess-hud{
+  margin:0 0 12px;padding:10px 12px 11px;border-radius:16px;
+  background:linear-gradient(180deg, var(--panel2), var(--panel));
+  border:1px solid var(--line);
+  box-shadow:0 8px 22px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.07);
+}
+.v184-sess-top{
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px;
+  font-variant-numeric:tabular-nums;
+}
+.v184-sess-top b{font-size:12.5px;font-weight:800;color:var(--text)}
+.v184-sess-top span{font-size:11.5px;font-weight:700;color:var(--accent)}
+.v184-laser{
+  height:5px;border-radius:99px;background:var(--panel3);overflow:hidden;
+}
+.v184-laser i{
+  display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg, var(--blue), var(--accent));
+  box-shadow:0 0 10px color-mix(in srgb, var(--accent) 65%, transparent);
+  transition:width .32s cubic-bezier(.22,1,.36,1);
+}
+#sessionSection #swipeZone,
+#sessionSection #swipeZone.hero-card{
+  padding:16px 16px 18px !important;
+  margin:10px 0 14px !important;
+  border-radius:20px !important;
+  background:radial-gradient(ellipse 80% 55% at 50% 0%, color-mix(in srgb, var(--blue) 16%, transparent), transparent 65%), var(--panel) !important;
+  border:1px solid color-mix(in srgb, var(--blue) 42%, var(--line)) !important;
+  box-shadow:0 12px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09) !important;
+}
+html[data-theme="light"] #sessionSection #swipeZone{
+  background:radial-gradient(ellipse 80% 55% at 50% 0%, rgba(37,99,235,.08), transparent 65%), #ffffff;
+  box-shadow:0 8px 22px rgba(15,23,42,.08);
+}
+#sessionSection #activeWeight{
+  font-variant-numeric:tabular-nums;letter-spacing:-.04em;
+  font-size:clamp(64px, 21vw, 108px);
+}
+#sessionSection .set-row.done{opacity:.56;transition:opacity .2s ease}
+#sessionSection .set-row.done:hover{opacity:.85}
+
+/* 4. Finish Screen Milestone Trophy Sheen & e1RM Mini-Sparkline */
+@keyframes v184Sheen{
+  0%{transform:translateX(-120%) skewX(-20deg)}
+  100%{transform:translateX(240%) skewX(-20deg)}
+}
+.v182-goal-hit{
+  position:relative;overflow:hidden;
+  border:1px solid color-mix(in srgb, var(--mint) 55%, transparent);
+  background:radial-gradient(circle at 12% 15%, color-mix(in srgb, var(--mint) 24%, transparent), transparent 55%),
+             linear-gradient(135deg, color-mix(in srgb, var(--mint) 16%, var(--panel)), color-mix(in srgb, var(--blue) 10%, var(--panel))) !important;
+  box-shadow:0 10px 26px color-mix(in srgb, var(--mint) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.v182-goal-hit::after{
+  content:"";position:absolute;top:0;bottom:0;width:42%;pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
+  animation:v184Sheen 3.2s ease-in-out infinite;
+}
+.v184-trend{
+  margin:12px 0 4px;padding:10px 12px;border-radius:14px;
+  background:var(--panel2);border:1px solid var(--line);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.v184-trend-h{
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;
+  font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
+}
+.v184-trend-h b{color:var(--sky, var(--blue));font-variant-numeric:tabular-nums;text-transform:none;letter-spacing:0;font-size:12px}
+.v184-confetti{
+  position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:200;
+}
+
+/* 5. Frosted Glass Native iOS Bottom Sheets & Warm-up Plate-Diff Badge */
+.modal.bottom-sheet{
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.modal.bottom-sheet .modal-card,
+.modal.bottom-sheet .readiness-card,
+.modal.bottom-sheet .confirm-card{
+  background:color-mix(in srgb, var(--panel) 86%, transparent);
+  backdrop-filter:blur(22px) saturate(165%);-webkit-backdrop-filter:blur(22px) saturate(165%);
+  border:1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  box-shadow:0 -12px 38px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.16);
+}
+html[data-theme="light"] .modal.bottom-sheet .modal-card,
+html[data-theme="light"] .modal.bottom-sheet .readiness-card,
+html[data-theme="light"] .modal.bottom-sheet .confirm-card{
+  background:rgba(255,255,255,.88);
+  border-color:rgba(15,23,42,.12);
+  box-shadow:0 -10px 30px rgba(15,23,42,.14), inset 0 1px 0 #fff;
+}
+.modal.bottom-sheet .sheet-handle{
+  width:42px;height:4px;border-radius:99px;background:color-mix(in srgb, var(--muted) 55%, transparent);
+}
+.v184-wudiff{
+  display:inline-flex;align-items:center;gap:5px;margin:4px 0 6px;padding:3px 10px;border-radius:99px;
+  font-size:11.5px;font-weight:800;color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 16%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  font-variant-numeric:tabular-nums;
+}
+.v184-wudiff[hidden]{display:none}
+
+@media (prefers-reduced-motion: reduce){
+  .v182-goal-hit::after,.v184-laser i{animation:none !important;transition:none !important}
+}
+
+/* 6. Spacing polish: keep Cancel/End cleanly above #swipeZone and lift toasts above #v17Strip */
+#sessionSection .v171-out{margin:2px 2px 6px !important}
+body.v17-strip-on .toast{bottom:calc(144px + var(--safe-b, 0px)) !important}
+
 </style>
 </head>
 <body>
@@ -5514,7 +5646,7 @@ html[data-theme="light"] .v18-heat i.fut{background:var(--panel3)}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '18.3.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.4.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -8847,6 +8979,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
             : (plates?.note || 'Bar only');
           el.warmupPlates.textContent = plateStr;
           v16Safe('warmup plates', () => renderPlateSVG(plates, document.getElementById('warmupPlateSvg'), null));   // v16
+          v18Safe('v184 warmup diff', () => v184WarmupDiff(ramp, stepIdx, session.liftId));
         } catch(_){ el.warmupPlates.textContent = ''; }
         // Show running history of ratings
         el.warmupHistory.textContent = _warmupFeedbackLog.length
@@ -9740,7 +9873,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     v16Safe('recap', () => v16RecapHero(entry, totalTonnage, duration));   // v16: the result first, and a share card
     try{ v17Recap(entry); }catch(err){ console.error('v17 recap failed', err); }
-    try{ v182Finish(entry); v183FinishSetup(entry); }catch(err){ console.error('18.2/18.3 finish failed', err); }   // 2.0: display-only additions
+    try{ v182Finish(entry); v183FinishSetup(entry); v184FinishEnhance(entry); }catch(err){ console.error('18.2/18.3/18.4 finish failed', err); }   // 2.0: display-only additions
     // Coaching
     if (el.scoCoaching) el.scoCoaching.hidden = true;
     // Weak point
@@ -11155,6 +11288,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     renderReadinessMini();
     maybeShowMidCheck();
     el.setProgress.textContent = session.sets.filter(s => s.done).length + ' / ' + session.sets.length;
+    v18Safe('v184 hud', () => v184SyncSessionHud(session));
 
     if (!set){
       el.activeSetLabel.textContent = 'Session complete';
@@ -21078,6 +21212,168 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         .observe(el.warmupModal, { attributes:true, attributeFilter:['hidden'] });
     }
   }
+
+  /* ═══════════════ 18.4.0: Active Workout Focus HUD, Warm-up Plate Diff, Trophy Milestone Celebration & e1RM Sparkline ═══════════════
+     Home Screen, Cycle Map, and all 31 protected math/training/Hermes functions remain completely untouched. */
+
+  /* ── 1. Active Workout Top Laser Progress Bar + Live Tonnage HUD ── */
+  function v184SyncSessionHud(session){
+    if (!el.sessionSection || !session || !Array.isArray(session.sets)) return;
+    let hud = document.getElementById('v184SessHud');
+    if (!hud){
+      hud = document.createElement('div');
+      hud.id = 'v184SessHud';
+      hud.className = 'v184-sess-hud';
+      const sw = document.getElementById('swipeZone');
+      if (sw && sw.parentNode) sw.parentNode.insertBefore(hud, sw.nextSibling);
+      else el.sessionSection.appendChild(hud);
+    }
+    const total = session.sets.length;
+    const doneSets = session.sets.filter(s => s && s.done);
+    const done = doneSets.length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    const tonnage = doneSets.reduce((sum, s) => {
+      const r = setRole(s, session.phase);
+      if (r === 'ramp' || r === 'leadin') return sum;
+      const w = n(s.weight), reps = Math.max(0, Math.floor(n(s.performedReps)));
+      return sum + (Number.isFinite(w) ? w * reps : 0);
+    }, 0);
+    const liftName = (getLiftMeta(session.liftId) || {}).name || session.liftId || 'Workout';
+    const label = done >= total ? (liftName + ' · All ' + total + ' sets done') : (liftName + ' · Set ' + (done + 1) + ' of ' + total);
+    hud.innerHTML = '<div class="v184-sess-top"><b>' + escapeHtml(label) + '</b><span>' + (tonnage > 0 ? escapeHtml(formatWeight(roundToIncrement(tonnage, 5))) + ' lifted' : pct + '% complete') + '</span></div>'
+      + '<div class="v184-laser" aria-hidden="true"><i style="width:' + pct + '%"></i></div>';
+  }
+
+  /* ── 2. Warm-up Plate-Change Diff Badge ── */
+  function v184PlateDiffText(prevPlates, curPlates){
+    const prev = Array.isArray(prevPlates) ? prevPlates.slice() : [];
+    const cur = Array.isArray(curPlates) ? curPlates.slice() : [];
+    if (!cur.length) return 'Bar only';
+    if (!prev.length) return 'Load ' + cur.map(weightDigits).join(' + ') + ' / side';
+    const rem = prev.slice(), add = [];
+    for (const p of cur){
+      const idx = rem.indexOf(p);
+      if (idx >= 0) rem.splice(idx, 1); else add.push(p);
+    }
+    if (!add.length && !rem.length) return 'Same plates';
+    if (add.length && !rem.length) return 'Add ' + add.map(weightDigits).join(' + ') + ' / side';
+    if (!add.length && rem.length) return 'Remove ' + rem.map(weightDigits).join(' + ') + ' / side';
+    return 'Swap ' + rem.map(weightDigits).join('+') + ' → ' + add.map(weightDigits).join('+') + ' / side';
+  }
+  function v184WarmupDiff(ramp, stepIdx, liftId){
+    const wtEl = el.warmupWeight; if (!wtEl || !wtEl.parentNode) return;
+    let badge = document.getElementById('v184WuDiff');
+    if (!badge){
+      badge = document.createElement('div');
+      badge.id = 'v184WuDiff';
+      badge.className = 'v184-wudiff';
+      badge.hidden = true;
+      const row = wtEl.parentNode;
+      if (row && row.parentNode) row.parentNode.insertBefore(badge, row.nextSibling);
+      else wtEl.parentNode.insertBefore(badge, wtEl.nextSibling);
+    }
+    if (!Array.isArray(ramp) || stepIdx < 0 || stepIdx >= ramp.length){ badge.hidden = true; return; }
+    try{
+      const cur = calculatePlates(ramp[stepIdx].weight, liftId);
+      const prev = stepIdx > 0 ? calculatePlates(ramp[stepIdx - 1].weight, liftId) : { perSide: [] };
+      const txt = v184PlateDiffText(prev && prev.perSide, cur && cur.perSide);
+      badge.textContent = txt;
+      badge.hidden = !txt;
+    }catch(_){ badge.hidden = true; }
+  }
+
+  /* ── 3. Finish Screen Milestone Confetti & e1RM Trend Sparkline ── */
+  function v184FireConfetti(){
+    try{
+      if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const old = document.getElementById('v184Confetti'); if (old) old.remove();
+      const c = document.createElement('canvas');
+      c.id = 'v184Confetti'; c.className = 'v184-confetti';
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      document.body.appendChild(c);
+      const ctx = c.getContext('2d'); if (!ctx){ c.remove(); return; }
+      const cols = ['#34d399', '#60a5fa', '#facc15', '#ffffff', '#fb923c'];
+      const parts = Array.from({ length: 54 }, () => ({
+        x: c.width * (0.15 + Math.random() * 0.7),
+        y: c.height * 0.28,
+        vx: (Math.random() - 0.5) * 6.5,
+        vy: -3.5 - Math.random() * 5.5,
+        w: 5 + Math.random() * 5, h: 3 + Math.random() * 3,
+        r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.26,
+        col: cols[Math.floor(Math.random() * cols.length)], life: 1
+      }));
+      let frames = 0;
+      const tick = () => {
+        ctx.clearRect(0, 0, c.width, c.height);
+        let alive = false;
+        for (const p of parts){
+          p.x += p.vx; p.y += p.vy; p.vy += 0.16; p.vx *= 0.99; p.r += p.vr; p.life -= 0.016;
+          if (p.life > 0){
+            alive = true;
+            ctx.save(); ctx.globalAlpha = Math.max(0, p.life);
+            ctx.translate(p.x, p.y); ctx.rotate(p.r);
+            ctx.fillStyle = p.col; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+          }
+        }
+        if (alive && ++frames < 120) requestAnimationFrame(tick);
+        else c.remove();
+      };
+      requestAnimationFrame(tick);
+    }catch(_){}
+  }
+
+  function v184FinishEnhance(entry){
+    const sum = el.scoSummary; if (!sum || !entry || !entry.liftId) return;
+    // 1. Fire tasteful confetti ONLY on genuine milestones (Goal Lifted or Test-week TM increase)
+    const hasGoalHit = !!sum.querySelector('.v182-goal-hit');
+    const t = typeof entryTest === 'function' ? entryTest(entry) : null;
+    const hasTmUp = !!(t && !t.ruleVersion && t.tmChange && t.tmChange.amount > 0 && !t.tmChange.awaitingConfirmation);
+    if (hasGoalHit || hasTmUp) setTimeout(v184FireConfetti, 220);
+
+    // 2. Render recent e1RM mini-sparkline from real history (if >= 2 sessions exist)
+    const prevEl = sum.querySelector('#v184FinTrend'); if (prevEl) prevEl.remove();
+    const pts = [];
+    const hist = (state.history || []).filter(h => h && h.liftId === entry.liftId && Array.isArray(h.sets))
+      .sort((a, b) => (a.completedAt || '').localeCompare(b.completedAt || ''))
+      .slice(-8);
+    for (const h of hist){
+      let bestE = 0;
+      for (const s of h.sets){
+        const role = setRole(s, h.phase); if (role === 'ramp' || role === 'leadin') continue;
+        const w = n(s.weight), r = Math.floor(n(s.performedReps));
+        if (r >= 1 && Number.isFinite(w) && w > 0){
+          const wu = v182InUnits(w, h.units);
+          const e = r === 1 ? wu : wu * (1 + r / 30);
+          if (e > bestE) bestE = e;
+        }
+      }
+      if (bestE > 0) pts.push(Math.round(bestE));
+    }
+    if (pts.length >= 2){
+      const lo = Math.min(...pts), hi = Math.max(...pts), span = Math.max(1, hi - lo);
+      const W = 260, H = 36, pad = 6;
+      const coords = pts.map((v, i) => [
+        pad + (i / (pts.length - 1)) * (W - pad * 2),
+        H - pad - ((v - lo) / span) * (H - pad * 2)
+      ]);
+      const lineD = coords.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+      const last = coords[coords.length - 1];
+      const delta = pts[pts.length - 1] - pts[0];
+      const deltaStr = delta > 0 ? ' (+' + delta + ')' : delta < 0 ? ' (' + delta + ')' : '';
+      const areaD = lineD + ' L' + last[0].toFixed(1) + ',' + H + ' L' + coords[0][0].toFixed(1) + ',' + H + ' Z';
+      const card = '<div id="v184FinTrend" class="v184-trend">'
+        + '<div class="v184-trend-h"><span>Recent Est. 1RM Trend</span><b>' + v17Num(pts[pts.length - 1]) + ' ' + escapeHtml(unitLabel()) + escapeHtml(deltaStr) + '</b></div>'
+        + '<svg width="100%" height="36" viewBox="0 0 260 36" aria-hidden="true">'
+        + '<path d="' + areaD + '" fill="color-mix(in srgb, var(--accent) 18%, transparent)"/>'
+        + '<path d="' + lineD + '" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+        + '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="3.5" fill="var(--accent)" stroke="var(--panel)" stroke-width="1.2"/>'
+        + '</svg></div>';
+      const stats = sum.querySelector('.summary-stats');
+      if (stats) stats.insertAdjacentHTML('beforebegin', card);
+    }
+  }
+
 
 
 
