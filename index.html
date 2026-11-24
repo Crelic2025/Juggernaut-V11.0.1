@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut v18 — 18.2.0</title>
+<title>Juggernaut v18 — 18.3.0</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -3621,6 +3621,153 @@ details[open]>summary>.g181-chev{transform:rotate(180deg)}
 .v182-cue-row{display:flex;gap:8px}
 .v182-cue-row input{flex:1 1 auto;min-width:0;min-height:44px}
 .v182-cue-row .btn-s{flex:none;min-height:44px}
+
+/* ═══════════════ Juggernaut 18.3.0: UI upgrades, daylight theme, cues/setup, rest overtime, synced captions ═══════════════ */
+
+/* 1. Wider +1 tap target (without changing card height) */
+#dashboardCard .v18-c[data-v18="ex:bonus"]{min-width:40px;padding-left:4px;padding-right:4px}
+#dashboardCard .v18-c[data-v18="ex:bonus"]::after{inset:-8px -4px}
+
+/* 2. Tap-to-explain subtle visual affordances */
+#dashboardCard .v18-load-s[data-v18="ex:tm"] b{text-decoration:underline dotted color-mix(in srgb, var(--sky) 65%, transparent);text-underline-offset:3px;text-decoration-thickness:1.5px}
+#dashboardCard .v182-trk{position:relative}
+#dashboardCard .v182-trk::after{content:"?";position:absolute;right:6px;top:2px;width:14px;height:14px;border-radius:99px;font-size:10px;line-height:14px;font-weight:800;text-align:center;color:var(--muted);border:1px solid var(--line2);opacity:.7;pointer-events:none}
+
+/* 3. Sticky bottom bar uses native [hidden]{display:none} controlled cleanly inside v17Strip() */
+
+/* 4. Bottom-anchored toasts (never overlap Progress hero or Home lift tiles) */
+.toast{top:auto !important;bottom:calc(74px + var(--safe-b, 0px)) !important;transform:translateX(-50%) translateY(14px) !important;box-shadow:0 8px 28px rgba(0,0,0,.38)}
+.toast.show{transform:translateX(-50%) translateY(0) !important}
+
+/* 5. Synced caption strip cleanly below tour video (never covered by native scrubber) */
+.v183-tcap{margin-top:10px;padding:10px 14px;min-height:54px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:14px;line-height:20px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center}
+.v183-tcap[hidden]{display:none}
+
+/* 6. Home card subtle top-edge phase hairline tint */
+#dashboardCard.v18-on{position:relative;overflow:hidden}
+#dashboardCard.v18-on::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;pointer-events:none;opacity:.85;background:transparent}
+#dashboardCard.v18-on[data-phase="accumulation"]::before{background:linear-gradient(90deg, var(--blue), color-mix(in srgb, var(--blue) 35%, transparent))}
+#dashboardCard.v18-on[data-phase="intensification"]::before{background:linear-gradient(90deg, var(--warn), color-mix(in srgb, var(--warn) 35%, transparent))}
+#dashboardCard.v18-on[data-phase="test"]::before{background:linear-gradient(90deg, var(--bad), color-mix(in srgb, var(--bad) 35%, transparent))}
+#dashboardCard.v18-on[data-phase="deload"]::before{background:linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 35%, transparent))}
+
+/* 7. Progress bar clarity & % of goal indicator */
+.v17-lr-bar > i:not(.was){background:linear-gradient(90deg, var(--blue), var(--accent));min-width:6px;transition:width .35s ease}
+.v183-goal-pct{font-size:11px;font-weight:700;color:var(--muted);margin-left:6px;font-variant-numeric:tabular-nums}
+.v183-e1rm-best{display:block;margin-top:2px;font-size:11px;line-height:15px;font-weight:600;color:var(--blue)}
+
+/* 8. Tactile micro-interactions (respecting reduced motion) */
+@keyframes v183FadeSlide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.v182-ex{animation:v183FadeSlide .18s ease-out}
+#dashboardCard .v18-c{transition:transform .12s ease, box-shadow .15s ease}
+#dashboardCard .v18-c:active{transform:scale(.95)}
+@media (prefers-reduced-motion: reduce){
+  .v182-ex,#v17Strip,.v17-lr-bar > i:not(.was),#dashboardCard .v18-c{animation:none !important;transition:none !important}
+}
+
+/* 9. Permanent Setup + Inline Editable Cue on Home, Warm-up & Rest Timer */
+.v183-cs-wrap{display:flex;flex-direction:column;gap:8px;padding:2px 0}
+.v183-cs-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.v183-cs-btn{background:none;border:0;padding:4px 8px;margin:-4px -8px;border-radius:8px;color:var(--sky, var(--blue));font-size:12px;font-weight:700;cursor:pointer;min-height:32px}
+.v183-setup-row{display:flex;gap:10px;align-items:flex-start;color:var(--muted)}
+.v183-setup-row svg{flex:none;margin-top:2px;color:var(--accent)}
+.v183-setup-row span{display:block;font-size:11px;line-height:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.v183-setup-row p{margin:2px 0 0;font-size:14px;line-height:19px;font-weight:600;color:var(--text2);overflow-wrap:anywhere}
+.v183-cs-form{margin-top:4px;padding:10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.v183-cs-form label{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.v183-cs-form input{width:100%;min-height:40px;font-size:14px}
+.v183-cs-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:2px}
+.v183-cs-actions button{min-height:38px;padding:0 14px;font-size:13px}
+.v183-rcue{margin-top:8px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb, var(--sky, var(--blue)) 12%, var(--panel2));border:1px solid color-mix(in srgb, var(--sky, var(--blue)) 32%, transparent);text-align:left}
+.v183-rcue[hidden]{display:none}
+.v183-rcue b{display:block;font-size:10px;line-height:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sky, var(--blue))}
+.v183-rcue span{display:block;margin-top:2px;font-size:13px;line-height:17px;font-weight:700;color:var(--text)}
+.v183-wsetup{margin:0 0 8px;padding:8px 12px;display:flex;gap:10px;align-items:flex-start;border-radius:12px;border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);background:color-mix(in srgb, var(--accent) 10%, var(--panel));color:var(--accent)}
+.v183-wsetup[hidden]{display:none}
+.v183-wsetup span{display:block;font-size:10px;line-height:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.v183-wsetup p{margin:2px 0 0;font-size:14px;line-height:18px;font-weight:600;color:var(--text)}
+
+/* 10. Rest Timer Overtime + Visual Finish Pulse */
+@keyframes v183PulseRing{0%,100%{filter:drop-shadow(0 0 0 rgba(86,212,165,0))}50%{filter:drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 75%, transparent))}}
+#restModal.v183-overtime .timer-ring-fg{stroke:var(--accent) !important;animation:v183PulseRing 1.4s ease-in-out infinite}
+#restModal.v183-overtime .timer-text{color:var(--accent)}
+#restModal.v183-overtime .timer-label{color:var(--accent);font-weight:800}
+.badge.rest-overtime{background:color-mix(in srgb, var(--accent) 20%, var(--panel2));color:var(--accent);border-color:var(--accent)}
+
+/* 11. History Inline Note Editing */
+.v183-hnote-bar{margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.v183-hnote-btn{background:none;border:1px solid var(--line2);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;min-height:28px}
+.v183-hnote-btn:hover{color:var(--text);border-color:var(--edge)}
+.v183-hnote-ed{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.v183-hnote-ed textarea{width:100%;min-height:64px;padding:8px 10px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-family:inherit;font-size:13px;resize:vertical}
+.v183-hnote-ed-act{display:flex;gap:8px;justify-content:flex-end}
+.v183-hnote-ed-act button{min-height:34px;padding:0 12px;font-size:12px}
+
+/* 12. Theme Segmented Control in Settings */
+.v183-theme-row{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.v183-theme-row > label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.v183-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.v183-seg button{min-height:38px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer}
+.v183-seg button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* 13. Daylight / High-Contrast Gym Light Theme */
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f2f5fa;
+  --bg2:#e8edf5;
+  --panel:#ffffff;
+  --panel2:#eef2f8;
+  --panel3:#e2e8f2;
+  --text:#0f172a;
+  --text2:#334155;
+  --muted:#526074;
+  --line:#d5dde9;
+  --line2:#bcc7d8;
+  --edge:#8fa0b8;
+  --accent:#0f8f63;
+  --accent-ink:#ffffff;
+  --accent-dim:rgba(15,143,99,.12);
+  --accent-mid:rgba(15,143,99,.38);
+  --mint:#0f8f63;
+  --blue:#2563eb;
+  --sky:#1d4ed8;
+  --blue-dim:rgba(37,99,235,.10);
+  --blue-mid:rgba(37,99,235,.35);
+  --purple:#475569;
+  --purple-dim:rgba(15,23,42,.05);
+  --warn:#b4690e;
+  --warn-dim:rgba(180,105,14,.12);
+  --warn-mid:rgba(180,105,14,.38);
+  --warn-ink:#ffffff;
+  --bad:#c83232;
+  --bad-dim:rgba(200,50,50,.10);
+  --bad-mid:rgba(200,50,50,.38);
+  --bad-ink:#ffffff;
+  --scrim:rgba(15,23,42,.45);
+  --press:rgba(15,23,42,.06);
+}
+html[data-theme="light"] body{background:var(--bg);color:var(--text)}
+html[data-theme="light"] .card,
+html[data-theme="light"] .modal-card,
+html[data-theme="light"] .v17-slab,
+html[data-theme="light"] .v18-card{box-shadow:0 2px 10px rgba(15,23,42,.06)}
+html[data-theme="light"] .toast{background:#0f172a;color:#f8fafc;border-color:#334155}
+html[data-theme="light"] .bottom-nav,
+html[data-theme="light"] #v17Strip{background:rgba(255,255,255,.94);border-color:var(--line)}
+html[data-theme="light"] .tour-th{background:#f2f5fa;color:#0f172a}
+html[data-theme="light"] .v18-c{background:var(--panel2);border-color:var(--line2);color:var(--text)}
+html[data-theme="light"] .v18-c.plus,
+html[data-theme="light"] .v18-c.test{background:color-mix(in srgb, var(--blue) 12%, #ffffff);border-color:var(--blue);color:var(--blue)}
+
+html[data-theme="light"] header{background:rgba(242,245,250,.92);border-bottom-color:var(--line)}
+html[data-theme="light"] .v18-rd,
+html[data-theme="light"] .v18-list-r.h,
+html[data-theme="light"] .v18-wk-w{background:var(--panel2);border-color:var(--line)}
+html[data-theme="light"] .v18-track u{border-color:var(--panel2)}
+html[data-theme="light"] .v18-lift.done{background:color-mix(in srgb, var(--accent) 14%, #ffffff);border-color:color-mix(in srgb, var(--accent) 38%, transparent)}
+html[data-theme="light"] .v18-heat i.fut{background:var(--panel3)}
+.tour-th .v183-tcap{flex:none;margin:0 0 8px}
+
 </style>
 </head>
 <body>
@@ -3919,6 +4066,7 @@ details[open]>summary>.g181-chev{transform:rotate(180deg)}
       <div class="card">
         <div class="row">
           <div class="tight"><button id="btnExport" class="btn-s">Export</button></div>
+          <div class="tight"><button id="btnExportCsv" class="btn-s">Export CSV</button></div>
           <div class="tight">
             <label class="btn-s file-btn">
               Import
@@ -4264,6 +4412,14 @@ details[open]>summary>.g181-chev{transform:rotate(180deg)}
                 <input id="uiSound" type="checkbox">
                 <span style="font-size:13px">Sound cue when rest timer finishes</span>
               </label>
+            </div>
+            <div class="v183-theme-row">
+              <label>Appearance (Gym Daylight / Dark)</label>
+              <div id="v183ThemeSeg" class="v183-seg" role="group" aria-label="Theme">
+                <button type="button" data-v183-theme="dark" aria-pressed="true">Dark</button>
+                <button type="button" data-v183-theme="light" aria-pressed="false">Light</button>
+                <button type="button" data-v183-theme="auto" aria-pressed="false">Auto</button>
+              </div>
             </div>
           </div>
         </div>
@@ -5358,7 +5514,7 @@ details[open]>summary>.g181-chev{transform:rotate(180deg)}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '18.2.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.3.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -6898,6 +7054,13 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
             .map(([k, v]) => [k, { text:v.text.replace(/\s+/g, ' ').trim().slice(0, 120), at:(typeof v.at === 'string' ? v.at.slice(0, 40) : '') }]))
         : {};
     }
+    if (s.setup !== undefined){  // 18.3: permanent lift setup per lift ({ text, at })
+      s.setup = _isObj(s.setup)
+        ? Object.fromEntries(Object.entries(s.setup).filter(([k, v]) => _isLift(k) && _isObj(v) && typeof v.text === 'string' && v.text.trim())
+            .map(([k, v]) => [k, { text:v.text.replace(/\s+/g, ' ').trim().slice(0, 120), at:(typeof v.at === 'string' ? v.at.slice(0, 40) : '') }]))
+        : {};
+    }
+    if (_isObj(s.ui) && s.ui.theme !== undefined && s.ui.theme !== 'dark' && s.ui.theme !== 'light' && s.ui.theme !== 'auto') s.ui.theme = 'dark';
     for (const l of LIFTS){
       const x = base.lifts[l.id], dl = DEFAULT_STATE.lifts[l.id];
       x.id = l.id;
@@ -9027,6 +9190,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.restNextWeight.textContent = formatWeight(nextSet.weight);
     const tag = roleLabel(nextSet.role) ? ' · ' + roleLabel(nextSet.role) : '';
     el.restNextDetail.textContent = 'Set ' + (nextSet.index + 1) + ' · ' + nextSet.targetReps + ' reps @ ' + formatPercent(nextSet.pctTM) + ' TM' + tag;
+    v183RestCue();
 
     // Show plate changes if weight differs from previous
     const prevDoneSet = [...session.sets].reverse().find(s => s.done);
@@ -9576,7 +9740,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
     v16Safe('recap', () => v16RecapHero(entry, totalTonnage, duration));   // v16: the result first, and a share card
     try{ v17Recap(entry); }catch(err){ console.error('v17 recap failed', err); }
-    try{ v182Finish(entry); }catch(err){ console.error('18.2 finish failed', err); }   // 2.0: display-only additions
+    try{ v182Finish(entry); v183FinishSetup(entry); }catch(err){ console.error('18.2/18.3 finish failed', err); }   // 2.0: display-only additions
     // Coaching
     if (el.scoCoaching) el.scoCoaching.hidden = true;
     // Weak point
@@ -14535,7 +14699,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           <div class="hist-tonnage">${formatWeightAs(roundToIncrement(tonnage, 5), item.units)} tonnage · ${workingSets.length} set${workingSets.length === 1 ? '' : 's'}${readinessStr}${difficultyStr}</div>
           ${v18SetChips(workingSets, item.phase)}${partialNote}${weightNote}${review}
           ${item.note ? '<div class="xs mt" style="margin-top:4px;opacity:.7">' + escapeHtml(item.note) + '</div>' : ''}
-          ${item.userNote ? '<div class="xs mt" style="margin-top:4px;opacity:.7;font-style:italic">' + escapeHtml(item.userNote) + '</div>' : ''}
+          ${item.userNote ? '<div class="xs mt" style="margin-top:4px;opacity:.82;font-style:italic">' + escapeHtml(item.userNote) + '</div>' : ''}
+          <div class="v183-hnote-bar"><button type="button" class="v183-hnote-btn" data-v183="hnote-edit" data-hid="${escapeHtml(item.id || '')}">${item.userNote ? 'Edit note' : '+ Add note'}</button></div>
           ${item.coachingInsight ? '<div class="hist-coaching" data-coaching-toggle><strong>' + escapeHtml(coachLabelFor(item)) + '</strong> <span style="opacity:.5;font-size:12px">tap to expand</span><div class="hist-coaching-text" style="display:none;margin-top:4px;color:var(--text2)">' + escapeHtml(item.coachingInsight) + '</div></div>' : ''}
         </div>`;
       // Swipe-to-delete
@@ -14910,6 +15075,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     ensureAudio(); // unlock audio on this user-gesture so the completion beep is allowed on iOS
     restTimer.totalSeconds = seconds;
     restTimer.endAt = Date.now() + (seconds * 1000);
+    _v183LastPipSec = -1; _v183OvertimeFired = false;
+    if (el.restModal){ el.restModal.classList.remove('v183-overtime'); const lbl = el.restModal.querySelector('.timer-label'); if (lbl) lbl.textContent = 'Rest Timer'; }
     el.restModal.hidden = false;
     requestAnimationFrame(() => el.restModal.classList.add('show'));
     renderRestPreview();
@@ -14920,10 +15087,10 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function stopRest(){ restTimer.endAt = null; closeRest(false); }
   function closeRest(showToast=true){
     if (restTimer.rafId){ clearInterval(restTimer.rafId); restTimer.rafId = null; }
-    el.restModal.classList.remove('show');
+    el.restModal.classList.remove('show', 'v183-overtime');
     setTimeout(() => { if (!el.restModal.classList.contains('show')) el.restModal.hidden = true; }, 220);
-    // If timer still running, show mini-badge in header
-    if (restTimer.endAt && restTimer.endAt > Date.now()){
+    // If timer still running (or in overtime), clear on Done or show mini-badge if still counting down
+    if (restTimer.endAt && restTimer.endAt > Date.now() && showToast){
       startRestMiniBadge();
     } else {
       restTimer.endAt = null;
@@ -14942,6 +15109,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const MAX_MS = 20 * 60 * 1000;
     const clampedRemainingMs = Math.min(MAX_MS, Math.max(MIN_MS, proposedRemainingMs));
     restTimer.endAt = now + clampedRemainingMs;
+    if (restTimer.endAt > Date.now()){ _v183OvertimeFired = false; _v183LastPipSec = -1; if (el.restModal){ el.restModal.classList.remove('v183-overtime'); const lbl = el.restModal.querySelector('.timer-label'); if (lbl) lbl.textContent = 'Rest Timer'; } }
     // Update totalSeconds so the ring reflects the new baseline when extending
     if (delta > 0) restTimer.totalSeconds = Math.max(1, restTimer.totalSeconds + delta);
     tickRest();
@@ -14949,22 +15117,25 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function tickRest(){
     if (!restTimer.endAt) return;
-    const remaining = Math.max(0, (restTimer.endAt - Date.now()) / 1000);
-    el.restDisplay.textContent = formatDuration(remaining);
-    // Update circular progress
-    const progress = restTimer.totalSeconds > 0 ? remaining / restTimer.totalSeconds : 0;
-    // v10: ring FILLS toward full as rest completes (was: depleted) — matches lifter expectation
-    el.timerArc.style.strokeDashoffset = String(CIRCUMFERENCE * progress);
-    if (remaining <= 0){
-      restTimer.endAt = null;
-      closeRest(false);
-      stopRestMiniBadge();
-      toast('Rest done!', 'g');
-      beep();
-      haptic([120, 60, 120]);
-      return;
+    const diffSec = (restTimer.endAt - Date.now()) / 1000;
+    if (diffSec > 0){
+      const remCeil = Math.ceil(diffSec);
+      if (remCeil <= 3 && remCeil >= 1 && remCeil !== _v183LastPipSec){ _v183LastPipSec = remCeil; v183Pip(); }
+      el.restDisplay.textContent = formatDuration(diffSec);
+      const progress = restTimer.totalSeconds > 0 ? diffSec / restTimer.totalSeconds : 0;
+      el.timerArc.style.strokeDashoffset = String(CIRCUMFERENCE * progress);
+    } else {
+      const overSec = Math.floor(-diffSec);
+      el.restDisplay.textContent = '+' + formatDuration(overSec);
+      el.timerArc.style.strokeDashoffset = '0';
+      if (!_v183OvertimeFired){
+        _v183OvertimeFired = true;
+        if (el.restModal){ el.restModal.classList.add('v183-overtime'); const lbl = el.restModal.querySelector('.timer-label'); if (lbl) lbl.textContent = 'Rest Done · Overtime'; }
+        toast('Rest done!', 'g');
+        beep();
+        haptic([120, 60, 120]);
+      }
     }
-    // v10: setInterval at 250ms instead of rAF — plenty smooth, saves ~98% of draw calls
     if (!restTimer.rafId){ restTimer.rafId = setInterval(tickRest, 250); }
   }
 
@@ -18425,7 +18596,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         + '<em>' + escapeHtml(st ? 'Pick another lift on Home' : numeric ? scheme + ' at ' + wt : scheme) + '</em></span>'
         + (st || preview ? (onToday ? '' : '<button type="button" class="v17-go ghost" data-v17="home">Home</button>') : '<button type="button" class="v17-go" data-v17="start"' + (el.btnStartResume && el.btnStartResume.disabled ? ' disabled' : '') + '>' + v17Ic('play', 16) + 'Start</button>');
     }
-    if (show && onToday && !s && _sessionPhase === 'idle' && _v18StartOn) show = false;   // v18: the card's Start is on screen
+    const _p183 = v183PastStart(); _v183LastPastStart = _p183; if (show && onToday && !s && _sessionPhase === 'idle' && !_p183) show = false;   // 18.3: show only after Start scrolls past top header
     document.body.classList.toggle('v17-strip-on', show);
     box.hidden = !show;
     if (show) v17Once('strip', html, () => { box.innerHTML = html; }); else _v17Sig.strip = null;
@@ -19050,7 +19221,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     try{ v171Bind(); }catch(err){ console.error('v171 bind failed', err); }   // 2.1: boot continues
     try{ v173Bind(); }catch(err){ console.error('v173 bind failed', err); }   // 2.3: boot continues
     try{ v18Bind(); }catch(err){ console.error('v18 bind failed', err); }
-    try{ v182Bind(); }catch(err){ console.error('18.2 bind failed', err); }   // v18: boot continues
+    try{ v182Bind(); }catch(err){ console.error('18.2 bind failed', err); }
+    try{ v183Bind(); }catch(err){ console.error('18.3 bind failed', err); }   // v18: boot continues
     setupModalA11y(); // v11.0.2: dialog roles + Escape-to-close
     wireOnboarding(); // v10: attach onboarding modal handlers
     try{ db = await idb.open(); }
@@ -19059,6 +19231,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       console.error('IDB open failed — running degraded', err);
     }
     await loadState();
+    try{ v183ApplyTheme(); }catch(_){}
     await loadDeviceRecord();    // v14: installId / seq / pendingPairing, reconciled across both copies (BRIDGE_SPEC 6, A1)
     try{ await hermesAfterOlderVersion(); }catch(err){ console.error('Bridge state after an older version:', err && err.message); }   // v14 (B23)
     await loadRecoveryIndex();   // v13.2.1: History → Undo import / Export recovery copies when available
@@ -20070,12 +20243,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (P.st) body = v18HandledHtml(P);
       else {
         const R = v18Ready(), E = v18Effect(P, R);
-        body = v18LoadHtml(P) + '<div class="v18-rule full" aria-hidden="true"></div>' + v18LadderHtml(P, R, E) + '<div class="v18-rule" aria-hidden="true"></div>' + v18PlatesHtml(P) + v182CueHtml(P);
+        body = v18LoadHtml(P) + '<div class="v18-rule full" aria-hidden="true"></div>' + v18LadderHtml(P, R, E) + '<div class="v18-rule" aria-hidden="true"></div>' + v18PlatesHtml(P) + v183HomeCueSetupHtml(P);
         ready = P.previewing ? '' : v18ReadyHtml(P, R, E);
       }
       v18Put('v18Top', top); v18Put('v18Body', body); v18Put('v18Ready', ready);
       card.classList.add('v18-on');                      // only once every part has been built: a fault above leaves the 2.4 card showing
       card.classList.toggle('v18-handled', !!P.st);
+      card.dataset.phase = (P.wk && P.wk.phase) ? P.wk.phase : '';
+      v183SyncDock();
       const b = el.btnStartResume, label = 'Start ' + P.short.toLowerCase();
       if (b && !b.disabled && b.textContent.trim() !== label) b.innerHTML = v18Ic('play', 16) + '<span>' + escapeHtml(label) + '</span>';
     }catch(err){ card.classList.remove('v18-on', 'v18-handled'); throw err; }
@@ -20410,6 +20585,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (before && h.id === before) continue;
       const at = Date.parse(h.completedAt); if (!Number.isFinite(at)) continue;
       for (const s of h.sets){
+        const role = setRole(s, h.phase); if (role === 'ramp' || role === 'leadin') continue;
         const r = Math.floor(n(s && s.performedReps)), w = n(s && s.weight);
         if (r >= 1 && Number.isFinite(w) && w > 0) out.push({ w:Math.round(v182InUnits(w, h.units) * 10) / 10, r, at, id:h.id });
       }
@@ -20430,9 +20606,15 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
   function v182BestHtml(x){
     const b = v182Best(x.id), hit = x.goal ? v182GoalHit(x.id, x.goal) : null, md = t => escapeHtml(v18Md(new Date(t).toISOString()));
-    const left = b ? 'Heaviest lifted <b>' + v17Num(b.w) + ' × ' + b.r + '</b> · ' + md(b.at) : 'Heaviest lifted: nothing logged yet';
+    const eBest = v183BestE1rm(x.id);
+    const bE1 = b ? (b.r === 1 ? b.w : Math.round(b.w * (1 + b.r / 30) * 10) / 10) : 0;
+    const showE = eBest && b && (eBest.w !== b.w || eBest.r !== b.r) && eBest.e > bE1 + 0.5;
+    const left = b ? 'Heaviest lifted <b>' + v17Num(b.w) + ' × ' + b.r + '</b> · ' + md(b.at)
+      + (showE ? '<span class="v183-e1rm-best">Best est. 1RM: ' + v17Num(eBest.w) + ' × ' + eBest.r + ' (' + v17Num(Math.round(eBest.e)) + ')</span>' : '')
+      : 'Heaviest lifted: nothing logged yet';
+    const gPct = (x.goal > 0 && !hit && x.est < x.goal) ? '<span class="v183-goal-pct">' + Math.min(99, Math.round((x.est / x.goal) * 100)) + '%</span>' : '';
     const right = hit ? '<b class="ok">' + v18Ic('check', 13, 3) + 'Goal lifted ' + md(hit.at) + '</b>'
-      : (x.goal && x.est >= x.goal) ? '<b class="est">Estimate at goal</b>' : '';
+      : (x.goal && x.est >= x.goal) ? '<b class="est">Estimate at goal</b>' : gPct;
     return '<span class="v182-best"><em>' + left + '</em>' + right + '</span>';
   }
 
@@ -20577,6 +20759,327 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     }
   }
 
+  /* ═══════════════ 18.3.0: UI upgrades, daylight theme, editable cues + permanent setup, rest overtime, history note edit, CSV export ═══════════════
+     All 31 protected math/training/Hermes functions remain byte-identical.
+     Persisted keys added: settings.setup ({ liftId:{ text, at } }), settings.ui.theme ('dark'|'light'|'auto'), and item.userNote edits in history. */
+
+  /* ── 1. Daylight / Auto Light-Dark theme ── */
+  let _v183Mql = null;
+  function v183ThemePref(){
+    const t = state.settings && state.settings.ui && state.settings.ui.theme;
+    return (t === 'light' || t === 'dark' || t === 'auto') ? t : 'dark';
+  }
+  function v183ApplyTheme(){
+    const pref = v183ThemePref();
+    let resolved = pref;
+    if (pref === 'auto'){
+      const isLight = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: light)').matches;
+      resolved = isLight ? 'light' : 'dark';
+    }
+    document.documentElement.dataset.theme = resolved;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', resolved === 'light' ? '#f2f5fa' : '#05070D');
+    document.querySelectorAll('#v183ThemeSeg button[data-v183-theme]').forEach(b => {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-v183-theme') === pref));
+    });
+  }
+  async function v183SetTheme(pref){
+    if (pref !== 'dark' && pref !== 'light' && pref !== 'auto') return;
+    if (!state.settings.ui) state.settings.ui = {};
+    state.settings.ui.theme = pref;
+    v183ApplyTheme();
+    await saveState();
+  }
+
+  /* ── 2. Permanent Lift Setup (separate from temporary Form Cue) ── */
+  const V183_WRENCH = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
+  let _v183EditLift = null;
+
+  function v183Setup(id){
+    const s = state.settings && state.settings.setup && state.settings.setup[id];
+    return (s && typeof s.text === 'string' && s.text.trim()) ? s.text.trim() : '';
+  }
+  async function v183SetSetup(id, text){
+    const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+    const all = (state.settings.setup && typeof state.settings.setup === 'object') ? { ...state.settings.setup } : {};
+    if (t) all[id] = { text:t, at:nowISO() }; else delete all[id];
+    state.settings.setup = all;
+    await saveState();
+    return t;
+  }
+
+  function v183HomeCueSetupHtml(P){
+    const id = P.id, cue = v182Cue(id), setup = v183Setup(id), word = v182LiftWord(id);
+    const editing = _v183EditLift === id;
+    let out = '<div class="v18-rule" aria-hidden="true"></div><div class="v183-cs-wrap">';
+    if (editing){
+      out += '<div class="v183-cs-form" data-v183-form="' + escapeHtml(id) + '">'
+        + '<div><label for="v183SetupIn">Permanent setup (' + escapeHtml(word) + ')</label>'
+        + '<input id="v183SetupIn" type="text" maxlength="120" autocomplete="off" placeholder="e.g. J-cup 11, safety pin 5, belt hole 4" value="' + escapeHtml(setup) + '"></div>'
+        + '<div><label for="v183CueHomeIn">Temporary cue (clears on tap)</label>'
+        + '<input id="v183CueHomeIn" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Drive knees out, stay tight out of the hole" value="' + escapeHtml(cue) + '"></div>'
+        + '<div class="v183-cs-actions">'
+        + '<button type="button" class="btn-s" data-v183="cs-cancel">Cancel</button>'
+        + '<button type="button" class="btn-p" data-v183="cs-save" data-lift="' + escapeHtml(id) + '">Save</button>'
+        + '</div></div>';
+    } else {
+      if (setup){
+        out += '<div class="v183-cs-head"><div class="v183-setup-row" role="note" aria-label="Setup for ' + escapeHtml(word) + '">' + V183_WRENCH
+          + '<div><span>Setup</span><p>' + escapeHtml(setup) + '</p></div></div>'
+          + '<button type="button" class="v183-cs-btn" data-v183="cs-edit" data-lift="' + escapeHtml(id) + '">Edit</button></div>';
+      }
+      if (cue){
+        out += '<div class="v183-cs-head"><div class="v182-cue" role="note" aria-label="Your cue for ' + escapeHtml(word) + '">' + V182_PIN
+          + '<div><span>Your cue</span><p>' + escapeHtml(cue) + '</p></div></div>'
+          + (setup ? '' : '<button type="button" class="v183-cs-btn" data-v183="cs-edit" data-lift="' + escapeHtml(id) + '">Edit</button>') + '</div>';
+      }
+      if (!setup && !cue){
+        out += '<div class="v183-cs-head"><span style="font-size:12px;color:var(--muted)">No setup or cue saved for ' + escapeHtml(word) + '</span>'
+          + '<button type="button" class="v183-cs-btn" data-v183="cs-edit" data-lift="' + escapeHtml(id) + '">+ Setup / cue</button></div>';
+      }
+    }
+    out += '</div>';
+    return out;
+  }
+
+  // Warm-up sheet: show permanent Setup above the temporary Cue (never cleared by Clear Cue)
+  function v183WarmSetup(){
+    const cueBox = document.getElementById('v182WarmCue'); if (!cueBox || !cueBox.parentNode) return;
+    let sBox = document.getElementById('v183WarmSetup');
+    if (!sBox){
+      sBox = document.createElement('div');
+      sBox.id = 'v183WarmSetup';
+      sBox.className = 'v183-wsetup';
+      sBox.hidden = true;
+      cueBox.parentNode.insertBefore(sBox, cueBox);
+    }
+    const id = (state.activeSession && state.activeSession.liftId) || (el.liftSelect && el.liftSelect.value) || '';
+    const st = id ? v183Setup(id) : '';
+    if (!st){ sBox.hidden = true; sBox.innerHTML = ''; return; }
+    sBox.innerHTML = V183_WRENCH + '<div><span>Permanent setup</span><p>' + escapeHtml(st) + '</p></div>';
+    sBox.hidden = false;
+  }
+
+  // Rest Timer "Up next" card: show active Cue (and Setup) right before stepping under the bar
+  function v183RestCue(){
+    if (!el.restNextPreview) return;
+    let box = document.getElementById('v183RestCue');
+    if (!box){
+      box = document.createElement('div');
+      box.id = 'v183RestCue';
+      box.className = 'v183-rcue';
+      box.hidden = true;
+      el.restNextPreview.appendChild(box);
+    }
+    const id = state.activeSession && state.activeSession.liftId;
+    if (!id){ box.hidden = true; box.innerHTML = ''; return; }
+    const cue = v182Cue(id), setup = v183Setup(id);
+    if (!cue && !setup){ box.hidden = true; box.innerHTML = ''; return; }
+    let html = '';
+    if (cue) html += '<b>Your cue</b><span>' + escapeHtml(cue) + '</span>';
+    if (setup) html += '<b style="color:var(--accent)' + (cue ? ';margin-top:6px' : '') + '">Setup</b><span style="font-weight:600;color:var(--text2)">' + escapeHtml(setup) + '</span>';
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  // Finish screen: add Permanent Setup input right below the Cue input
+  function v183FinishSetup(entry){
+    const sum = el.scoSummary; if (!sum || !entry || !entry.liftId) return;
+    const cuebox = sum.querySelector('.v182-cuebox'); if (!cuebox) return;
+    const id = entry.liftId, word = v182LiftWord(id), cur = v183Setup(id);
+    cuebox.insertAdjacentHTML('afterend', '<div class="v182-cuebox v183-setupbox"><label for="v183FinSetupIn">' + V183_WRENCH + 'Permanent ' + escapeHtml(word) + ' setup</label>'
+      + '<p>Rack height, grip, or belt hole. Stays saved even when you clear a temporary cue.</p>'
+      + '<div class="v182-cue-row"><input id="v183FinSetupIn" type="text" maxlength="120" autocomplete="off" enterkeyhint="done" placeholder="e.g. J-cup 11, safety pin 5, belt hole 4" value="' + escapeHtml(cur) + '">'
+      + '<button type="button" id="v183FinSetupSave" class="btn-s" data-lift="' + escapeHtml(id) + '">Save setup</button></div></div>');
+  }
+
+  /* ── 3. Best e1RM set helper (excluding ramp/lead-in sets) ── */
+  function v183BestE1rm(id){
+    let best = null;
+    for (const x of v182Lifted(id)){
+      const e = x.r === 1 ? x.w : x.w * (1 + x.r / 30);
+      if (!best || e > best.e || (e === best.e && x.at < best.at)) best = { ...x, e: Math.round(e * 10) / 10 };
+    }
+    return best;
+  }
+
+  /* ── 4. Show sticky Start bar on Home ONLY after the card's Start button scrolls past the top header ── */
+  let _v183LastPastStart = false;
+  function v183PastStart(){
+    const btn = el.btnStartResume;
+    if (!btn || btn.hidden || btn.offsetParent === null) return false;
+    return btn.getBoundingClientRect().top < 64;
+  }
+  function v183SyncDock(){
+    const past = v183PastStart();
+    if (past !== _v183LastPastStart){
+      _v183LastPastStart = past;
+      v17Safe('strip', v17Strip);
+    }
+  }
+  function v183InitDockObserver(){
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; v183SyncDock(); });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    _v183LastPastStart = v183PastStart();
+    v17Safe('strip', v17Strip);
+  }
+
+  /* ── 5. Rest Timer Overtime + 3-2-1 Countdown Pip ── */
+  let _v183LastPipSec = -1;
+  let _v183OvertimeFired = false;
+  function v183Pip(){
+    if (!state.settings?.ui?.sound) return;
+    try{
+      ensureAudio();
+      if (!_audioCtx) return;
+      const t = _audioCtx.currentTime;
+      const o = _audioCtx.createOscillator(), g = _audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 620;
+      o.connect(g); g.connect(_audioCtx.destination);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.14, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      o.start(t); o.stop(t + 0.1);
+    }catch(_){}
+  }
+
+  /* ── 6. One-Tap CSV Export ── */
+  function v183CsvEsc(v){
+    const s = String(v == null ? '' : v);
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function v183ExportCsv(){
+    const rows = [['date','lift','cycle','wave','week','phase','set_index','role','weight','units','target_reps','performed_reps','e1rm','readiness','notes']];
+    const items = (state.history || []).slice().sort((a,b) => (a.completedAt || '').localeCompare(b.completedAt || ''));
+    for (const h of items){
+      const date = (h.completedAt || '').slice(0, 10);
+      const lift = (getLiftMeta(h.liftId) || {}).name || h.liftId || '';
+      const units = h.units || unitLabel();
+      const rd = h.readiness && Number.isFinite(h.readiness.score) ? readinessScoreText(h.readiness.score) : '';
+      const notes = String(h.userNote || h.note || '').replace(/\r?\n/g, ' ').trim();
+      const sets = Array.isArray(h.sets) ? h.sets : [];
+      if (!sets.length){
+        rows.push([date, lift, h.cycle || 1, h.wave || '', h.weekIndex != null ? h.weekIndex + 1 : '', h.phase || '', '', '', '', units, '', '', '', rd, notes]);
+      } else {
+        sets.forEach((s, i) => {
+          const w = Number.isFinite(n(s.weight)) ? n(s.weight) : '';
+          const r = Number.isFinite(n(s.performedReps)) ? n(s.performedReps) : '';
+          const e1 = (w > 0 && r >= 1) ? (r === 1 ? w : Math.round(w * (1 + r / 30) * 10) / 10) : '';
+          rows.push([date, lift, h.cycle || 1, h.wave || '', h.weekIndex != null ? h.weekIndex + 1 : '', h.phase || '', i + 1, setRole(s, h.phase), w, units, s.targetReps != null ? s.targetReps : '', r, e1, rd, i === 0 ? notes : '']);
+        });
+      }
+    }
+    const csv = rows.map(r => r.map(v183CsvEsc).join(',')).join('\r\n') + '\r\n';
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'juggernaut-history-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1000);
+    toast('CSV exported (' + items.length + ' session' + (items.length === 1 ? '' : 's') + ').', 'g');
+  }
+
+  /* ── 7. Bind all 18.3.0 interactions ── */
+  function v183Bind(){
+    v183ApplyTheme();
+    if (typeof window.matchMedia === 'function'){
+      _v183Mql = window.matchMedia('(prefers-color-scheme: light)');
+      if (_v183Mql && _v183Mql.addEventListener) _v183Mql.addEventListener('change', () => { if (v183ThemePref() === 'auto') v183ApplyTheme(); });
+    }
+    v183InitDockObserver();
+    const csvBtn = document.getElementById('btnExportCsv');
+    if (csvBtn) csvBtn.addEventListener('click', () => v18Safe('csv export', v183ExportCsv));
+
+    document.addEventListener('click', ev => {
+      const tb = ev.target.closest && ev.target.closest('[data-v183-theme]');
+      if (tb){ v18Safe('theme', () => v183SetTheme(tb.getAttribute('data-v183-theme'))); return; }
+
+      const fs = ev.target.closest && ev.target.closest('#v183FinSetupSave');
+      if (fs){
+        v18Safe('finish setup', () => {
+          const id = fs.getAttribute('data-lift'), inp = document.getElementById('v183FinSetupIn'); if (!id || !inp) return;
+          v183SetSetup(id, inp.value).then(t => {
+            inp.value = t;
+            toast(t ? 'Permanent setup saved for ' + v182LiftWord(id) + '.' : 'Setup cleared.', 'g');
+          }).catch(err => { console.error('setup save failed', err); toast('Setup was not saved.', 'b'); });
+        });
+        return;
+      }
+
+      const b = ev.target.closest && ev.target.closest('[data-v183]');
+      if (!b) return;
+      const act = b.getAttribute('data-v183');
+      v18Safe('v183:' + act, () => {
+        if (act === 'cs-edit'){
+          _v183EditLift = b.getAttribute('data-lift');
+          v18Card();
+          const inp = document.getElementById('v183SetupIn'); if (inp) inp.focus({ preventScroll:true });
+        } else if (act === 'cs-cancel'){
+          _v183EditLift = null;
+          v18Card();
+        } else if (act === 'cs-save'){
+          const id = b.getAttribute('data-lift');
+          const sIn = document.getElementById('v183SetupIn'), cIn = document.getElementById('v183CueHomeIn');
+          if (!id || !sIn || !cIn) return;
+          Promise.all([v183SetSetup(id, sIn.value), v182SetCue(id, cIn.value)]).then(() => {
+            _v183EditLift = null;
+            v18Card();
+            toast('Saved setup & cue for ' + v182LiftWord(id) + '.', 'g');
+          }).catch(err => { console.error('cs-save failed', err); toast('Could not save.', 'b'); });
+        } else if (act === 'hnote-edit'){
+          const hid = b.getAttribute('data-hid'), card = b.closest('.history-item');
+          if (!hid || !card || card.querySelector('.v183-hnote-ed')) return;
+          const entry = (state.history || []).find(h => h.id === hid); if (!entry) return;
+          const ed = document.createElement('div');
+          ed.className = 'v183-hnote-ed';
+          ed.innerHTML = '<textarea maxlength="600" placeholder="Add or edit session note…">' + escapeHtml(entry.userNote || '') + '</textarea>'
+            + '<div class="v183-hnote-ed-act">'
+            + '<button type="button" class="btn-s" data-v183="hnote-cancel">Cancel</button>'
+            + '<button type="button" class="btn-p" data-v183="hnote-save" data-hid="' + escapeHtml(hid) + '">Save note</button></div>';
+          const content = card.querySelector('.h-content') || card;
+          content.appendChild(ed);
+          const ta = ed.querySelector('textarea'); if (ta) ta.focus({ preventScroll:true });
+        } else if (act === 'hnote-cancel'){
+          const ed = b.closest('.v183-hnote-ed'); if (ed) ed.remove();
+        } else if (act === 'hnote-save'){
+          const hid = b.getAttribute('data-hid'), ed = b.closest('.v183-hnote-ed');
+          const ta = ed && ed.querySelector('textarea');
+          const entry = (state.history || []).find(h => h.id === hid);
+          if (!entry || !ta) return;
+          entry.userNote = String(ta.value || '').trim().slice(0, 600);
+          saveState().then(() => { renderHistory(); toast('Session note updated.', 'g'); })
+            .catch(err => { console.error('note save failed', err); toast('Could not save note.', 'b'); });
+        }
+      });
+    });
+
+    document.addEventListener('keydown', ev => {
+      if (ev.key !== 'Enter' || !ev.target) return;
+      const tid = ev.target.id;
+      if (tid === 'v183FinSetupIn'){
+        ev.preventDefault();
+        const b = document.getElementById('v183FinSetupSave'); if (b) b.click();
+      } else if (tid === 'v183SetupIn' || tid === 'v183CueHomeIn'){
+        ev.preventDefault();
+        const f = ev.target.closest && ev.target.closest('.v183-cs-form');
+        const b = f && f.querySelector('[data-v183="cs-save"]'); if (b) b.click();
+      }
+    });
+
+    if (el.warmupModal && typeof MutationObserver === 'function'){
+      new MutationObserver(() => { if (!el.warmupModal.hidden) v18Safe('warm-up setup', v183WarmSetup); })
+        .observe(el.warmupModal, { attributes:true, attributeFilter:['hidden'] });
+    }
+  }
+
+
 
   boot()
     .then(() => maybeSyncFormulaAccessories('boot').catch(() => {}))
@@ -20594,6 +21097,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     <video id="tourVideo" aria-label="Tour video" playsinline webkit-playsinline controls preload="metadata"></video>
     <div id="tourMsg" class="tour-msg" hidden></div>
   </div>
+  <div id="v183TourCap" class="v183-tcap" aria-live="polite" hidden></div>
   <div class="tour-th-nav">
     <button type="button" id="tourPrev" class="btn-s tour-nav-b">Previous</button>
     <button type="button" id="tourNext" class="btn-p tour-nav-b">Next chapter</button>
@@ -20637,6 +21141,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function release(){
     if (waiting){ clearTimeout(waiting); waiting = null; }
+    const _cap = $('v183TourCap'); if (_cap){ _cap.hidden = true; _cap.textContent = ''; }
     try{ video.pause(); }catch(_){}
     if (url){
       const old = url; url = null;
@@ -20702,9 +21207,26 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (state === 'bad'){ say('words'); return; }
     try{ url = URL.createObjectURL(new Blob([clipBytes(k)], { type:'video/mp4' })); }
     catch(err){ console.error(err); url = null; say('words'); return; }
-    video.src = url;
-    if (at > 0){ const go = () => { try{ video.currentTime = Math.max(0, Math.min(at, (video.duration || at + 1) - 0.5)); }catch(_){} };
-      if (video.readyState >= 1) go(); else video.addEventListener('loadedmetadata', go, { once:true }); }
+    const capEl = $('v183TourCap');
+    const V183_CAPS = [[[1.5,"Juggernaut is a sixteen-week strength program for four lifts: squat, bench, deadlift and press."],[8.88,"Every weight comes from one number for each lift, your training max. It starts at ninety percent of your best single, so the work is heavy but doable."],[17.84,"The sixteen weeks are four waves: tens, eights, fives and threes. Each wave is heavier, with fewer reps."],[26.82,"Every wave runs the same way. Week one is accumulation: lots of sets at a moderate weight."],[33.04,"Week two is intensification: heavier, with fewer reps in each set."],[37.96,"Week three is the test. One all-out set decides whether your training max goes up, and every weight after it goes up with it."],[45.5,"Week four is a deload: light work, so you recover before the next wave."],[50.24,"The app tells you what to lift each day, and adjusts the day to how ready you are."]],[[1.5,"This is Home. The card at the top is today's lift."],[4.86,"It shows the weight on the bar and the percent of your training max."],[8.6,"Every set is a box. The last one, with the plus, is your plus set."],[13.32,"Under that are the plates for each side, and your rest time."],[16.74,"Before you lift, tap Check in and rate five things from one to five."],[21.82,"Your score, out of thirty, sets the day. Under fifteen, a set comes off."],[27.16,"The dashed green box is a bonus set. Score twenty-three or more and the app offers it. Taking it is up to you."],[34.06,"Then tap Start."]],[[1.5,"Start opens the warm-up. Do each set, then tap how it felt."],[6.58,"Two fast sets in a row add five pounds to your work sets. Two slow ones take ten off."],[14.06,"Now the work sets. You see the weight, the plates, and the target reps."],[18.56,"Lift, then tap Log."],[21.34,"The rest timer starts on its own. Rate the set if you like, then start the next one."],[27.12,"The last set is the plus set. Do at least the target, then keep going while your reps stay clean."],[33.04,"Stop with reps left in the tank: two or three in accumulation, one or two in intensification. It's not a max-out."],[40.96,"Set your reps and log it."],[44.74,"Then tap Complete session to see your numbers. The week moves on to the next lift."]],[[1.5,"Under the card is your week. A lift you've done shows the day and the result."],[6.06,"A lift still to come shows the planned weight."],[8.76,"Tap a lift to put it on the card. The app suggests the next one, but your pick always wins."],[14.94,"Scroll down for your training days, readiness, sleep and bodyweight."],[19.5,"The cycle map shows all sixteen weeks. Tap a week to see its sets and load."],[24.88,"Tap Back to return to this week."]],[[1.5,"The third week of every wave is a test. You ramp up, then take one set for as many reps as you can."],[7.66,"The card gives you the standard, and the reps that raise your training max."],[11.9,"During the test, a table shows what each rep is worth."],[16.48,"Log your reps and the app works out your new max. Beat the standard by a few reps and it goes up. If not, it holds."],[25.26,"A deload week follows: light sets, and no plus set."]],[[1.5,"Program is the plan: all sixteen weeks, for one lift or all four."],[7.58,"Below it are this week's sets, load and rest, and every test so far."],[12.86,"Open All sixteen weeks to see the whole cycle in one table."],[18.54,"Progress is your results. Estimated maxes for each lift, and this week against last week."],[24.42,"The calendar shows every session. Further down are your progression charts and the full session log."]],[[1.5,"The sliders button opens Settings."],[4.58,"In Lifts and Maxes, set the training max for each lift. Every weight comes from it."],[9.98,"Program holds your units, bar weight and rounding. Gym Equipment hides what your gym doesn't have."],[17.06,"Your data lives on this phone, so export a backup from the Progress tab now and then."],[21.94,"That's the tour. The question mark opens this guide any time."]]];
+    const syncCap = () => {
+      if (!capEl) return;
+      const lines = V183_CAPS[cur - 1] || [];
+      const t = video.currentTime || 0;
+      let txt = '';
+      for (let i = lines.length - 1; i >= 0; i--){ if (t >= lines[i][0] - 0.15){ txt = lines[i][1]; break; } }
+      capEl.textContent = txt;
+      capEl.hidden = !txt;
+    };
+    video.ontimeupdate = syncCap;
+    video.onseeked = syncCap;
+    video.src = at > 0 ? (url + '#t=' + at.toFixed(1)) : url;
+    if (at > 0){
+      const target = at;
+      const go = () => { try{ video.currentTime = Math.max(0, Math.min(target, (video.duration || target + 1) - 0.5)); syncCap(); }catch(_){} };
+      if (video.readyState >= 1) go(); else video.addEventListener('loadedmetadata', go, { once:true });
+      video.addEventListener('playing', () => { if (Math.abs((video.currentTime || 0) - target) > 0.75) go(); }, { once:true });
+    } else { syncCap(); }
     if (play) start();
   }
 
