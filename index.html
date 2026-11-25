@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://openrouter.ai https://api.anthropic.com https: http://127.0.0.1:* blob:; worker-src 'self' blob:; manifest-src 'self' blob:; frame-ancestors 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://openrouter.ai https://api.anthropic.com https: http://127.0.0.1:* blob:; worker-src 'self' blob:; manifest-src 'self' blob:;">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#05070D">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut v18 — 18.4.0</title>
+<title>Juggernaut v18 — 18.4.1</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -1480,22 +1480,7 @@ html,body{overflow-x:hidden;max-width:100vw}
   0%{opacity:.6}
   100%{opacity:1}
 }
-@keyframes confettiBurst{
-  0%{opacity:1;transform:translateY(0) scale(1)}
-  100%{opacity:0;transform:translateY(-40px) scale(1.5)}
-}
 .success-ring{animation:successPulse .5s var(--ease) 1}
-.confetti-wrap{
-  position:fixed;top:50%;left:50%;
-  pointer-events:none;z-index:100;
-  transform:translate(-50%,-50%);
-}
-.confetti-particle{
-  position:absolute;
-  width:8px;height:8px;
-  border-radius:50%;
-  animation:confettiBurst .8s ease-out forwards;
-}
 
 /* ─── READINESS SHEET ─── */
 .readiness-card{text-align:left}
@@ -1874,7 +1859,7 @@ body{-webkit-font-smoothing:antialiased}
 .hdr-title,.card h2,h1,h2,.sheet-title,.dash-phase-title,.timer-label{font-stretch:118%;letter-spacing:-.01em}
 .hero-weight,.dash-preview-weight,.lift-hero-v,.timer-text,.rep-val,.rest-next-weight,.v16-num{
   font-family:var(--font);font-stretch:var(--wide);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.perf-mode .hero-weight,.perf-mode .dash-preview-weight{font-stretch:normal}
+.performance-mode .hero-weight,.performance-mode .dash-preview-weight{font-stretch:normal}
 
 /* shell */
 header{background:var(--bg);border-bottom:none;padding-bottom:4px}
@@ -2232,7 +2217,7 @@ body[data-plates="color"] .plate-svg .plate.added{stroke:#fff;stroke-width:2.5}
 .confirm-actions:has(#confirmAlt:not([hidden])) #confirmOk{flex:1 1 100%}
 
 /* 16.0.1 r3 (owner's choice 2026-11-15): the big weight on Today and in a session is set in Sora 800. Other numerals stay Archivo. */
-.dash-preview-weight,.hero-weight,.perf-mode .dash-preview-weight,.perf-mode .hero-weight{font-family:'Sora','Archivo',-apple-system,'Helvetica Neue',Arial,sans-serif;font-weight:800;font-stretch:normal;letter-spacing:-.03em}
+.dash-preview-weight,.hero-weight,.performance-mode .dash-preview-weight,.performance-mode .hero-weight{font-family:'Sora','Archivo',-apple-system,'Helvetica Neue',Arial,sans-serif;font-weight:800;font-stretch:normal;letter-spacing:-.03em}
 
 /* ═══ 2.0: text and stroke uses of the accent, re-pointed (generated) ═══ */
 .badge.g{color:var(--sky)}
@@ -2322,7 +2307,7 @@ body.v17-live[data-v17-view="Workout"] .app{background:radial-gradient(130% 360p
 body.v17-strip-on .app{padding-bottom:calc(148px + var(--safe-b))}
 .hdr-title,.card h2,h1,h2,.sheet-title,.dash-phase-title,.timer-label{font-stretch:normal;letter-spacing:-.015em}
 .hero-weight,.dash-preview-weight,.lift-hero-v,.timer-text,.rep-val,.rest-next-weight,.v16-num,
-.dash-preview-weight,.hero-weight,.perf-mode .dash-preview-weight,.perf-mode .hero-weight{font-family:var(--font);font-stretch:normal;font-weight:800;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.dash-preview-weight,.hero-weight,.performance-mode .dash-preview-weight,.performance-mode .hero-weight{font-family:var(--font);font-stretch:normal;font-weight:800;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
 header{background:transparent}
 .hdr-title{font-size:26px;line-height:32px;font-weight:800;display:inline}
 .hdr-sub{font-size:13px;font-weight:600;color:var(--muted);line-height:18px}
@@ -2432,9 +2417,9 @@ button{font-family:var(--font)}
 .v17m-s.due{fill:none;stroke:var(--text2);stroke-width:1.5}
 .v17m-s.skipped,.v17m-s.missed{fill:none;stroke:var(--line2);stroke-width:1.5;stroke-dasharray:2 2}
 @media (prefers-reduced-motion:no-preference){
-  body:not(.perf-mode) .v17-map.anim .v17m-stack{transform-box:fill-box;transform-origin:50% 100%;animation:v17rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
-  body:not(.perf-mode) .v17-map.anim .v17m-line{stroke-dasharray:1;stroke-dashoffset:1;animation:v17draw .9s ease-out .45s forwards}
-  body:not(.perf-mode) .v17-map.anim .v17m-fut,body:not(.perf-mode) .v17-map.anim .v17m-test,body:not(.perf-mode) .v17-map.anim .v17m-now,body:not(.perf-mode) .v17-map.anim .v17m-peak{animation:v17fade .4s ease-out 1.1s both}
+  body:not(.performance-mode) .v17-map.anim .v17m-stack{transform-box:fill-box;transform-origin:50% 100%;animation:v17rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+  body:not(.performance-mode) .v17-map.anim .v17m-line{stroke-dasharray:1;stroke-dashoffset:1;animation:v17draw .9s ease-out .45s forwards}
+  body:not(.performance-mode) .v17-map.anim .v17m-fut,body:not(.performance-mode) .v17-map.anim .v17m-test,body:not(.performance-mode) .v17-map.anim .v17m-now,body:not(.performance-mode) .v17-map.anim .v17m-peak{animation:v17fade .4s ease-out 1.1s both}
 }
 @keyframes v17rise{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
 @keyframes v17draw{to{stroke-dashoffset:0}}
@@ -3639,9 +3624,6 @@ details[open]>summary>.g181-chev{transform:rotate(180deg)}
 .toast{top:auto !important;bottom:calc(74px + var(--safe-b, 0px)) !important;transform:translateX(-50%) translateY(14px) !important;box-shadow:0 8px 28px rgba(0,0,0,.38)}
 .toast.show{transform:translateX(-50%) translateY(0) !important}
 
-/* 5. Synced caption strip cleanly below tour video (never covered by native scrubber) */
-.v183-tcap{margin-top:10px;padding:10px 14px;min-height:54px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:14px;line-height:20px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center}
-.v183-tcap[hidden]{display:none}
 
 /* 6. Home card subtle top-edge phase hairline tint */
 #dashboardCard.v18-on{position:relative;overflow:hidden}
@@ -3766,15 +3748,14 @@ html[data-theme="light"] .v18-wk-w{background:var(--panel2);border-color:var(--l
 html[data-theme="light"] .v18-track u{border-color:var(--panel2)}
 html[data-theme="light"] .v18-lift.done{background:color-mix(in srgb, var(--accent) 14%, #ffffff);border-color:color-mix(in srgb, var(--accent) 38%, transparent)}
 html[data-theme="light"] .v18-heat i.fut{background:var(--panel3)}
-.tour-th .v183-tcap{flex:none;margin:0 0 8px}
 
 /* ═══════════════ Juggernaut 18.4.0: Active Workout Focus, Trophy Finish, Frosted Sheets, Safe-Area Scrim ═══════════════
    Home Screen and Cycle Map are intentionally untouched from 18.3.0. */
 
 /* 1. Top Safe-Area Fade Scrim (keeps scrolled content from clashing with iOS status bar) */
 body::before{
-  content:"";position:fixed;left:0;right:0;top:0;height:calc(18px + var(--safe-t, 0px));
-  background:linear-gradient(to bottom, var(--bg) 68%, transparent);
+  content:"";position:fixed;left:0;right:0;top:0;height:calc(var(--safe-t, 0px) + 6px);   /* 18.4.1: the status-bar strip and a 6 px fade; it reached 18 px further down and cut off the top line of every screen */
+  background:linear-gradient(to bottom, var(--bg) calc(100% - 6px), transparent);
   pointer-events:none;z-index:35;
 }
 
@@ -3789,27 +3770,6 @@ html[data-theme="light"] .settings-group{
 }
 
 /* 3. "Under the Bar" Active Workout Focus Mode */
-.v184-sess-hud{
-  margin:0 0 12px;padding:10px 12px 11px;border-radius:16px;
-  background:linear-gradient(180deg, var(--panel2), var(--panel));
-  border:1px solid var(--line);
-  box-shadow:0 8px 22px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.07);
-}
-.v184-sess-top{
-  display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px;
-  font-variant-numeric:tabular-nums;
-}
-.v184-sess-top b{font-size:12.5px;font-weight:800;color:var(--text)}
-.v184-sess-top span{font-size:11.5px;font-weight:700;color:var(--accent)}
-.v184-laser{
-  height:5px;border-radius:99px;background:var(--panel3);overflow:hidden;
-}
-.v184-laser i{
-  display:block;height:100%;border-radius:99px;
-  background:linear-gradient(90deg, var(--blue), var(--accent));
-  box-shadow:0 0 10px color-mix(in srgb, var(--accent) 65%, transparent);
-  transition:width .32s cubic-bezier(.22,1,.36,1);
-}
 #sessionSection #swipeZone,
 #sessionSection #swipeZone.hero-card{
   padding:16px 16px 18px !important;
@@ -3893,13 +3853,71 @@ html[data-theme="light"] .modal.bottom-sheet .confirm-card{
 .v184-wudiff[hidden]{display:none}
 
 @media (prefers-reduced-motion: reduce){
-  .v182-goal-hit::after,.v184-laser i{animation:none !important;transition:none !important}
+  .v182-goal-hit::after{animation:none !important;transition:none !important}
 }
 
 /* 6. Spacing polish: keep Cancel/End cleanly above #swipeZone and lift toasts above #v17Strip */
 #sessionSection .v171-out{margin:2px 2px 6px !important}
 body.v17-strip-on .toast{bottom:calc(144px + var(--safe-b, 0px)) !important}
 
+
+/* ═══════════════ Juggernaut 18.4.1: clean-up from a full review of 18.4 (display only) ═══════════════ */
+
+/* the guide's title bar starts at the very top, so text no longer scrolls into view above it (it showed in the 8 px + status-bar gap) */
+#guideOverlay.guide-overlay{padding-top:0}
+#guideOverlay>.guide-close{padding-top:calc(var(--s2) + 8px + var(--safe-t, 0px))}
+.guide h2,.guide .tour-h,.g181-changes,.guide .g181-ch>summary h2{scroll-margin-top:calc(72px + var(--safe-t, 0px))}
+
+/* Program, this week: the small line under each number takes two lines when it must, instead of "of training …" */
+.v17-spec em{white-space:normal;overflow:visible;text-overflow:clip}
+
+/* Home: the readiness bar's "?" sits beside the bar, not on its last segment */
+#dashboardCard .v182-trk .v18-track,#dashboardCard .v182-trk .v18-track-l{margin-right:22px}
+
+/* text in the saturated blue could not be read on the dark panels */
+.v184-wudiff{color:var(--sky, var(--accent))}
+.v183-seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink, #fff)}
+
+/* finish screen: the test-day trend fills the card */
+.v184-trend-h{flex-wrap:wrap}
+.v184-trend-g{position:relative;height:36px}
+.v184-trend-g svg{display:block;width:100%;height:36px;overflow:visible}
+.v184-trend-g i{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--panel2)}
+.v184-trend-n{margin:6px 0 0;font-size:12px;line-height:16px;font-weight:500;color:var(--muted)}
+
+/* Performance mode ("reduce blur & animations") also turns off 18.4's frosted sheets */
+body.performance-mode .modal.bottom-sheet,
+body.performance-mode .modal.bottom-sheet .modal-card,
+body.performance-mode .modal.bottom-sheet .readiness-card,
+body.performance-mode .modal.bottom-sheet .confirm-card{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+body.performance-mode .modal.bottom-sheet .modal-card,
+body.performance-mode .modal.bottom-sheet .readiness-card,
+body.performance-mode .modal.bottom-sheet .confirm-card{background:var(--panel)}
+
+/* light theme: the 2.0 blue stays the main colour (18.3 made every button green), and the spots that could not be read */
+html[data-theme="light"]{
+  --accent:#2563eb;--accent-ink:#ffffff;--accent-dim:rgba(37,99,235,.12);--accent-mid:rgba(37,99,235,.38);
+  --panel4:#c9d3e3;
+}
+html[data-theme="light"] .readiness-score{color:var(--text) !important}
+html[data-theme="light"] .v16-zone-mark{background:var(--text)}
+html[data-theme="light"] .readiness-pills:has(.rp[data-rv="3"][aria-checked="true"]) .rp:nth-child(-n+3){background:#94a3b8;color:#94a3b8}
+html[data-theme="light"] .v18-wave>span{color:color-mix(in srgb, var(--c) 50%, #000)}
+html[data-theme="light"] .v17m-wave[fill="#FFE45C"]{fill:#8a7400}
+html[data-theme="light"] .v17m-wave[fill="#FFB703"]{fill:#9a5b00}
+html[data-theme="light"] .v17m-wave[fill="#FF7A1A"]{fill:#b44a00}
+html[data-theme="light"] .v17m-wave[fill="#FF4458"]{fill:#c0283a}
+html[data-theme="light"] .v17-tt-r.head b[style*="#FFE45C"]{color:#8a7400 !important}
+html[data-theme="light"] .v17-tt-r.head b[style*="#FFB703"]{color:#9a5b00 !important}
+html[data-theme="light"] .v17-tt-r.head b[style*="#FF7A1A"]{color:#b44a00 !important}
+html[data-theme="light"] .v17-tt-r.head b[style*="#FF4458"]{color:#c0283a !important}
+html[data-theme="light"] .v173-tag.top{color:#0b6b4a}
+html[data-theme="light"] .v173-tag.coach{color:#5b47c4}
+html[data-theme="light"] .btn-w{color:#8f5208}
+html[data-theme="light"] .confirm-card .btn-w{color:var(--warn-ink)}
+html[data-theme="light"] .v17m-peak.done,html[data-theme="light"] .v17m-peak.next,html[data-theme="light"] .v17m-wk.on{fill:var(--text)}
+html[data-theme="light"] .v17m-test.done{fill:var(--text2);stroke:var(--panel)}
+html[data-theme="light"] .v17m-cap{fill:var(--text2);filter:none}
 </style>
 </head>
 <body>
@@ -4796,7 +4814,51 @@ body.v17-strip-on .toast{bottom:calc(144px + var(--safe-b, 0px)) !important}
 
   <!-- WHAT CHANGED: one closed row (18.1). The note for each version is unchanged inside it. -->
   <details id="guide-changes" class="g181-changes">
-  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.2 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.4.1 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v1841">v18.4.1</h2><span class="g181-gist">A clean-up pass over 18.3 and 18.4</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>Fixes from a full review of the app. The weights, how they progress and the program are the same, and so is what goes to Hermes: test-day ramp sets you rate in the warm-up are simply logged for you.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Test day logs the ramp once.</strong> Each ramp set you rate in the guided warm-up is logged, so the workout opens on the test set instead of asking for the same sets again. Skip partway keeps the ratings you gave, and the rest of the ramp waits in the workout. Undo reopens the logged sets.</li>
+      <li><strong>Nothing covers Log.</strong> In a workout, messages such as “Timer closed.” sit just above the Log / Complete panel instead of on top of it.</li>
+      <li><strong>Edges.</strong> The top line of each screen (the date, or the version in Settings) is no longer cut off, and text no longer shows above this guide’s title bar as you scroll.</li>
+      <li><strong>Finish-screen trend.</strong> It now draws test days only, as Test-day est. 1RM. It mixed everyday sets, which stop short of failure, with tests, so it showed jumps that were not real.</li>
+      <li><strong>One progress bar.</strong> The second bar 18.4 added to a workout is gone: it repeated the bar at the top and sat behind the Log panel.</li>
+      <li><strong>Video tour.</strong> Captions show once. The clips have their own; 18.3 printed them a second time under the video.</li>
+      <li><strong>Light theme.</strong> Buttons keep the blue of the dark theme (they had turned green), and the readiness score, the selected tabs and answers, and the wave names can be read.</li>
+      <li><strong>Smaller things.</strong> Logging an accessory no longer throws the page up; Program’s week boxes show their full text; tonnage has a thousands comma; “10S” reads “10s”; Performance mode also turns off the frosted sheets and the confetti, and keeps the cycle map’s line; the readiness bar’s “?” sits beside the bar; the set list says “+35 lb from set 1”; the cue box’s example is a cue, since the rack setup has its own box.</li>
+    </ul>
+  </div>
+  </details>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v184">v18.4</h2><span class="g181-gist">Plate changes in the warm-up, a finish-screen trend</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>Display additions. The weights, how they progress, the program, your data and what goes to Hermes are the same.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Warm-up plate change.</strong> Each guided warm-up set says what to load, add or swap on each side.</li>
+      <li><strong>Finish screen.</strong> A small trend of your test-day estimated max, and confetti when a test raises your training max or you lift your goal.</li>
+      <li><strong>Look.</strong> Frosted sheets, a fade under the status bar, and a larger weight on the set card in a workout.</li>
+    </ul>
+  </div>
+  </details>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v183">v18.3</h2><span class="g181-gist">Light theme, lift setup, rest overtime, CSV export</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>The weights, how they progress, the program, your data and what goes to Hermes are the same.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Appearance.</strong> Settings, UI &amp; Performance: Dark, Light (for a bright gym) or Auto, which follows the phone.</li>
+      <li><strong>Permanent setup.</strong> Each lift keeps a setup note (rack height, safety pins, belt hole) until you change it. It shows on Home, in the warm-up and under Up next on the rest timer. The cue from 18.2 stays the note for next time.</li>
+      <li><strong>Rest timer.</strong> Three short pips before the end when sound is on; after zero it keeps counting as overtime.</li>
+      <li><strong>Notes in the log.</strong> Add or edit a session’s note from Progress.</li>
+      <li><strong>Export CSV.</strong> Every logged set as a spreadsheet file, from Progress.</li>
+      <li><strong>Start bar.</strong> Home’s pinned Start bar shows once the card’s own Start button has scrolled away.</li>
+    </ul>
+  </div>
+  </details>
 
   <details class="g181-ch">
   <summary><h2 id="guide-v182">v18.2</h2><span class="g181-gist">Home explains itself; the log shows what you lifted</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -4994,7 +5056,7 @@ body.v17-strip-on .toast{bottom:calc(144px + var(--safe-b, 0px)) !important}
   <h2 id="guide-warmup">Guided Warmup Feedback</h2>
   <div class="section">
     <p><em>App rule.</em> Before your first working set the app can walk you through a warm-up ramp with plate breakdowns and a one-tap rating per set.</p>
-    <p><strong>Accumulation and intensification days:</strong> about 40%, 60% and 80% of the day's first set. <strong>Test days:</strong> the book's ramp for that wave (it never includes a single at the test weight).</p>
+    <p><strong>Accumulation and intensification days:</strong> about 40%, 60% and 80% of the day's first set. <strong>Test days:</strong> the book's ramp for that wave (it never includes a single at the test weight). Each ramp set you rate there is logged in the workout, so you do not log it again.</p>
     <p><strong>Ratings:</strong> Slow (worse than expected), Solid (as expected), Fast (stronger than expected). Only the last 2 ratings count: two Fast add one step to the working sets and two Slow take off two steps. A step is 5 lb for squat and deadlift and 2.5 lb for bench and press (the same sizes as the training-max steps; in kg mode the same numbers in kg), anything mixed changes nothing. A change made this way is logged as a weight change with the reason "warmup feel".</p>
     <p><strong>Never changes test-day or deload weights.</strong> Turn it off in Settings → AI &amp; Readiness → "Guided warm-up with a rating after each set."</p>
   </div>
@@ -5646,7 +5708,7 @@ body.v17-strip-on .toast{bottom:calc(144px + var(--safe-b, 0px)) !important}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '18.4.0';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.4.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -8672,6 +8734,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       tone === 'w' ? 'rgba(245,166,35,.3)' :
       tone === 'b' ? 'var(--bad-mid)' : 'var(--line)';
     el.toast.classList.add('show');
+    v1841ToastLift();   // 18.4.1: never on top of the workout's Log / Complete panel
     clearTimeout(_toastTimer);
     _toastTimer = setTimeout(() => el.toast.classList.remove('show'), hasAction ? 6000 : 2500);
   }
@@ -8956,7 +9019,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       el.warmupStepTotal.textContent = String(ramp.length);
       // v14 (V14_DECISIONS section 1): warmup feel never changes test-day weights
       if (el.warmupSubtitle) el.warmupSubtitle.textContent = session.phase === 'realization'
-        ? 'Test day: rate each ramp set for the log. Ratings never change the test weight.'
+        ? 'Test day: these are your ramp sets. Each one you rate is logged; ratings never change the test weight.'
         : 'Rate each set. Two Fast in a row add ' + warmupStepText(session.liftId, 1) + ' to the work sets; two Slow take off ' + warmupStepText(session.liftId, 2) + ' (logged as a weight change).';
 
       const renderStep = () => {
@@ -9000,7 +9063,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       el.warmupFire.onclick = () => recordRating('fire');
       el.warmupSkip.onclick = () => {
         closeWarmupModal();
-        resolve({ skipped:true });
+        resolve({ skipped:true, feedback:[..._warmupFeedbackLog] });   // 18.4.1: on test day the ramp sets rated before Skip are logged and their ratings kept
         _warmupResolver = null;
       };
 
@@ -9109,25 +9172,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* showSessionSummary removed in v10 — was dead code; showCompletionOverlay is the only session-summary UI path now */
-
-  function triggerConfetti(){
-    const wrap = document.createElement('div');
-    wrap.className = 'confetti-wrap';
-    const colors = ['var(--accent)', 'var(--blue)', 'var(--spark)', 'var(--warn)', '#fff'];
-    for (let i = 0; i < 20; i++){
-      const p = document.createElement('div');
-      p.className = 'confetti-particle';
-      const angle = (i / 20) * Math.PI * 2;
-      const dist = 40 + Math.random() * 60;
-      const x = Math.cos(angle) * dist;
-      const y = Math.sin(angle) * dist;
-      p.style.cssText = 'left:' + x + 'px;top:' + y + 'px;background:' + colors[i % colors.length] +
-        ';animation-delay:' + (Math.random() * 0.2).toFixed(2) + 's;width:' + (6 + Math.random()*6) + 'px;height:' + (6 + Math.random()*6) + 'px';
-      wrap.appendChild(p);
-    }
-    document.body.appendChild(wrap);
-    setTimeout(() => wrap.remove(), 1200);
-  }
 
   /* ═══ QUICK-LOG SET (tap row = instant log if reps match target) ═══ */
   async function quickLogSet(idx){
@@ -9780,11 +9824,11 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.scoSummary.innerHTML = '<div class="summary-card' + (isProgress ? ' success-ring' : '') + '">' +
       '<div class="summary-title">' +
         '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
-        meta.name + ' · ' + entry.wave.toUpperCase() + ' ' + capitalize(entry.phase) +
+        meta.name + ' · ' + entry.wave + ' ' + capitalize(entry.phase) +
       '</div>' +
       (entry.partial === true ? '<div class="summary-partial">' + escapeHtml(partialLabel(entry)) + '. The sets not done were recorded as not performed.</div>' : '') +   // v15 (round 5, D7)
       '<div class="summary-stats">' +
-        '<div class="summary-stat"><div class="ss-k">Tonnage</div><div class="ss-v">' + formatWeight(roundToIncrement(totalTonnage, 5)) + '</div></div>' +
+        '<div class="summary-stat"><div class="ss-k">Tonnage</div><div class="ss-v">' + v1841Ton(roundToIncrement(totalTonnage, 5)) + '</div></div>' +
         '<div class="summary-stat"><div class="ss-k">Duration</div><div class="ss-v">' + dMin + ':' + String(dSec).padStart(2,'0') + '</div></div>' +
         testStat + plusStat +
         (Number.isFinite(e1rm) ? '<div class="summary-stat"><div class="ss-k">Test e1RM' + (t.confidence === 'lower' ? ' (lower confidence)' : '') + '</div><div class="ss-v">' + formatWeight(roundToIncrement(e1rm, state.settings.rounding)) + '</div></div>' : '') +
@@ -10098,31 +10142,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (!t) return;
     t.style.height = 'auto';
     t.style.height = Math.min(t.scrollHeight, 120) + 'px';
-  }
-
-  function showWeakPointPrompt(liftId){
-    if (!el.weakPointCard || !el.weakPointOptions) return;
-    const options = WEAK_POINT_OPTIONS[liftId] || WEAK_POINT_OPTIONS.squat;
-    el.weakPointOptions.innerHTML = '';
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.className = 'weak-point-btn';
-      btn.textContent = opt;
-      btn.addEventListener('click', async () => {
-        el.weakPointOptions.querySelectorAll('.weak-point-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        _sessionWeakPoint = opt;
-        // Persist to lift state for accessory highlighting
-        if (!state.settings.weakPoints) state.settings.weakPoints = {};
-        state.settings.weakPoints[liftId] = opt;
-        // Update the most recent history entry
-        const lastEntry = state.history[state.history.length - 1];
-        if (lastEntry && lastEntry.liftId === liftId) lastEntry.weakPoint = opt;
-        await saveState();
-      });
-      el.weakPointOptions.appendChild(btn);
-    });
-    el.weakPointCard.hidden = false;
   }
 
   function getWeakPointForLift(liftId){
@@ -10767,7 +10786,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.restMatrixGrid.innerHTML = '';
     ['10s','8s','5s','3s'].forEach(wave => {
       const hdr = document.createElement('div');
-      hdr.innerHTML = '<strong style="font-size:13px;display:block;margin:10px 0 6px">' + wave.toUpperCase() + ' Wave</strong>';
+      hdr.innerHTML = '<strong style="font-size:13px;display:block;margin:10px 0 6px">' + wave + ' wave</strong>';
       el.restMatrixGrid.appendChild(hdr);
       const grid = document.createElement('div'); grid.className = 'rest-grid';
       ['accumulation','intensification','realization','deload'].forEach(phase => {
@@ -10861,7 +10880,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       // Label: wave initial + phase initial (e.g. "10A", "8I", "5R", "3D")
       const phaseInitial = item.phase === 'accumulation' ? 'A' : item.phase === 'intensification' ? 'I' : item.phase === 'realization' ? 'R' : 'D';
       pill.textContent = item.wave.replace('s','') + phaseInitial;
-      pill.title = item.wave.toUpperCase() + ' ' + capitalize(item.phase) + ' (Week ' + (idx + 1) + ')';
+      pill.title = item.wave + ' ' + capitalize(item.phase) + ' (Week ' + (idx + 1) + ')';
 
       // Tap to preview
       pill.addEventListener('click', () => {
@@ -10890,8 +10909,17 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // (accessories/complete phases); a queued smooth scroll keeps animating after
     // render() returns and would drag the page even after scroll restoration.
     const scrollTarget = el.programTimeline.querySelector('.tl-week.preview') || el.programTimeline.querySelector('.tl-week.active');
-    if (scrollTarget && scrollTarget.offsetParent !== null && typeof scrollTarget.scrollIntoView === 'function'){
-      try { scrollTarget.scrollIntoView({ inline:'center', block:'nearest', behavior:'smooth' }); } catch(_){}
+    // 18.4.1: scrollIntoView also scrolled the page to the strip (block:'nearest'), so a redraw while scrolled down
+    // (Log or Swap on an accessory) threw the page up to the top. Only the strip itself is scrolled now, and only if it can.
+    if (scrollTarget && scrollTarget.offsetParent !== null){
+      const tl = el.programTimeline;
+      try{
+        if (tl.scrollWidth > tl.clientWidth + 1){
+          const r = scrollTarget.getBoundingClientRect(), tr = tl.getBoundingClientRect();
+          const d = (r.left + r.width / 2) - (tr.left + tr.width / 2);
+          if (Math.abs(d) > 1) tl.scrollBy({ left:d, behavior:'smooth' });
+        }
+      }catch(_){}
     }
   }
 
@@ -11058,7 +11086,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (isPreviewing){
       const banner = document.createElement('div');
       banner.className = 'dash-preview-banner';
-      banner.innerHTML = 'Previewing Week ' + (_previewWeekIdx + 1) + ' · ' + micro.wave.toUpperCase() + ' ' + capitalize(micro.phase);
+      banner.innerHTML = 'Previewing Week ' + (_previewWeekIdx + 1) + ' · ' + micro.wave + ' ' + capitalize(micro.phase);
       const backBtn = document.createElement('button');
       backBtn.textContent = 'Back to current';
       backBtn.addEventListener('click', () => { _previewWeekIdx = null; renderTimeline(); renderProgramChart(); renderDashboard(); });
@@ -11196,8 +11224,8 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const workingSets = lastSession.sets.filter(s => { const r = setRole(s, lastSession.phase); return r !== 'ramp' && r !== 'leadin'; });
       const setsStr = workingSets.map(s => s.performedReps).join('/');
       const tonnage = workingSets.reduce((sum, s) => sum + (s.weight * s.performedReps), 0);
-      let body = '<strong>' + lastSession.wave.toUpperCase() + ' ' + capitalize(lastSession.phase) + '</strong> · cycle ' + (lastSession.cycle || 1) + ' · ' + fmtDate(lastSession.completedAt);
-      body += '<br>Reps: ' + setsStr + ' · Tonnage: ' + formatWeight(roundToIncrement(tonnage, 5));
+      let body = '<strong>' + lastSession.wave + ' ' + capitalize(lastSession.phase) + '</strong> · cycle ' + (lastSession.cycle || 1) + ' · ' + fmtDate(lastSession.completedAt);
+      body += '<br>Reps: ' + setsStr + ' · Tonnage: ' + v1841Ton(roundToIncrement(tonnage, 5));
       const lt = entryTest(lastSession);
       if (lt){
         const tc = lt.tmChange;
@@ -11221,7 +11249,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       staleDiv.className = 'dash-stale-warning';
       staleDiv.style.cssText = 'margin-bottom:12px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--warn-mid);background:var(--warn-dim);font-size:12px;color:var(--warn);line-height:1.5';
       const liftName = getLiftMeta(liftId)?.name || liftId;
-      staleDiv.innerHTML = '<strong>⚠ ' + escapeHtml(liftName) + ': no test since the ' + staleInfo.wave.toUpperCase() + ' wave</strong> — the ' + staleInfo.wave.toUpperCase() + (staleInfo.endedEarly ? ' test was not done ' : ' test was skipped ') + staleInfo.weeksAgo + ' week' + (staleInfo.weeksAgo !== 1 ? 's' : '') + ' ago, so the TM hasn\u2019t moved. The next test updates it.';
+      staleDiv.innerHTML = '<strong>⚠ ' + escapeHtml(liftName) + ': no test since the ' + staleInfo.wave + ' wave</strong> — the ' + staleInfo.wave + (staleInfo.endedEarly ? ' test was not done ' : ' test was skipped ') + staleInfo.weeksAgo + ' week' + (staleInfo.weeksAgo !== 1 ? 's' : '') + ' ago, so the TM hasn\u2019t moved. The next test updates it.';
       el.dashPreview.insertAdjacentElement('afterend', staleDiv);
     }
     } // end !isPreviewing
@@ -11288,7 +11316,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     renderReadinessMini();
     maybeShowMidCheck();
     el.setProgress.textContent = session.sets.filter(s => s.done).length + ' / ' + session.sets.length;
-    v18Safe('v184 hud', () => v184SyncSessionHud(session));
 
     if (!set){
       el.activeSetLabel.textContent = 'Session complete';
@@ -11379,7 +11406,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         if (prevSet.weight !== item.weight){
           const diff = item.weight - prevSet.weight;
           const sign = diff > 0 ? '+' : '';
-          plateChange = '<div class="set-change">' + sign + formatWeight(diff) + ' change</div>';
+          plateChange = '<div class="set-change">' + sign + formatWeight(diff) + ' from set ' + idx + '</div>';   // 18.4.1: "+35 lb change" read as if the weight had been changed
         }
       }
       row.innerHTML = `<div class="set-l"><strong>Set ${idx + 1}</strong>${pill}
@@ -11851,7 +11878,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const diff = curr - prev;
       const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
       const sign = diff > 0 ? '+' : '';
-      const val = isWeight ? formatWeight(roundToIncrement(Math.abs(diff), 5)) : Math.abs(Math.round(diff));
+      const val = isWeight ? v1841Ton(roundToIncrement(Math.abs(diff), 5)) : Math.abs(Math.round(diff));
       if ((isWeight ? roundToIncrement(Math.abs(diff), 5) : Math.abs(Math.round(diff))) === 0) return ' <span class="ws-delta flat">same</span>';   // v18: it printed a bare 0 beside the number ("2 0")
       return ' <span class="ws-delta ' + cls + '">' + sign + (diff < 0 ? '\u2212' : '') + val + '</span>';   // v18: a drop in tonnage has its minus sign too (it read as a second, unlabelled number)
     }
@@ -11859,7 +11886,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     el.weeklyStats.innerHTML =
       '<div class="weekly-stat"><div class="ws-k">Sessions</div><div class="ws-v">' + tw.count + delta(tw.count, pw.count, false) + '</div></div>' +
       '<div class="weekly-stat"><div class="ws-k">Total Sets</div><div class="ws-v">' + tw.sets + delta(tw.sets, pw.sets, false) + '</div></div>' +
-      '<div class="weekly-stat"><div class="ws-k">Tonnage</div><div class="ws-v">' + formatWeight(roundToIncrement(tw.ton, 5)) + delta(tw.ton, pw.ton, true) + '</div></div>' +
+      '<div class="weekly-stat"><div class="ws-k">Tonnage</div><div class="ws-v">' + v1841Ton(roundToIncrement(tw.ton, 5)) + delta(tw.ton, pw.ton, true) + '</div></div>' +
       '<div class="weekly-stat"><div class="ws-k">Avg Readiness</div><div class="ws-v">' + (Number.isFinite(tw.avgR) ? readinessScoreText(tw.avgR) + '/30' : '\u2014') + '</div></div>' +
       (pw.count ? '<div class="v18-ws-note">Changes are against last week at this point.</div>' : '');   // v18
   }
@@ -11951,7 +11978,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         const chip = document.createElement('button');
         chip.className = 'filter-chip' + (current === val ? ' active' : '');
         chip.textContent = label === 'Lift' ? (getLiftMeta(val)?.name || val) :
-                           label === 'Wave' ? String(val).toUpperCase() :
+                           label === 'Wave' ? String(val) :
                            capitalize(val);
         chip.addEventListener('click', () => { setFn(val); renderHistory(); });
         wrap.appendChild(chip);
@@ -12363,7 +12390,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         const e1 = Number.isFinite(t.e1rm) ? ' · Test e1RM' + (t.confidence === 'lower' ? ' (lower confidence)' : '') + ' ' + fw(roundToIncrement(t.e1rm, state.settings.rounding)) : '';
         return '<div class="lift-test" data-test-date="' + calDayKey(new Date(h.completedAt)) + '"><div class="lift-test-top"><span>' + escapeHtml(fmtDate(h.completedAt)) + '</span>' +
           '<strong>' + numText(t.reps, '?') + ' reps · standard ' + numText(t.standard, '?') + '</strong></div>' +
-          '<div class="lift-test-sub">' + escapeHtml(String(h.wave || '?').toUpperCase() + ' test · ' + tmTxt + e1) + '</div></div>';
+          '<div class="lift-test-sub">' + escapeHtml(String(h.wave || '?') + ' test · ' + tmTxt + e1) + '</div></div>';
       }).join('') + '</div>';
     }
     // L6: this lift's Rep-Max PRs, as the Rep-Max PRs card shows them
@@ -13067,13 +13094,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         if (Number.isFinite(l.testReps)){
           parts.push('test ' + l.testReps + '/' + l.standard + ' at ' + formatWeight(l.testWeight) + ' (' + (l.delta >= 0 ? '+' : '') + l.delta + ')');
           parts.push('TM ' + formatWeight(l.tmBefore) + ' → ' + formatWeight(l.tmAfter) + (l.step === 'awaiting' ? ' (awaiting your OK)' : ' (' + l.step + ' step)'));
-          if (Number.isFinite(l.prevReps)) parts.push('previous test (' + String(l.prevWave || '').toUpperCase() + ', cycle ' + l.prevCycle + ') ' + l.prevReps + '/' + l.prevStandard);
+          if (Number.isFinite(l.prevReps)) parts.push('previous test (' + String(l.prevWave || '') + ', cycle ' + l.prevCycle + ') ' + l.prevReps + '/' + l.prevStandard);
         } else parts.push('no test this wave');
         if (Array.isArray(l.plusReps) && l.plusReps.length) parts.push('"+" sets ' + l.plusReps.join(', '));
         return '<div style="font-size:12px;color:var(--text2)">' + escapeHtml(l.name) + ': ' + escapeHtml(parts.join(' · ')) + '</div>';
       }).join('');
       return '<div class="card"><details><summary style="cursor:pointer;font-weight:700;font-size:14px">' +
-        escapeHtml(String(s.wave).toUpperCase()) + ' wave' + (s.cycle ? ' · cycle ' + s.cycle : '') + ' <span style="color:var(--muted);font-weight:400;font-size:12px">' + escapeHtml(s.from || '') + ' → ' + escapeHtml(s.to || '') + '</span></summary>' +
+        escapeHtml(String(s.wave)) + ' wave' + (s.cycle ? ' · cycle ' + s.cycle : '') + ' <span style="color:var(--muted);font-weight:400;font-size:12px">' + escapeHtml(s.from || '') + ' → ' + escapeHtml(s.to || '') + '</span></summary>' +
         '<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">' + rows + '</div>' +
         '</details></div>';
     }).join('');
@@ -14790,7 +14817,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function historyRowNode(item, idx){
       // v14: the test result and what the book rule did with the TM
       const t = entryTest(item);
-      const upd = t ? ' · <span style="color:var(--accent)">test ' + t.reps + '/' + t.standard + (t.ruleVersion ? ' (v13)' :
+      const upd = t ? ' · <span style="color:var(--sky)">test ' + t.reps + '/' + t.standard + (t.ruleVersion ? ' (v13)' :
         t.tmChange.awaitingConfirmation ? ' · TM change waiting for your OK' : t.tmChange.amount > 0 ? ' · TM ' + formatWeightAs(t.tmChange.from, item.units) + ' → ' + formatWeightAs(t.tmChange.to, item.units) + ' (' + t.tmChange.step + ')' : ' · TM held') + '</span>' : '';
       const cycleTag = ' · cycle ' + (item.cycle || 1);
       // Session outcome badge
@@ -14828,9 +14855,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       node.innerHTML = `
         <div class="swipe-bg">DELETE</div>
         <div class="h-content">
-          <div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(wave.toUpperCase())} ${escapeHtml(capitalize(phase))}${outcomeBadge}${partialBadge}</div>
+          <div><strong>${escapeHtml(getLiftMeta(item.liftId)?.name || item.liftId)}</strong> · ${escapeHtml(wave)} ${escapeHtml(capitalize(phase))}${outcomeBadge}${partialBadge}</div>
           <div class="sm mt">${fmtDate(item.completedAt)}${cycleTag}${upd}</div>
-          <div class="hist-tonnage">${formatWeightAs(roundToIncrement(tonnage, 5), item.units)} tonnage · ${workingSets.length} set${workingSets.length === 1 ? '' : 's'}${readinessStr}${difficultyStr}</div>
+          <div class="hist-tonnage">${v1841Ton(roundToIncrement(tonnage, 5), item.units)} tonnage · ${workingSets.length} set${workingSets.length === 1 ? '' : 's'}${readinessStr}${difficultyStr}</div>
           ${v18SetChips(workingSets, item.phase)}${partialNote}${weightNote}${review}
           ${item.note ? '<div class="xs mt" style="margin-top:4px;opacity:.7">' + escapeHtml(item.note) + '</div>' : ''}
           ${item.userNote ? '<div class="xs mt" style="margin-top:4px;opacity:.82;font-style:italic">' + escapeHtml(item.userNote) + '</div>' : ''}
@@ -14872,7 +14899,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const keepLabel = el.confirmCancel.textContent;
       try{
         const asked = showConfirm('Delete this session?',
-          name + ', ' + String(h.wave || '').toUpperCase() + ' ' + capitalize(String(h.phase || '')) + ', ' + fmtDate(h.completedAt) + '.\n\n'
+          name + ', ' + String(h.wave || '') + ' ' + capitalize(String(h.phase || '')) + ', ' + fmtDate(h.completedAt) + '.\n\n'
           + 'It leaves your log for good.'
           + ((t && t.tmChange && t.tmChange.amount > 0 && !t.tmChange.awaitingConfirmation)
               ? ' This test raised the training max to ' + formatWeight(t.tmChange.to) + '. Deleting it does not lower the training max; change that in Settings if you need to.'
@@ -14959,6 +14986,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     // is an animation that outlives the restore — both still win. So preserving
     // scroll is always correct here, in every phase, on every tab.
     const _keepY = window.scrollY;
+    const _keepBodyY = document.body ? document.body.scrollTop : 0;   // 18.4.1: the page scrolls inside <body> (see v171Top), where window.scrollY is always 0
     // v13 A2: storage-degraded banner (page-load dismiss only)
     if (el.storageBanner) el.storageBanner.hidden = !(storageDegraded && !_storageBannerDismissed);
     // v17.4.1 (item 6): one guard per draw; the same draws in the same order
@@ -15002,6 +15030,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     try{ v171Render(); }catch(err){ console.error('v171 render failed', err); }   // 2.1: what the audit fixes keep in step on each redraw
     _scrollKeepY = _keepY;
     window.scrollTo(0, _scrollKeepY);
+    if (document.body && document.body.scrollTop !== _keepBodyY) document.body.scrollTop = _keepBodyY;   // 18.4.1: a list emptied mid-redraw had clamped it (Log on an accessory threw the page up ~700 px)
     if (typeof requestAnimationFrame === 'function'){
       requestAnimationFrame(() => window.scrollTo(0, _scrollKeepY));
     }
@@ -15079,7 +15108,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         session.warmup = { ratings:(warmupResult.feedback || []).map(f => map[f.rating]).filter(Boolean), adjustment:null };
         if (warmupResult.adjustment) applyWarmupAdjustmentToSession(session, warmupResult.adjustment);
         if (session.warmupAdjustment && session.warmupAdjustment.delta) session.warmup.adjustment = { delta:session.warmupAdjustment.delta, appliedTo:'work' };
+      } else if (warmupResult && warmupResult.skipped && session.phase === 'realization'){
+        // 18.4.1: Skip on test day skips only the ramp sets not yet rated. The ratings already given are kept, in the same
+        // format as a finished warm-up. Skip applies no warm-up adjustment, and test-day weights never change.
+        const map = { poop:'worse', thumb:'expected', fire:'better' };
+        const ratings = (warmupResult.feedback || []).map(f => map[f.rating]).filter(Boolean);
+        if (ratings.length) session.warmup = { ratings, adjustment:null };
       }
+      if (warmupResult && session.phase === 'realization') v1841LogRatedRamps(session, warmupResult.feedback);   // 18.4.1: test day logs the ramp once
     }
     state.activeSession = session;
     closeProgramOverview();
@@ -15230,7 +15266,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       restTimer.endAt = null;
       stopRestMiniBadge();
     }
-    if (showToast) toast('Timer closed.');
+    if (showToast) toast(restTimer.endAt ? 'Rest keeps counting at the top.' : 'Timer closed.');   // 18.4.1: a rest closed early carries on in the header badge
   }
 
   function adjustRest(delta){
@@ -18239,7 +18275,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       _v16Recap = { session:true, wave:entry.wave, cycle:entry.cycle || state.program.cycle || 1, title:meta.name, sub:entry.wave + ' wave, ' + entry.phase + ', ' + v16Day(entry.completedAt),
         k, big:String(t ? t.reps : p.reps), bigSub:'reps at ' + formatWeight(t ? t.weight : p.weight), line:s,
         barWeight:(t ? t.weight : p.weight), liftId:entry.liftId,
-        foot:[formatWeight(roundToIncrement(tonnage, 5)) + ' volume', Math.max(1, Math.round(duration / 60)) + ' min'] };
+        foot:[v1841Ton(roundToIncrement(tonnage, 5)) + ' volume', Math.max(1, Math.round(duration / 60)) + ' min'] };
       modal.hidden = false; requestAnimationFrame(() => modal.classList.add('show'));
       v16DrawRecap();
       try{ if (document.fonts && document.fonts.load) document.fonts.load('800 80px Montserrat').then(v16DrawRecap).catch(() => {}); }catch(_){}
@@ -18406,63 +18442,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     return null;
   }
   function v17ZoneOf(v){ const i = V17_ZONES.findIndex(z => v < z[1]); return i < 0 ? 3 : i; }
-  function v17Ruler(v){
-    const on = Number.isFinite(v) ? v17ZoneOf(v) : -1, pos = x => 'calc(' + (x / 30 * 100).toFixed(2) + '% - ' + (x / 30 * 12).toFixed(2) + 'px + ' + (Math.min(3, V17_ZONES.findIndex(z => x <= z[1]) < 0 ? 3 : V17_ZONES.findIndex(z => x <= z[1])) * 4) + 'px)';
-    const mark = (x, g) => '<span style="left:calc(' + (x / 30 * 100).toFixed(2) + '% - ' + (x / 30 * 12).toFixed(2) + 'px + ' + (g * 4 - 2) + 'px)">' + x + '</span>';
-    return '<div class="v17-ruler" role="img" aria-label="' + (on < 0 ? 'Readiness scale from 0 to 30.' : 'Readiness ' + readinessScoreText(v) + ' of 30, ' + V17_ZONES[on][2] + '.') + ' Under 8 drops two sets, 8 to 15 drops one, 15 to 23 is as written, 23 and over offers an extra set.">'
-      + '<div class="v17-ruler-n"><span style="left:0">0</span>' + mark(8, 1) + mark(15, 2) + mark(23, 3) + '<span style="right:0;left:auto;transform:none">30</span></div>'
-      + '<div class="v17-ruler-t">' + V17_ZONES.map((z, i) => '<i class="z' + i + (i === on ? ' on' : '') + '" style="flex:' + (z[1] - z[0]) + ' 1 0"></i>').join('')
-      + (on < 0 ? '' : '<b style="left:' + pos(Math.max(0.4, Math.min(29.6, v))) + '"></b>') + '</div>'
-      + '<div class="v17-ruler-l">' + V17_ZONES.map((z, i) => '<span class="z' + i + (i === on ? ' on' : '') + '" style="flex:' + (z[1] - z[0]) + ' 1 0"><b>' + z[2] + '</b><em>' + z[3] + '</em></span>').join('') + '</div></div>';
-  }
-  function v17Hero(){
-    const box = v17$('v17Hero'); if (!box) return;
-    const idle = v17Idle(), off = state.settings.ai?.enableReadiness === false;
-    box.hidden = !idle; if (box.hidden) return;
-    const today = v17ReadyToday(), hist = v16LastReadiness(11), ph = currentMicrocycle().phase;
-    let sev = 'none'; try { sev = computeDeloadAssessment().severity || 'none'; } catch (e){ sev = 'none'; }   // the same reading the Recovery screen shows
-    const sevText = { watch:'Deload signals: watch', caution:'Deload signals: caution', deload:'Deload suggested' }[sev] || '';
-    const sevChip = sevText ? '<button type="button" class="v17-pill sev ' + sev + '" data-v17="recovery">' + sevText + v17Ic('right', 16) + '</button>' : '';
-    const recLink = '<button type="button" class="v17-link" data-v17="recovery">Recovery' + v17Ic('right', 16) + '</button>';
-    const sig = JSON.stringify([today, hist.length, hist.length ? hist[hist.length - 1] : 0, ph, v17Ymd(Date.now()), sev, off]);
-    v17Once('hero', sig, () => {
-      if (off){
-        box.innerHTML = '<div class="v17-hero-h"><span class="v17-lbl">Readiness</span>' + recLink + '</div><div class="v17-hero-empty">The readiness check is off. Turn it on in Settings, under AI &amp; Readiness.</div>' + (sevChip ? '<div class="v17-hero-act">' + sevChip + '</div>' : '');
-        return;
-      }
-      const past = (today && today.src === 'history') ? hist.slice(0, -1) : hist;      // sessions before today's
-      const cur = today || (past.length ? { v:past[past.length - 1].v, at:past[past.length - 1].at, src:'last' } : null);
-      const prev = today ? past[past.length - 1] : past[past.length - 2];
-      const wd = iso => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { weekday:'long' }); };
-      if (!cur){
-        box.innerHTML = '<div class="v17-hero-h"><span class="v17-lbl">Readiness</span>' + recLink + '</div><div class="v17-hero-empty">Five taps before you lift. The score decides how many sets you do.</div>'
-          + '<div class="v17-hero-act"><button type="button" class="v17-pill pri" data-v17="checkin">Check in</button>' + sevChip + '</div>' + v17Ruler(NaN);
-        return;
-      }
-      const z = v17ZoneOf(cur.v), d = prev ? cur.v - prev.v : null;
-      let older = false;   // v17.1 (M4): the check-in shown is not from the most recent session (that one was skipped)
-      try{ const lastS = (state.history || []).filter(h => h && h.phase !== 'deload').slice().sort(_byCompleted).pop(); older = !today && !!lastS && lastS.completedAt !== cur.at; }catch(_){ older = false; }
-      const when = today ? 'Today' + (cur.at ? ', ' + new Date(cur.at).toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' }).toLowerCase() : '')
-        : older ? 'Last check-in, ' + new Date(cur.at).toLocaleDateString(undefined, { month:'short', day:'numeric' }) : wd(cur.at) + '’s session';
-      const vals = past.slice(-(today ? 9 : 10)).map(x => x.v); if (today) vals.push(today.v);
-      let note;
-      if (ph === 'realization' || ph === 'deload') note = 'Recorded with the session. On ' + (ph === 'deload' ? 'a deload' : 'test day') + ' the sets stay as planned.';
-      else if (z === 0) note = 'Two working sets come off today. Recover first.';
-      else if (z === 1) note = 'One working set comes off today.';
-      else if (z === 2){ const need = Math.ceil((23 - cur.v) / 1.5 - 1e-9) * 1.5; note = 'Sets as written today.' + (need <= 3 ? ' ' + (need <= 1.5 ? 'One answer a step higher' : 'Two steps higher across your answers') + ' makes it a fire day, with an extra set on offer.' : ''); }   // v17.1 (L12): scores move 1.5 at a time, so the gap is counted in steps (it said "0.5 more points")
-      else note = 'You are fresh. An extra set is on offer today.';
-      if (!today) note = older ? 'From your last check-in. The sessions since skipped it. Check in to score today.' : 'From your last session. Check in to score today.';
-      const bars = vals.map((x, i) => '<i class="' + (i === vals.length - 1 ? 'on ' : '') + 'z' + v17ZoneOf(x) + '" style="height:' + Math.max(10, Math.round(x / 30 * 100)) + '%"></i>').join('');
-      box.innerHTML = '<div class="v17-hero-h"><span class="v17-lbl">Readiness</span><span class="v17-hero-when">' + escapeHtml(when) + '</span>'
-        + recLink + '</div>'
-        + '<div class="v17-hero-row"><span class="v17-hero-n' + (readinessScoreText(cur.v).length > 2 ? ' dec' : '') + '">' + escapeHtml(readinessScoreText(cur.v)) + '</span><span class="v17-hero-of">/30</span>'
-        + '<span class="v17-hero-side">' + (d === null ? '' : '<span class="v17-delta ' + (d < 0 ? 'dn' : 'up') + '">' + (d === 0 ? '' : v17Ic(d < 0 ? 'dn' : 'up', 18)) + '<b>' + escapeHtml(d === 0 ? 'Same' : readinessScoreText(Math.abs(d))) + '</b><em>vs ' + escapeHtml(wd(prev.at) || 'last time') + '</em></span>')
-        + (vals.length > 1 ? '<span class="v17-trend" aria-hidden="true">' + bars + '</span><span class="v17-trend-l">Last ' + vals.length + ' check-ins</span>' : '') + '</span></div>'
-        + '<div class="v17-zone z' + z + '">' + V17_ZONES[z][2] + '</div><p class="v17-hero-p">' + escapeHtml(note) + '</p>'
-        + ((today && today.src !== 'pre' && !sevChip) ? '' : '<div class="v17-hero-act">' + (today && today.src !== 'pre' ? '' : '<button type="button" class="v17-pill' + (today ? '' : ' pri') + '" data-v17="checkin">' + (today ? v17Ic('refresh', 16) + 'Check in again' : 'Check in for today') + '</button>') + sevChip + '</div>')
-        + v17Ruler(cur.v);
-    });
-  }
   async function v17PreCheck(){   // the app's own readiness sheet, opened from Home; the answer is kept for today
     if (state.activeSession || _v17Pre || !el.readinessModal || !el.readinessModal.hidden) return;
     _v17Pre = true; document.body.classList.add('v17-precheck');
@@ -19058,7 +19037,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function v17Bind(){
     const mk = (id, cls) => { const d = document.createElement('div'); d.id = id; if (cls) d.className = cls; d.hidden = true; return d; };
     const dash = v17$('dashboardCard'), wp = v17$('weeklyPlanCard');
-    if (dash){ dash.parentNode.insertBefore(mk('v17Hero', 'v17-hero'), dash); dash.parentNode.insertBefore(mk('v17MapCard', 'v17-slab v17-mapcard'), dash); }
+    if (dash){ dash.parentNode.insertBefore(mk('v17MapCard', 'v17-slab v17-mapcard'), dash); }
     if (wp){ wp.parentNode.insertBefore(mk('v17Cal', 'v17-sec'), wp); wp.parentNode.insertBefore(mk('v17Maxes', 'v17-sec'), wp); }
     const pg = v17$('pgProg'), pw = v17$('pgWeek');
     if (pg) pg.parentNode.insertBefore(mk('v17PgMap', 'v17-slab v17-pgmap'), pg);
@@ -20418,7 +20397,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const def = getPhaseDef(wk.wave, wk.phase), stale = [];
     const tiles = F.statuses.map(s => {
       const id = s.lift.id, on = id === sel, name = V17_SHORT[id] || s.lift.name, warn = liftTestWarning(id);
-      if (warn && !on) stale.push(s.lift.name + ': the ' + warn.wave.toUpperCase() + (warn.endedEarly ? ' test was not done ' : ' test was skipped ') + warn.weeksAgo + ' week' + (warn.weeksAgo !== 1 ? 's' : '') + ' ago, so the TM hasn’t moved since.');
+      if (warn && !on) stale.push(s.lift.name + ': the ' + warn.wave + (warn.endedEarly ? ' test was not done ' : ' test was skipped ') + warn.weeksAgo + ' week' + (warn.weeksAgo !== 1 ? 's' : '') + ' ago, so the TM hasn’t moved since.');
       let cls, head, val, said, size = '';
       if (s.status === 'done'){
         const h = v17Entry(hist, wk, id), a = h ? _sessionAmrap(h) : null, early = liftEndedEarlyInWeek(id, wk);
@@ -20462,7 +20441,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     };
     const more = [];   // what the old "Last session for this lift" line carried and the two rows do not
     more.push('Reps ' + historyRowSets(last).map(s => numText(s.performedReps, '?')).join('/'));
-    more.push(formatWeightAs(roundToIncrement(historyRowTonnage(last), 5), last.units));
+    more.push(v1841Ton(roundToIncrement(historyRowTonnage(last), 5), last.units));
     if (Number.isFinite(readinessScoreAnswered(last.readiness))) more.push('readiness ' + readinessScoreText(readinessScoreAnswered(last.readiness)) + '/30');
     const lt = entryTest(last);   // a test: the training-max change in full, as the 2.4 line gave it
     if (lt) more.push(lt.tmChange.awaitingConfirmation ? 'TM change waiting for your OK' : lt.tmChange.amount > 0 ? 'TM ' + formatWeightAs(lt.tmChange.from, last.units) + ' → ' + formatWeightAs(lt.tmChange.to, last.units) + ' (' + lt.tmChange.step + ')' : 'TM held');
@@ -20810,11 +20789,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     return t;
   }
   function v182LiftWord(id){ return String(((getLiftMeta(id) || {}).name || id)).toLowerCase(); }
-  function v182CueHtml(P){
-    const t = v182Cue(P.id); if (!t) return '';
-    return '<div class="v18-rule" aria-hidden="true"></div><div class="v182-cue" role="note" aria-label="Your cue for ' + escapeHtml(v182LiftWord(P.id)) + '">' + V182_PIN
-      + '<div><span>Your cue</span><p>' + escapeHtml(t) + '</p></div></div>';
-  }
   // the warm-up sheet: the cue at the top, with Clear (and Undo for a few seconds after)
   let _v182Undo = null;
   function v182WarmCue(){
@@ -20846,7 +20820,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const cur = v182Cue(id);
     notes.insertAdjacentHTML('afterend', '<div class="v182-cuebox"><label for="v182CueIn">' + V182_PIN + 'Cue for next ' + escapeHtml(word) + ' day</label>'
       + '<p>Shows on Home and when you start your next ' + escapeHtml(word) + ' warm-up, until you clear it.</p>'
-      + '<div class="v182-cue-row"><input id="v182CueIn" type="text" maxlength="120" autocomplete="off" enterkeyhint="done" placeholder="e.g. Rack hole 7, middle finger on the ring" value="' + escapeHtml(cur) + '">'
+      + '<div class="v182-cue-row"><input id="v182CueIn" type="text" maxlength="120" autocomplete="off" enterkeyhint="done" placeholder="e.g. Big breath, stay tight" value="' + escapeHtml(cur) + '">'
       + '<button type="button" id="v182CueSave" class="btn-s" data-lift="' + escapeHtml(id) + '">Save cue</button></div></div>');
   }
 
@@ -20951,7 +20925,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         + '<div><label for="v183SetupIn">Permanent setup (' + escapeHtml(word) + ')</label>'
         + '<input id="v183SetupIn" type="text" maxlength="120" autocomplete="off" placeholder="e.g. J-cup 11, safety pin 5, belt hole 4" value="' + escapeHtml(setup) + '"></div>'
         + '<div><label for="v183CueHomeIn">Temporary cue (clears on tap)</label>'
-        + '<input id="v183CueHomeIn" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Drive knees out, stay tight out of the hole" value="' + escapeHtml(cue) + '"></div>'
+        + '<input id="v183CueHomeIn" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Big breath, stay tight" value="' + escapeHtml(cue) + '"></div>'
         + '<div class="v183-cs-actions">'
         + '<button type="button" class="btn-s" data-v183="cs-cancel">Cancel</button>'
         + '<button type="button" class="btn-p" data-v183="cs-save" data-lift="' + escapeHtml(id) + '">Save</button>'
@@ -21023,7 +20997,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const id = entry.liftId, word = v182LiftWord(id), cur = v183Setup(id);
     cuebox.insertAdjacentHTML('afterend', '<div class="v182-cuebox v183-setupbox"><label for="v183FinSetupIn">' + V183_WRENCH + 'Permanent ' + escapeHtml(word) + ' setup</label>'
       + '<p>Rack height, grip, or belt hole. Stays saved even when you clear a temporary cue.</p>'
-      + '<div class="v182-cue-row"><input id="v183FinSetupIn" type="text" maxlength="120" autocomplete="off" enterkeyhint="done" placeholder="e.g. J-cup 11, safety pin 5, belt hole 4" value="' + escapeHtml(cur) + '">'
+      + '<div class="v182-cue-row"><input id="v183FinSetupIn" type="text" maxlength="120" autocomplete="off" enterkeyhint="done" placeholder="e.g. J-cup 11, belt hole 4" value="' + escapeHtml(cur) + '">'
       + '<button type="button" id="v183FinSetupSave" class="btn-s" data-lift="' + escapeHtml(id) + '">Save setup</button></div></div>');
   }
 
@@ -21057,7 +21031,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (raf) return;
       raf = requestAnimationFrame(() => { raf = 0; v183SyncDock(); });
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });   // 18.4.1: the page scrolls inside <body>, whose scroll events never reached a window listener
     window.addEventListener('resize', onScroll, { passive: true });
     _v183LastPastStart = v183PastStart();
     v17Safe('strip', v17Strip);
@@ -21216,33 +21190,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   /* ═══════════════ 18.4.0: Active Workout Focus HUD, Warm-up Plate Diff, Trophy Milestone Celebration & e1RM Sparkline ═══════════════
      Home Screen, Cycle Map, and all 31 protected math/training/Hermes functions remain completely untouched. */
 
-  /* ── 1. Active Workout Top Laser Progress Bar + Live Tonnage HUD ── */
-  function v184SyncSessionHud(session){
-    if (!el.sessionSection || !session || !Array.isArray(session.sets)) return;
-    let hud = document.getElementById('v184SessHud');
-    if (!hud){
-      hud = document.createElement('div');
-      hud.id = 'v184SessHud';
-      hud.className = 'v184-sess-hud';
-      const sw = document.getElementById('swipeZone');
-      if (sw && sw.parentNode) sw.parentNode.insertBefore(hud, sw.nextSibling);
-      else el.sessionSection.appendChild(hud);
-    }
-    const total = session.sets.length;
-    const doneSets = session.sets.filter(s => s && s.done);
-    const done = doneSets.length;
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    const tonnage = doneSets.reduce((sum, s) => {
-      const r = setRole(s, session.phase);
-      if (r === 'ramp' || r === 'leadin') return sum;
-      const w = n(s.weight), reps = Math.max(0, Math.floor(n(s.performedReps)));
-      return sum + (Number.isFinite(w) ? w * reps : 0);
-    }, 0);
-    const liftName = (getLiftMeta(session.liftId) || {}).name || session.liftId || 'Workout';
-    const label = done >= total ? (liftName + ' · All ' + total + ' sets done') : (liftName + ' · Set ' + (done + 1) + ' of ' + total);
-    hud.innerHTML = '<div class="v184-sess-top"><b>' + escapeHtml(label) + '</b><span>' + (tonnage > 0 ? escapeHtml(formatWeight(roundToIncrement(tonnage, 5))) + ' lifted' : pct + '% complete') + '</span></div>'
-      + '<div class="v184-laser" aria-hidden="true"><i style="width:' + pct + '%"></i></div>';
-  }
+  /* ── 1. (removed in 18.4.1) The second progress bar repeated the one at the top of a workout and sat behind the Log panel ── */
 
   /* ── 2. Warm-up Plate-Change Diff Badge ── */
   function v184PlateDiffText(prevPlates, curPlates){
@@ -21325,56 +21273,89 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function v184FinishEnhance(entry){
     const sum = el.scoSummary; if (!sum || !entry || !entry.liftId) return;
-    // 1. Fire tasteful confetti ONLY on genuine milestones (Goal Lifted or Test-week TM increase)
+    // 1. Fire tasteful confetti ONLY on genuine milestones (Goal Lifted or Test-week TM increase); not in Performance mode (18.4.1)
     const hasGoalHit = !!sum.querySelector('.v182-goal-hit');
     const t = typeof entryTest === 'function' ? entryTest(entry) : null;
     const hasTmUp = !!(t && !t.ruleVersion && t.tmChange && t.tmChange.amount > 0 && !t.tmChange.awaitingConfirmation);
-    if (hasGoalHit || hasTmUp) setTimeout(v184FireConfetti, 220);
+    if ((hasGoalHit || hasTmUp) && !state.settings?.ui?.performanceMode) setTimeout(v184FireConfetti, 220);
 
-    // 2. Render recent e1RM mini-sparkline from real history (if >= 2 sessions exist)
+    // 2. 18.4.1: the trend is drawn from test days only. An everyday set stops short of failure (a 10s day at 60% × 5 reads
+    //    as about 70% of a max), so mixing every session drew jumps that were not real ("+146" from a 10s day to its test).
+    //    Each point is that test's own e1RM, the "Test e1RM" figure the stats below show.
     const prevEl = sum.querySelector('#v184FinTrend'); if (prevEl) prevEl.remove();
     const pts = [];
-    const hist = (state.history || []).filter(h => h && h.liftId === entry.liftId && Array.isArray(h.sets))
+    const hist = (state.history || []).filter(h => h && h.liftId === entry.liftId && h.phase === 'realization')
       .sort((a, b) => (a.completedAt || '').localeCompare(b.completedAt || ''))
       .slice(-8);
     for (const h of hist){
-      let bestE = 0;
-      for (const s of h.sets){
-        const role = setRole(s, h.phase); if (role === 'ramp' || role === 'leadin') continue;
-        const w = n(s.weight), r = Math.floor(n(s.performedReps));
-        if (r >= 1 && Number.isFinite(w) && w > 0){
-          const wu = v182InUnits(w, h.units);
-          const e = r === 1 ? wu : wu * (1 + r / 30);
-          if (e > bestE) bestE = e;
-        }
-      }
-      if (bestE > 0) pts.push(Math.round(bestE));
+      const ht = entryTest(h);
+      const e = ht && Number.isFinite(ht.e1rm) ? v182InUnits(ht.e1rm, h.units) : NaN;
+      if (Number.isFinite(e) && e > 0) pts.push(Math.round(e));
     }
     if (pts.length >= 2){
       const lo = Math.min(...pts), hi = Math.max(...pts), span = Math.max(1, hi - lo);
-      const W = 260, H = 36, pad = 6;
+      const W = 300, H = 36, pad = 6;
       const coords = pts.map((v, i) => [
         pad + (i / (pts.length - 1)) * (W - pad * 2),
         H - pad - ((v - lo) / span) * (H - pad * 2)
       ]);
       const lineD = coords.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
       const last = coords[coords.length - 1];
-      const delta = pts[pts.length - 1] - pts[0];
-      const deltaStr = delta > 0 ? ' (+' + delta + ')' : delta < 0 ? ' (' + delta + ')' : '';
+      const delta = pts[pts.length - 1] - pts[pts.length - 2];
+      const deltaStr = delta > 0 ? ' · +' + delta + ' vs last test' : delta < 0 ? ' · −' + Math.abs(delta) + ' vs last test' : ' · same as last test';
       const areaD = lineD + ' L' + last[0].toFixed(1) + ',' + H + ' L' + coords[0][0].toFixed(1) + ',' + H + ' Z';
       const card = '<div id="v184FinTrend" class="v184-trend">'
-        + '<div class="v184-trend-h"><span>Recent Est. 1RM Trend</span><b>' + v17Num(pts[pts.length - 1]) + ' ' + escapeHtml(unitLabel()) + escapeHtml(deltaStr) + '</b></div>'
-        + '<svg width="100%" height="36" viewBox="0 0 260 36" aria-hidden="true">'
-        + '<path d="' + areaD + '" fill="color-mix(in srgb, var(--accent) 18%, transparent)"/>'
-        + '<path d="' + lineD + '" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
-        + '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="3.5" fill="var(--accent)" stroke="var(--panel)" stroke-width="1.2"/>'
-        + '</svg></div>';
+        + '<div class="v184-trend-h"><span>Test-day est. 1RM</span><b>' + v17Num(pts[pts.length - 1]) + ' ' + escapeHtml(unitLabel()) + escapeHtml(deltaStr) + '</b></div>'
+        + '<div class="v184-trend-g"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">'
+        + '<path d="' + areaD + '" style="fill:color-mix(in srgb, var(--accent) 18%, transparent);stroke:none"/>'
+        + '<path d="' + lineD + '" vector-effect="non-scaling-stroke" style="fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"/>'
+        + '</svg><i style="left:' + (last[0] / W * 100).toFixed(2) + '%;top:' + last[1].toFixed(1) + 'px"></i></div>'
+        + '<p class="v184-trend-n">Your last ' + pts.length + ' tests of this lift. Everyday sets stop short of failure, so only tests are drawn.</p>'
+        + '</div>';
       const stats = sum.querySelector('.summary-stats');
       if (stats) stats.insertAdjacentHTML('beforebegin', card);
     }
   }
 
-
+  /* ═══════════════ 18.4.1: clean-up helpers (display only) ═══════════════ */
+  // Toasts sit at the bottom since 18.3. In a workout that is where the Log / Complete panel is, so "Timer closed.",
+  // "Session started." and the like covered the Log button for 2.5 s. While that panel is up, a toast sits just above it.
+  function v1841ToastLift(){
+    const t = el.toast; if (!t) return;
+    const place = () => {
+      try{
+        if (!t.classList.contains('show')) return;
+        const pn = document.getElementById('v17Panel');
+        const r = (pn && !pn.hidden && getComputedStyle(pn).display !== 'none') ? pn.getBoundingClientRect() : null;
+        if (r && r.height > 0 && r.top > 0 && r.top < window.innerHeight) t.style.setProperty('bottom', Math.round(window.innerHeight - r.top + 10) + 'px', 'important');
+        else t.style.removeProperty('bottom');
+      }catch(_){ t.style.removeProperty('bottom'); }
+    };
+    place();
+    // a toast can come just before the panel does ("Session started."), so look again once the screen has been drawn
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => requestAnimationFrame(place));
+    setTimeout(place, 150); setTimeout(place, 450);
+  }
+  // Test day: the guided warm-up walks through the session's own ramp sets (buildWarmupRamp). A ramp set rated there was
+  // lifted, so it is logged here, once, the way "Quick Log All Warm-Up Sets" logs it. It used to come back unlogged in
+  // the workout ("Ramp-up set 1 of 3, 0 of 4 sets done") to be logged a second time. One Undo puts them all back.
+  function v1841LogRatedRamps(session, feedback){
+    if (!session || session.phase !== 'realization' || !Array.isArray(feedback) || !feedback.length) return;
+    const ramp = buildWarmupRamp(session);
+    const todo = feedback.map(f => ramp[f && f.setIdx]).filter(r => r && r.fromRealization && Number.isInteger(r.refIdx))
+      .map(r => r.refIdx).filter((i, k, a) => a.indexOf(i) === k && session.sets[i] && session.sets[i].isRamp && !session.sets[i].done);
+    if (!todo.length) return;
+    if (Array.isArray(session.undoStack)) session.undoStack.push(deepClone({ sets:session.sets, activeSetIndex:session.activeSetIndex }));
+    todo.forEach(i => { session.sets[i].done = true; });
+    session.updatedAt = nowISO();
+    setSessionActiveIndexToNextOpen(session);
+  }
+  // Tonnage with a thousands separator ("10,875 lb"), as Home's week total and the estimated total already show it.
+  function v1841Ton(w, units){
+    if (!Number.isFinite(w)) return '—';
+    const u = (units === 'kg' || units === 'lb') ? units : unitLabel();
+    return Math.round(w).toLocaleString() + ' ' + u;
+  }
 
 
   boot()
@@ -21393,7 +21374,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     <video id="tourVideo" aria-label="Tour video" playsinline webkit-playsinline controls preload="metadata"></video>
     <div id="tourMsg" class="tour-msg" hidden></div>
   </div>
-  <div id="v183TourCap" class="v183-tcap" aria-live="polite" hidden></div>
   <div class="tour-th-nav">
     <button type="button" id="tourPrev" class="btn-s tour-nav-b">Previous</button>
     <button type="button" id="tourNext" class="btn-p tour-nav-b">Next chapter</button>
@@ -21404,7 +21384,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 /* Juggernaut 18.1.0: the video tour in How to Use, and "What changed" as one row.
 
    A separate script on purpose. It reads nothing from the app's state, calls none of the app's functions and writes
-   no storage. All it does is show and hide its own elements and play the six clips stored below it in this file
+   no storage. All it does is show and hide its own elements and play the seven clips stored below it in this file
    (the application/octet-stream blocks: base64 MP4, never run as code).
 
    A clip is turned into a Blob only when its chapter is opened, and let go when the chapter changes or the player
@@ -21437,7 +21417,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   function release(){
     if (waiting){ clearTimeout(waiting); waiting = null; }
-    const _cap = $('v183TourCap'); if (_cap){ _cap.hidden = true; _cap.textContent = ''; }
     try{ video.pause(); }catch(_){}
     if (url){
       const old = url; url = null;
@@ -21503,26 +21482,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     if (state === 'bad'){ say('words'); return; }
     try{ url = URL.createObjectURL(new Blob([clipBytes(k)], { type:'video/mp4' })); }
     catch(err){ console.error(err); url = null; say('words'); return; }
-    const capEl = $('v183TourCap');
-    const V183_CAPS = [[[1.5,"Juggernaut is a sixteen-week strength program for four lifts: squat, bench, deadlift and press."],[8.88,"Every weight comes from one number for each lift, your training max. It starts at ninety percent of your best single, so the work is heavy but doable."],[17.84,"The sixteen weeks are four waves: tens, eights, fives and threes. Each wave is heavier, with fewer reps."],[26.82,"Every wave runs the same way. Week one is accumulation: lots of sets at a moderate weight."],[33.04,"Week two is intensification: heavier, with fewer reps in each set."],[37.96,"Week three is the test. One all-out set decides whether your training max goes up, and every weight after it goes up with it."],[45.5,"Week four is a deload: light work, so you recover before the next wave."],[50.24,"The app tells you what to lift each day, and adjusts the day to how ready you are."]],[[1.5,"This is Home. The card at the top is today's lift."],[4.86,"It shows the weight on the bar and the percent of your training max."],[8.6,"Every set is a box. The last one, with the plus, is your plus set."],[13.32,"Under that are the plates for each side, and your rest time."],[16.74,"Before you lift, tap Check in and rate five things from one to five."],[21.82,"Your score, out of thirty, sets the day. Under fifteen, a set comes off."],[27.16,"The dashed green box is a bonus set. Score twenty-three or more and the app offers it. Taking it is up to you."],[34.06,"Then tap Start."]],[[1.5,"Start opens the warm-up. Do each set, then tap how it felt."],[6.58,"Two fast sets in a row add five pounds to your work sets. Two slow ones take ten off."],[14.06,"Now the work sets. You see the weight, the plates, and the target reps."],[18.56,"Lift, then tap Log."],[21.34,"The rest timer starts on its own. Rate the set if you like, then start the next one."],[27.12,"The last set is the plus set. Do at least the target, then keep going while your reps stay clean."],[33.04,"Stop with reps left in the tank: two or three in accumulation, one or two in intensification. It's not a max-out."],[40.96,"Set your reps and log it."],[44.74,"Then tap Complete session to see your numbers. The week moves on to the next lift."]],[[1.5,"Under the card is your week. A lift you've done shows the day and the result."],[6.06,"A lift still to come shows the planned weight."],[8.76,"Tap a lift to put it on the card. The app suggests the next one, but your pick always wins."],[14.94,"Scroll down for your training days, readiness, sleep and bodyweight."],[19.5,"The cycle map shows all sixteen weeks. Tap a week to see its sets and load."],[24.88,"Tap Back to return to this week."]],[[1.5,"The third week of every wave is a test. You ramp up, then take one set for as many reps as you can."],[7.66,"The card gives you the standard, and the reps that raise your training max."],[11.9,"During the test, a table shows what each rep is worth."],[16.48,"Log your reps and the app works out your new max. Beat the standard by a few reps and it goes up. If not, it holds."],[25.26,"A deload week follows: light sets, and no plus set."]],[[1.5,"Program is the plan: all sixteen weeks, for one lift or all four."],[7.58,"Below it are this week's sets, load and rest, and every test so far."],[12.86,"Open All sixteen weeks to see the whole cycle in one table."],[18.54,"Progress is your results. Estimated maxes for each lift, and this week against last week."],[24.42,"The calendar shows every session. Further down are your progression charts and the full session log."]],[[1.5,"The sliders button opens Settings."],[4.58,"In Lifts and Maxes, set the training max for each lift. Every weight comes from it."],[9.98,"Program holds your units, bar weight and rounding. Gym Equipment hides what your gym doesn't have."],[17.06,"Your data lives on this phone, so export a backup from the Progress tab now and then."],[21.94,"That's the tour. The question mark opens this guide any time."]]];
-    const syncCap = () => {
-      if (!capEl) return;
-      const lines = V183_CAPS[cur - 1] || [];
-      const t = video.currentTime || 0;
-      let txt = '';
-      for (let i = lines.length - 1; i >= 0; i--){ if (t >= lines[i][0] - 0.15){ txt = lines[i][1]; break; } }
-      capEl.textContent = txt;
-      capEl.hidden = !txt;
-    };
-    video.ontimeupdate = syncCap;
-    video.onseeked = syncCap;
+    // 18.4.1: the clips carry their own captions; the second copy 18.3 printed under the video is gone
     video.src = at > 0 ? (url + '#t=' + at.toFixed(1)) : url;
     if (at > 0){
       const target = at;
-      const go = () => { try{ video.currentTime = Math.max(0, Math.min(target, (video.duration || target + 1) - 0.5)); syncCap(); }catch(_){} };
+      const go = () => { try{ video.currentTime = Math.max(0, Math.min(target, (video.duration || target + 1) - 0.5)); }catch(_){} };
       if (video.readyState >= 1) go(); else video.addEventListener('loadedmetadata', go, { once:true });
       video.addEventListener('playing', () => { if (Math.abs((video.currentTime || 0) - target) > 0.75) go(); }, { once:true });
-    } else { syncCap(); }
+    }
     if (play) start();
   }
 
