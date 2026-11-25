@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut v18 — 18.4.1</title>
+<title>Juggernaut v18 — 18.5.1</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -3357,28 +3357,6 @@ body[data-plates="iron"] .v18-chip.p10{background:#B0B8C7}body[data-plates="iron
 .v18-bw button{flex:none;height:44px;padding:0 14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font:inherit;font-size:14px;font-weight:800}
 .v18-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* ── the cycle map on Home: the week picked, under the key ── */
-.v18-wk{padding:14px 2px 0;border-top:1px solid var(--line)}
-.v18-wk-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.v18-wk-h h3{margin:0;font-size:16px;line-height:20px;font-weight:800;color:var(--text)}
-.v18-wk-h>span{font-size:12.5px;line-height:16px;font-weight:600;color:var(--muted);white-space:nowrap}
-.v18-wk-s{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));font-variant-numeric:tabular-nums}
-.v18-wk-s>div+div{padding-left:14px;border-left:1px solid var(--line)}
-.v18-wk-s b{display:flex;align-items:baseline;gap:1px;height:32px;font-size:28px;line-height:32px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
-.v18-wk-s b small{font-size:14px;line-height:1;font-weight:800;letter-spacing:0}
-.v18-wk-s span{display:block;margin-top:2px;font-size:12px;line-height:16px;font-weight:500;color:var(--muted)}
-.v18-wk-w{margin-top:14px;padding:12px 14px 13px;border:1px solid var(--line);border-radius:14px;background:#080C16;font-variant-numeric:tabular-nums}
-.v18-wk-wh{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.v18-wk-wh>b{font-size:14px;line-height:18px;font-weight:800;color:var(--text)}
-.v18-wk-wh span b{font-size:22px;line-height:26px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
-.v18-wk-wh span small{margin-left:3px;font-size:13px;font-weight:700;color:var(--muted)}
-.v18-wk-bar{margin-top:10px;display:flex;gap:4px}
-.v18-wk-bar i{flex:1 1 0;height:7px;border-radius:4px;box-sizing:border-box;border:1.5px solid var(--line2)}
-.v18-wk-bar i.done{border:none;background:var(--mint)}
-.v18-wk-bar i.today{border-color:var(--sky)}
-.v18-wk-bar i.skipped,.v18-wk-bar i.missed{border-style:dashed}
-.v18-wk-w p{margin:8px 0 0;font-size:12.5px;line-height:16px;font-weight:500;color:var(--text2)}
-
 /* ── estimated maxes ── */
 .v18-approx{margin-right:2px;font-style:normal;font-size:.5em;font-weight:700;color:var(--muted);vertical-align:.32em;letter-spacing:0}
 .v17-tile-s .v18-tm{margin-right:5px}
@@ -3918,6 +3896,146 @@ html[data-theme="light"] .confirm-card .btn-w{color:var(--warn-ink)}
 html[data-theme="light"] .v17m-peak.done,html[data-theme="light"] .v17m-peak.next,html[data-theme="light"] .v17m-wk.on{fill:var(--text)}
 html[data-theme="light"] .v17m-test.done{fill:var(--text2);stroke:var(--panel)}
 html[data-theme="light"] .v17m-cap{fill:var(--text2);filter:none}
+
+/* ═══════════════ Juggernaut 18.5.0: Cycle Map Full Telemetry Revamp ═══════════════ */
+.v185-hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px}
+.v185-hdr-l{min-width:0;flex:1 1 0}
+.v185-hdr-top{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.v185-hdr-top h2{margin:0;font-size:22px;line-height:26px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.v185-streak{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11.5px;line-height:16px;font-weight:700;color:var(--mint);background:rgba(62,224,161,.11);border:1px solid rgba(62,224,161,.28);white-space:nowrap}
+.v185-streak.warn{color:var(--warn);background:rgba(255,183,3,.11);border-color:rgba(255,183,3,.28)}
+.v185-streak.idle{color:var(--sky);background:var(--blue-dim);border-color:var(--blue-mid)}
+.v185-sub{margin:4px 0 0;font-size:12.5px;line-height:17px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.v185-ring{position:relative;width:48px;height:48px;flex:none;display:flex;align-items:center;justify-content:center}
+.v185-ring svg{width:48px;height:48px;transform:rotate(-90deg)}
+.v185-ring-bg{fill:none;stroke:var(--panel3);stroke-width:4}
+.v185-ring-fg{fill:none;stroke:var(--mint);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .4s ease}
+.v185-ring span{position:absolute;font-size:11.5px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+
+.v185-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;padding:10px 13px;border-radius:14px;background:rgba(62,224,161,.05);border:1px solid rgba(62,224,161,.24);font-size:12.5px;line-height:17px;font-variant-numeric:tabular-nums}
+.v185-strip-l{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+.v185-strip-l b{color:var(--mint);font-weight:800;font-size:13.5px}
+.v185-strip-l span{color:var(--muted);font-weight:600}
+.v185-strip-r{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;font-weight:600;color:var(--text2);justify-content:flex-end}
+.v185-strip-r .lbl{color:var(--muted);font-weight:700}
+.v185-strip-r .gain{color:var(--warn);font-weight:800}
+.v185-strip-r .brk{color:var(--text2);font-size:11.5px;font-weight:700}
+
+.v185-waves{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.v185-wv{appearance:none;text-align:left;padding:8px 9px 9px;border-radius:13px;background:var(--panel2);border:1.5px solid var(--line);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,background .15s;min-width:0}
+.v185-wv:active{transform:scale(.98)}
+.v185-wv.sel{border-color:var(--wc,var(--sky));background:color-mix(in srgb, var(--wc,var(--sky)) 11%, var(--panel2))}
+.v185-wv-t{display:flex;align-items:baseline;justify-content:space-between;gap:4px;font-variant-numeric:tabular-nums}
+.v185-wv-t b{font-size:13px;line-height:16px;font-weight:800;color:var(--wc,var(--text))}
+.v185-wv-t span{font-size:11px;line-height:14px;font-weight:700;color:var(--muted)}
+.v185-wv-bar{height:4px;border-radius:99px;background:var(--panel3);overflow:hidden}
+.v185-wv-bar i{display:block;height:100%;border-radius:99px;background:var(--wc,var(--sky))}
+
+.v185-ctrl{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.v185-seg{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:var(--panel2);border:1px solid var(--line)}
+.v185-seg button{appearance:none;border:none;background:transparent;color:var(--muted);font-size:11.5px;line-height:15px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.v185-seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.v185-lifts{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.v185-lifts button{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:11px;line-height:15px;font-weight:700;padding:4px 8px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s,background .15s}
+.v185-lifts button[aria-pressed="true"]{border-color:var(--sky);background:var(--blue-dim);color:var(--text)}
+
+/* Mode Telemetry Lens Strip (shown under existing graph in Tonnage or Readiness mode, zero changes to SVG layout) */
+.v185-lens{padding:10px 11px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.v185-lens-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.v185-lens-h b{font-size:12px;font-weight:800;color:var(--text)}
+.v185-lens-h span{font-size:11.5px;font-weight:700;color:var(--mint)}
+.v185-lens-h span.rd{color:var(--sky)}
+.v185-lens-g{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px;align-items:end;height:36px}
+.v185-lens-c{appearance:none;border:none;background:transparent;padding:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;cursor:pointer}
+.v185-lens-c i{display:block;width:100%;min-height:3px;border-radius:3px;background:var(--panel3);transition:background .15s}
+.v185-lens-c.has i{background:var(--mint);opacity:.78}
+.v185-lens-c.rd.has i{background:var(--sky);opacity:.82}
+.v185-lens-c.sel i{opacity:1;box-shadow:0 0 0 1.5px var(--text)}
+.v185-lens-c em{font-style:normal;font-size:8.5px;line-height:10px;font-weight:700;color:var(--muted)}
+.v185-lens-c.sel em{color:var(--text);font-weight:800}
+
+/* Selected Week Telemetry Panel */
+.v185-wk{padding:14px 2px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.v185-wk-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.v185-wk-h h3{margin:0;font-size:16px;line-height:21px;font-weight:800;color:var(--text);min-width:0}
+.v185-wk-r{display:flex;align-items:center;gap:6px;flex:none}
+.v185-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:11.5px;line-height:14px;font-weight:700;background:var(--blue-dim);color:var(--sky);border:1px solid var(--blue-mid);white-space:nowrap}
+.v185-badge.now{background:rgba(62,224,161,.14);color:var(--mint);border-color:rgba(62,224,161,.35)}
+.v185-badge.done{background:rgba(62,224,161,.12);color:var(--mint);border-color:rgba(62,224,161,.3)}
+.v185-badge.past{background:var(--panel2);color:var(--text2);border-color:var(--line2)}
+.v185-back{appearance:none;border:none;background:transparent;color:var(--sky);font-size:11.5px;font-weight:700;padding:6px 8px;cursor:pointer;white-space:nowrap}
+
+.v185-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;font-variant-numeric:tabular-nums}
+.v185-kpi{padding:10px 6px 9px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.v185-kpi b{font-size:19px;line-height:23px;font-weight:800;letter-spacing:-.02em;color:var(--text);white-space:nowrap}
+.v185-kpi span{font-size:9.5px;line-height:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.v185-kpi em{font-style:normal;font-size:10.5px;line-height:13px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+.v185-wtrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;font-variant-numeric:tabular-nums}
+.v185-wt{appearance:none;padding:9px 5px;border-radius:13px;background:var(--panel2);border:1px solid var(--line);text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;min-width:0;transition:border-color .15s,background .15s}
+.v185-wt.sel{border-color:var(--sky);background:var(--blue-dim)}
+.v185-wt.done{border-color:rgba(62,224,161,.35)}
+.v185-wt span{font-size:10.5px;line-height:13px;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.v185-wt b{font-size:13.5px;line-height:17px;font-weight:800;color:var(--sky);white-space:nowrap}
+.v185-wt.done b{color:var(--mint)}
+
+.v185-log{padding:12px 14px 12px;border:1px solid var(--line);border-radius:16px;background:#080C16;font-variant-numeric:tabular-nums}
+.v185-log-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.v185-log-h>b{font-size:13.5px;line-height:18px;font-weight:800;color:var(--text)}
+.v185-log-r{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.v185-log-r b{font-size:15px;line-height:18px;font-weight:800;color:var(--mint)}
+.v185-log-r span{font-size:12px;line-height:16px;font-weight:700;color:var(--sky)}
+.v185-log-bars{margin-top:10px;display:grid;gap:6px}
+.v185-log-seg{display:flex;flex-direction:column;align-items:center;gap:5px}
+.v185-log-seg i{display:block;width:100%;height:7px;border-radius:4px;box-sizing:border-box;border:1.5px solid var(--line2);background:transparent}
+.v185-log-seg i.done{border:none;background:var(--mint)}
+.v185-log-seg i.today{border-color:var(--sky);background:rgba(127,170,255,.18)}
+.v185-log-seg i.skipped,.v185-log-seg i.missed{border-style:dashed}
+.v185-log-seg span{font-size:10.5px;line-height:13px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.v185-log-seg.done span{color:var(--text2)}
+.v185-log-seg.spot span{color:var(--sky);font-weight:800}
+.v185-log-seg.spot i{box-shadow:0 0 0 1px var(--sky)}
+.v185-log-meta{margin:8px 0 0;font-size:11.5px;line-height:15px;font-weight:500;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* Light theme overrides for v18.5.0 Cycle Map Telemetry */
+html[data-theme="light"] .v185-streak{background:rgba(15,143,99,.10);border-color:rgba(15,143,99,.28)}
+html[data-theme="light"] .v185-streak.warn{background:rgba(180,105,14,.10);border-color:rgba(180,105,14,.28)}
+html[data-theme="light"] .v185-strip{background:rgba(15,143,99,.06);border-color:rgba(15,143,99,.26)}
+html[data-theme="light"] .v185-log{background:var(--panel2);border-color:var(--line)}
+html[data-theme="light"] .v185-wv-t b[style*="#FFE45C"]{color:#8a7400 !important}
+html[data-theme="light"] .v185-wv-t b[style*="#FFB703"]{color:#9a5b00 !important}
+html[data-theme="light"] .v185-wv-t b[style*="#FF7A1A"]{color:#b44a00 !important}
+html[data-theme="light"] .v185-wv-t b[style*="#FF4458"]{color:#c0283a !important}
+html[data-theme="light"] .v185-kpi b[style*="#FFE45C"]{color:#8a7400 !important}
+html[data-theme="light"] .v185-kpi b[style*="#FFB703"]{color:#9a5b00 !important}
+html[data-theme="light"] .v185-kpi b[style*="#FF7A1A"]{color:#b44a00 !important}
+html[data-theme="light"] .v185-kpi b[style*="#FF4458"]{color:#c0283a !important}
+html[data-theme="light"] .v185-seg button[aria-pressed="true"]{color:#ffffff}
+html[data-theme="light"] .v185-lifts button[aria-pressed="true"]{color:var(--sky)}
+/* 18.5.1: text the light theme left in its dark-theme colours (green, amber and the deload lilac read at 1.9 to 4.1:1).
+   The darker inks are the ones the rest of the light theme uses (.v173-tag.top, .btn-w, .v173-tag.coach). */
+html[data-theme="light"] .v185-streak,
+html[data-theme="light"] .v185-strip-l b,
+html[data-theme="light"] .v185-badge.now,
+html[data-theme="light"] .v185-badge.done,
+html[data-theme="light"] .v185-wt.done b,
+html[data-theme="light"] .v185-log-r b,
+html[data-theme="light"] .v185-lens-h span:not(.rd){color:#0b6b4a}
+html[data-theme="light"] .v185-streak.idle{color:var(--sky)}
+html[data-theme="light"] .v185-streak.warn,
+html[data-theme="light"] .v185-strip-r .gain{color:#8f5208}
+html[data-theme="light"] .v185-wv-t b[style*="#FFE45C"],
+html[data-theme="light"] .v185-kpi b[style*="#FFE45C"]{color:#6f5d00 !important}
+html[data-theme="light"] .v185-wv-t b[style*="#FF7A1A"],
+html[data-theme="light"] .v185-kpi b[style*="#FF7A1A"]{color:#a34300 !important}
+html[data-theme="light"] .v185-kpi b[style*="#B7A6FF"]{color:#5b47c4 !important}
+@media (max-width:374px){
+  .v185-streak{padding:3px 8px;font-size:11px;white-space:normal;max-width:100%}   /* 18.5.1: "🔥 15-wk streak · Ready to start" is the longest */
+  .v185-kpi b{font-size:16.5px}
+  .v185-wt b{font-size:12px}
+  .v185-seg button{padding:5px 8px;font-size:11px}
+}
+
 </style>
 </head>
 <body>
@@ -4814,7 +4932,34 @@ html[data-theme="light"] .v17m-cap{fill:var(--text2);filter:none}
 
   <!-- WHAT CHANGED: one closed row (18.1). The note for each version is unchanged inside it. -->
   <details id="guide-changes" class="g181-changes">
-  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.4.1 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.5.1 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v1851">v18.5.1</h2><span class="g181-gist">Fixes to the cycle map card</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>Fixes from a review of 18.5.0. The weights, how they progress and the program are the same, and so is what goes to Hermes.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Streak and pace agree with Home.</strong> The streak counts full weeks in a row, the same number as the stats under the calendar, and the pace is the week’s pace from the lifts row. The card said “8-wk streak” over “5 full weeks in a row”, and “Catch-up” after three skipped sessions while the lifts row said “On pace”.</li>
+      <li><strong>Exact numbers.</strong> Peak TM shows 67.5% as the plan does (it said 68%), a 3.75 lb TM change shows as +3.75 (it said +3.8), 7,350 lb reads 7.4k, and the finish date is the last day of week 16 (it gave the first).</li>
+      <li><strong>Up to date.</strong> The weight cards change as soon as you change a bar, plates or rounding in Settings. They kept the old weight until the app was reopened.</li>
+      <li><strong>Light theme.</strong> The streak, tonnage, TM gain, week badges, the 10s and 5s labels and a deload week’s Peak TM can be read.</li>
+      <li><strong>Smaller things.</strong> Rest reads “per set” (it said “Peak”); the button back to this week is easier to tap; VoiceOver names that button and reads each wave as its test percent and how much of it is done.</li>
+    </ul>
+  </div>
+  </details>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v1850">v18.5.0</h2><span class="g181-gist">Cycle Map full telemetry upgrade</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>Adds full cycle telemetry around the existing 16-week Cycle Map graph without changing the graph layout. All program math, TM progression, storage, and Hermes bridge code remain unchanged.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Cycle header &amp; progress ring.</strong> Shows your active streak and pace badge, session progress, estimated cycle finish date, and a circular completion ring.</li>
+      <li><strong>Cycle tonnage &amp; TM gain strip.</strong> Tracks total tonnage moved this cycle alongside total and per-lift Training Max gains.</li>
+      <li><strong>Wave progress pills &amp; interactive filters.</strong> Displays 10s, 8s, 5s, and 3s wave completion bars (tappable to jump to a wave), a Sets / Tonnage / Readiness lens toggle, and All / SQ / BP / DL / OH lift spotlight pills wired directly to the existing graph.</li>
+      <li><strong>Upgraded week detail panel.</strong> Adds 4 KPI cards (Sets, Reps, Peak TM with RIR cue, and Rest), per-lift target weight cards, and a labeled 4-lift work logged progress card with next-test countdown.</li>
+    </ul>
+  </div>
+  </details>
 
   <details class="g181-ch">
   <summary><h2 id="guide-v1841">v18.4.1</h2><span class="g181-gist">A clean-up pass over 18.3 and 18.4</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -5708,7 +5853,7 @@ html[data-theme="light"] .v17m-cap{fill:var(--text2);filter:none}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '18.4.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.5.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -18465,6 +18610,19 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
   /* ── the cycle map: sixteen weeks, one block a set, the top set as a stepped line, the sessions underneath ── */
+  // 18.5.1: the heaviest set lifted in one program week, for the Cycle Map's top-set label and the weight card. Every entry of
+  // that lift in that week counts: v17Entry keeps only the last one in the saved list, so the order of the list decided which
+  // of two sessions showed (100 kg then 200 lb read 200 lb; the other way round, 220.5 lb). Each set is put in the unit shown
+  // now from its own entry's unit before the comparison, with the weight card's conversion (a row with no unit counts as the
+  // unit shown); sets marked not done are left out, as before. hist is the cycle's history (v17Hist). 0 when nothing was logged.
+  function v1851WeekTop(hist, wk, liftId){
+    let top = 0;
+    for (const h of hist){
+      if (!h || h.liftId !== liftId || h.wave !== wk.wave || h.phase !== wk.phase) continue;
+      for (const x of (h.sets || [])) if (x && x.done !== false) top = Math.max(top, v185UnitAmt(x.weight, h.units));
+    }
+    return top;
+  }
   function v17MapData(liftId){
     const tl = buildTimeline(), mc = currentMicrocycle(), cur = mc.index, cycle = v17Cycle(), hist = v17Hist();
     const act = v17Active(), lifts = liftId ? act.filter(l => l.id === liftId) : act;
@@ -18474,7 +18632,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       const sets = plannedSets(ref, wk.wave, wk.phase, cycle).filter(x => Number.isFinite(x.pctTM) && Number.isFinite(x.targetReps));
       const top = sets.reduce((m, x) => Math.max(m, x.pctTM), 0); let topW = sets.reduce((m, x) => Math.max(m, n(x.weight) || 0), 0);
       if (liftId){   // one lift chosen: a week already trained shows the weight that was on the bar, not today's plan worked backwards
-        const h = v17Entry(hist, wk, liftId), w = h ? (h.sets || []).filter(x => x.done !== false).reduce((m, x) => Math.max(m, n(x.weight) || 0), 0) : 0;
+        // 18.5.1: the heaviest set of the week across every entry of this lift, each in the unit shown now (v1851WeekTop).
+        // 100 kg read "100" under "Top set, lb", and with two entries the last one in the saved list was the one shown.
+        const w = v1851WeekTop(hist, wk, liftId);
         if (w > 0) topW = w;
       }
       let over = null;
@@ -18596,13 +18756,13 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function v17HomeMap(){
     const box = v17$('v17MapCard'); if (!box) return;
     box.hidden = !v17Idle(); if (box.hidden) return;
-    const D = v17MapData(''); if (!D){ box.hidden = true; return; }
-    const sig = JSON.stringify([D.cur, D.cycle, D.hist.length, state.program.completion, selectedLiftId(), D.act.map(l => trainingMax(state.lifts[l.id])), D.gains, _v18Week, unitLabel()]);   // v18: and the week picked
+    const liftFilter = (_v185Lift && isActiveLift(_v185Lift)) ? _v185Lift : '';
+    const D = v17MapData(liftFilter); if (!D){ box.hidden = true; return; }
+    const sel = v18MapSel(D);
+    const sig = JSON.stringify([D.cur, D.cycle, D.hist.length, state.program.completion, selectedLiftId(), D.act.map(l => trainingMax(state.lifts[l.id])), D.gains, _v18Week, unitLabel(), _v185Mode, liftFilter, state.settings.restMatrix || 0,
+      v1851PlanKey(D), v17Ymd(Date.now()), _previewWeekIdx]);   // 18.5.1: also the bar, plates and rounding the planned weights are built from (a change in Settings left the weight cards on the old weight), and the day (pace, finish date)
     v17Once('homeMap', sig, () => {
-      const N = D.tl.length, total = N * D.act.length, done = D.tl.reduce((a, _, i) => a + D.act.filter(l => v17StateOf(D.tl, D.cur, D.hist, i, l.id) === 'done').length, 0), left = Math.max(0, N - D.cur - 1);
-      box.innerHTML = '<div class="v17-slab-h"><div><h2>Cycle ' + D.cycle + '</h2><p>' + (D.cur >= N ? 'Complete' : 'Week ' + (D.cur + 1) + ' of ' + N) + ' · ' + done + ' of ' + total + ' sessions</p></div>'
-        + '<button type="button" class="v17-link" data-v17="program">Program' + v17Ic('right', 18) + '</button></div>'
-        + v17MapSvg(D, { sel:v18MapSel(D), tap:true, home:true, anim:_v17Anim, uid:'hm' }) + v17MapKey(D) + v18WeekSummary(D) + v17NextTest(D);   // v18: the week picked, and its summary under the key   // v17.2: 'Week N of 16' (it said 'N weeks to go'); week buttons over the map
+      box.innerHTML = v185CycleHtml(D, 'hm', sel);
       _v17Anim = false;
     });
   }
@@ -20548,32 +20708,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     v17Safe('home map', v17HomeMap);
     const sel = _v18Week === null ? cur : _v18Week, nb = document.querySelector('#v17MapCard .v17-taps [data-v16-week="' + sel + '"]'); if (nb) nb.focus({ preventScroll:true });
   }
-  function v18WeekSummary(D){
-    const N = D.tl.length, i = v18MapSel(D); if (i < 0 || i >= N) return '';
-    const wk = D.tl[i], def = getPhaseDef(wk.wave, wk.phase), ref = D.act[0] ? D.act[0].id : '', isCur = i === D.cur;
-    const planned = ref ? plannedSets(ref, wk.wave, wk.phase, D.cycle) : [], counted = planned.filter(s => s.role !== 'ramp' && s.role !== 'leadin');   // the Session Log's rule: ramp and lead-in sets are not counted
-    const stat = (num, unit, label) => '<div><b>' + num + (unit ? '<small>' + unit + '</small>' : '') + '</b><span>' + label + '</span></div>';
-    let stats;
-    if (wk.phase === 'realization') stats = stat(def.rampUp.length, '', 'ramp sets, then the test') + stat(PROGRAM.waveTargetReps[wk.wave], '+', 'reps is the standard') + stat(escapeHtml(formatPercent(def.testPctTM).replace('%', '')), '%', 'of TM on the test');
-    else stats = stat(counted.length, '', 'sets per lift') + stat(counted.reduce((a, s) => a + (n(s.targetReps) || 0), 0), '', 'reps per lift')
-      + stat(escapeHtml(formatPercent(planned.reduce((m, s) => Math.max(m, n(s.pctTM) || 0), 0)).replace('%', '')), '%', 'peak of TM');
-    let lb = 0, setsDone = 0, liftsDone = 0, segs = '';
-    D.act.forEach(l => {
-      const st = v17StateOf(D.tl, D.cur, D.hist, i, l.id), h = v17Entry(D.hist, wk, l.id);
-      if (h){ lb += historyRowTonnage(h); setsDone += historyRowSets(h).length; }
-      if (st === 'done') liftsDone++;
-      segs += '<i class="' + st + '"></i>';
-    });
-    const total = counted.length * D.act.length, name = wk.wave + ' ' + (V18_PHASE[wk.phase] || wk.phase);
-    return '<div class="v18-wk" aria-live="polite"><div class="v18-wk-h"><h3>Week ' + (i + 1) + ', ' + escapeHtml(name) + '</h3>'
-      + (isCur ? '<span>This week</span>' : '<button type="button" class="v18-link in" data-v18="week:cur">Back to week ' + (D.cur + 1) + '</button>') + '</div>'
-      + '<div class="v18-wk-s">' + stats + '</div>'
-      + '<div class="v18-wk-w"><div class="v18-wk-wh"><b>Week ' + (i + 1) + ' work logged</b><span><b>' + escapeHtml(Math.round(lb).toLocaleString()) + '</b><small>' + escapeHtml(unitLabel()) + '</small></span></div>'
-      + '<div class="v18-wk-bar" role="img" aria-label="' + liftsDone + ' of ' + D.act.length + ' lifts done">' + segs + '</div>'
-      + '<p>' + setsDone + ' of ' + total + ' work set' + (total === 1 ? '' : 's') + ', ' + liftsDone + ' of ' + D.act.length + ' lift' + (D.act.length === 1 ? '' : 's') + (i > D.cur ? ' · not started' : '') + '</p></div></div>';
-  }
-
-  /* ── Progress: the session log shows each counted set as a chip ── */
   function v18SetChips(sets, phase){
     if (!sets || !sets.length) return '';
     return '<div class="v18-setchips" role="img" aria-label="Reps per set: ' + escapeHtml(sets.map(s => numText(s.performedReps, '?') + ' of ' + numText(s.targetReps, '?')).join(', ')) + '">'
@@ -21358,9 +21492,403 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   }
 
 
+
+  /* ═══════════════ Juggernaut 18.5.0: Cycle Map Full Telemetry Engine (graph layout untouched) ═══════════════ */
+  let _v185Mode = 'sets';   // 'sets' | 'tonnage' | 'readiness'
+  let _v185Lift = '';       // '' (All) | 'squat' | 'bench' | 'deadlift' | 'ohp'
+
+  function v185FmtTon(ton){
+    const u = unitLabel();
+    if (!Number.isFinite(ton) || ton <= 0) return '0 ' + u;
+    if (ton >= 1000) return (Math.round(ton / 100) / 10).toFixed(1).replace(/\.0$/, '') + 'k ' + u;   // 18.5.1: halves round up (7,350 read 7.3k)
+    return Math.round(ton).toLocaleString() + ' ' + u;
+  }
+
+  function v185UnitAmt(val, fromUnits){
+    const x = n(val);
+    if (!Number.isFinite(x)) return 0;
+    if (typeof v182InUnits === 'function') return v182InUnits(x, fromUnits);
+    return x;
+  }
+
+  // 18.5.1: what the planned weights on the card are built from besides the TM (the bar, collars, rounding and plates)
+  function v1851PlanKey(D){
+    const st = state.settings || {};
+    return [st.barWeight, st.rounding, st.plates, D.act.map(l => { const x = state.lifts[l.id] || {}; return [x.barWeight, x.collarWeight, x.rounding, x.plates]; })];
+  }
+
+  function v185CycleStats(D){
+    const N = D.tl.length;
+    const activeLifts = D.act;
+    const filterLift = D.liftId || '';
+    const scopeLifts = filterLift ? activeLifts.filter(l => l.id === filterLift) : activeLifts;
+    const total = N * activeLifts.length;
+    let done = 0;
+    D.tl.forEach((wk, i) => {
+      activeLifts.forEach(l => { if (v17StateOf(D.tl, D.cur, D.hist, i, l.id) === 'done') done++; });
+    });
+
+    // 18.5.1: the streak is Home's "full weeks in a row": weeks before this one with every active lift done. It counted any
+    // week with one lift done, this week included, so the badge said "8-wk streak" over "5 full weeks in a row".
+    let streak = 0;
+    for (let i = Math.min(D.cur, N) - 1; i >= 0; i--){
+      if (activeLifts.length && activeLifts.every(l => v17StateOf(D.tl, D.cur, D.hist, i, l.id) === 'done')) streak++; else break;
+    }
+
+    // 18.5.1: the pace is the week's pace from Home's lifts row (lifts due against the days left in the program week). It
+    // said "Catch-up" once three sessions in past weeks were skipped, beside a lifts row that said "On pace".
+    let paceText = 'Complete', streakCls = '', daysLeft = 7;
+    if (D.cur < N){
+      let F = null;
+      try{ F = weeklyPlanFacts(); }catch(err){ console.error('v185 pace failed', err); }
+      paceText = (F && String(F.paceLabel || '').replace(/^[^A-Za-z]+/, '')) || 'On pace';
+      streakCls = (F && (F.paceCls === 'behind' || F.paceCls === 'tight')) ? 'warn' : /^Ready/.test(paceText) ? 'idle' : '';
+      if (F && Number.isFinite(F.daysLeft)) daysLeft = F.daysLeft;
+    }
+
+    // Estimated finish: the last day of week 16 if this program week runs its seven days and each week after takes seven
+    // (18.5.1: it gave the first day of week 16, and did not count the days of this week already used)
+    let estStr = '';
+    if (D.cur < N){
+      const end = new Date(); end.setHours(12, 0, 0, 0);
+      end.setDate(end.getDate() + (daysLeft - 1) + 7 * ((N - 1) - D.cur));
+      estStr = v18Md(end.getTime());
+    }
+
+    // Cycle tonnage moved (respecting lift spotlight if active)
+    let cycleTon = 0;
+    D.hist.forEach(h => {
+      if (filterLift && h.liftId !== filterLift) return;
+      cycleTon += v185UnitAmt(historyRowTonnage(h), h.units);
+    });
+
+    // Cycle TM gain total & per-lift breakdown
+    const liftGains = {};
+    scopeLifts.forEach(l => { liftGains[l.id] = 0; });
+    PROGRAM.waves.forEach(wv => {
+      const rows = v16WaveRecapData(wv, D.cycle);
+      rows.forEach(r => {
+        if (filterLift && r.id !== filterLift) return;
+        const amt = v185UnitAmt(r.amount || 0, r.units);
+        if (amt !== 0){
+          liftGains[r.id] = (liftGains[r.id] || 0) + amt;
+        }
+      });
+    });
+    const totalTmGain = Object.values(liftGains).reduce((a, b) => a + b, 0);
+    const gainParts = scopeLifts
+      .filter(l => Math.abs(liftGains[l.id] || 0) > 0.01)
+      .map(l => {
+        const g = Math.round(liftGains[l.id] * 1e6) / 1e6;   // 18.5.1: as the app writes TM changes (a 3.75 lb half step read +3.8)
+        const code = V17_CODE[l.id] || l.name.slice(0, 2).toUpperCase();
+        return code + (g > 0 ? '+' : '') + weightDigits(g);
+      });
+
+    // Per-wave completion progress (reflects scopeLifts)
+    const waves = PROGRAM.waves.map((wv, wi) => {
+      let wDone = 0, wTot = 4 * scopeLifts.length;
+      for (let k = 0; k < 4; k++){
+        const wkIdx = wi * 4 + k;
+        if (wkIdx >= N) continue;
+        scopeLifts.forEach(l => {
+          if (v17StateOf(D.tl, D.cur, D.hist, wkIdx, l.id) === 'done') wDone++;
+        });
+      }
+      const pct = wTot > 0 ? Math.round((wDone / wTot) * 100) : 0;
+      const testPct = Math.round((PROGRAM.testPct[wv] || 0) * 100);
+      return { wv, wi, startIdx: wi * 4, pct, testPct, color: V17_WAVE[wv] || 'var(--sky)' };
+    });
+
+    // Per-week tonnage & readiness arrays for Tonnage / Readiness modes
+    const weekTon = new Array(N).fill(0);
+    const weekRd = new Array(N).fill(null);
+    D.tl.forEach((wk, i) => {
+      let tSum = 0;
+      const rdVals = [];
+      D.hist.forEach(h => {
+        if (h.wave === wk.wave && h.phase === wk.phase && scopeLifts.some(l => l.id === h.liftId)){
+          tSum += v185UnitAmt(historyRowTonnage(h), h.units);
+          const rs = readinessScoreAnswered(h.readiness);
+          if (Number.isFinite(rs)) rdVals.push(rs);
+        }
+      });
+      weekTon[i] = tSum;
+      if (rdVals.length) weekRd[i] = rdVals.reduce((a, b) => a + b, 0) / rdVals.length;
+    });
+
+    const pctComplete = total > 0 ? Math.round((done / total) * 100) : 0;
+    return {
+      N, total, done, pctComplete, streak, paceText, streakCls, estStr,
+      cycleTon, totalTmGain, gainParts, waves, weekTon, weekRd
+    };
+  }
+
+  function v185LensStrip(D, S, sel){
+    if (_v185Mode !== 'tonnage' && _v185Mode !== 'readiness') return '';
+    const isRd = _v185Mode === 'readiness';
+    const vals = isRd ? S.weekRd : S.weekTon;
+    const maxVal = isRd ? 30 : Math.max(1, ...vals);
+    const selVal = (sel >= 0 && sel < vals.length) ? vals[sel] : null;
+    const selLabel = isRd
+      ? (selVal !== null ? 'W' + (sel + 1) + ' avg ' + readinessScoreText(selVal) + '/30' : 'W' + (sel + 1) + ' no check-in')
+      : ('W' + (sel + 1) + ': ' + v185FmtTon(selVal || 0));
+
+    const cols = D.tl.map((wk, i) => {
+      const v = vals[i];
+      const has = isRd ? (v !== null && v > 0) : (v > 0);
+      const hPct = has ? Math.max(16, Math.min(100, Math.round((v / maxVal) * 100))) : 12;
+      const title = isRd
+        ? ('Week ' + (i + 1) + ': ' + (has ? readinessScoreText(v) + '/30' : 'no readiness logged'))
+        : ('Week ' + (i + 1) + ': ' + v185FmtTon(v || 0));
+      return '<button type="button" class="v185-lens-c' + (isRd ? ' rd' : '') + (has ? ' has' : '') + (i === sel ? ' sel' : '') + '" data-v16-week="' + i + '" aria-label="' + escapeHtml(title) + '" title="' + escapeHtml(title) + '">'
+        + '<i style="height:' + hPct + '%"></i><em>' + (i + 1) + '</em></button>';
+    }).join('');
+
+    return '<div class="v185-lens">'
+      + '<div class="v185-lens-h"><b>' + (isRd ? 'Weekly readiness (avg / 30)' : 'Weekly tonnage logged') + '</b>'
+      + '<span class="' + (isRd ? 'rd' : '') + '">' + escapeHtml(selLabel) + '</span></div>'
+      + '<div class="v185-lens-g" role="group" aria-label="' + (isRd ? 'Weekly readiness bars' : 'Weekly tonnage bars') + '">' + cols + '</div></div>';
+  }
+
+  function v185WeekDetail(D, selIdx){
+    const N = D.tl.length;
+    const i = (Number.isInteger(selIdx) && selIdx >= 0 && selIdx < N) ? selIdx : (N - 1);
+    if (i < 0 || i >= N) return '';
+    const wk = D.tl[i], def = getPhaseDef(wk.wave, wk.phase), isCur = (D.cur < N && i === D.cur);
+    const ref = (D.liftId && isActiveLift(D.liftId)) ? D.liftId : (D.act[0] ? D.act[0].id : '');
+    const planned = ref ? plannedSets(ref, wk.wave, wk.phase, D.cycle) : [];
+    const counted = planned.filter(s => s.role !== 'ramp' && s.role !== 'leadin');
+    const hasPlus = planned.some(s => s.role === 'plus' || s.role === 'test');
+    const col = v17Col(wk);
+
+    // 1. SETS KPI
+    let setsNum, setsSub;
+    if (wk.phase === 'realization'){
+      setsNum = String((def.rampUp ? def.rampUp.length : 0) + 1);
+      setsSub = 'incl. test';
+    } else if (wk.phase === 'deload'){
+      setsNum = String(counted.length || 3);
+      setsSub = 'deload';
+    } else {
+      setsNum = String(counted.length);
+      setsSub = hasPlus ? 'incl. +' : 'work sets';
+    }
+
+    // 2. REPS KPI
+    let repsNum, repsSub;
+    if (wk.phase === 'realization'){
+      repsNum = PROGRAM.waveTargetReps[wk.wave] + '+';
+      repsSub = 'std test';
+    } else if (wk.phase === 'deload'){
+      repsNum = String(counted.reduce((a, s) => a + (n(s.targetReps) || 0), 0) || 15);
+      repsSub = '5/set';
+    } else {
+      const repSum = counted.reduce((a, s) => a + (n(s.targetReps) || 0), 0);
+      repsNum = repSum + (hasPlus ? '+' : '');
+      repsSub = (def.reps || '') + '/set';
+    }
+
+    // 3. PEAK TM KPI
+    // 18.5.1: written as the plan writes it (formatPercent, the v17.1 L12 rule): 67.5%, not 68%
+    const peakPct = wk.phase === 'realization'
+      ? (def.testPctTM || 0)
+      : planned.reduce((m, s) => Math.max(m, n(s.pctTM) || 0), 0);
+    const peakSub = wk.phase === 'accumulation' ? 'RIR 2–3'
+      : wk.phase === 'intensification' ? 'RIR 1–2'
+      : wk.phase === 'realization' ? 'All-out'
+      : 'Easy';
+
+    // 4. REST KPI
+    const rKey = wk.wave + '_' + wk.phase;
+    const rmx = state.settings.restMatrix ? state.settings.restMatrix[rKey] : undefined;
+    const restSec = Number.isFinite(rmx) ? rmx : (PROGRAM.defaultRestMatrix[rKey] || 0);
+    const restTxt = restSec > 0 ? formatDuration(restSec) : 'Open';
+    const restSub = wk.phase === 'realization' ? 'Test' : wk.phase === 'deload' ? 'Easy' : 'per set';   // 18.5.1: it said "Peak"
+
+    // Status pill for selected week (guard against D.cur >= N so no W17 ghost button appears)
+    const allDoneInWk = D.act.length > 0 && D.act.every(l => v17StateOf(D.tl, D.cur, D.hist, i, l.id) === 'done');
+    const backBtn = (D.cur < N && i !== D.cur) ? ('<button type="button" class="v185-back" data-v18="week:cur" aria-label="Back to week ' + (D.cur + 1) + '">W' + (D.cur + 1) + '</button>') : '';
+    let statusPill = '';
+    if (isCur){
+      statusPill = '<span class="v185-badge now">This week</span>';
+    } else if (i > D.cur){
+      statusPill = backBtn + '<span class="v185-badge">Upcoming</span>';
+    } else if (allDoneInWk){
+      statusPill = backBtn + '<span class="v185-badge done">Completed</span>';
+    } else {
+      statusPill = backBtn + '<span class="v185-badge past">Past</span>';
+    }
+
+    // 4-Lift Target Weight Row
+    const units = escapeHtml(unitLabel());
+    const liftCols = Math.max(1, D.act.length);
+    const wtCards = D.act.map(l => {
+      const code = V17_CODE[l.id] || l.name.slice(0, 2).toUpperCase();
+      const st = v17StateOf(D.tl, D.cur, D.hist, i, l.id);
+      let topW = v1851WeekTop(D.hist, wk, l.id);   // 18.5.1: the week's heaviest set across every entry of the lift, as on the graph
+      if (!(topW > 0)){
+        const lSets = plannedSets(l.id, wk.wave, wk.phase, D.cycle);
+        topW = lSets.reduce((m, x) => Math.max(m, n(x.weight) || 0), 0);
+      }
+      const isSelLift = D.liftId === l.id;
+      const wtStr = topW > 0 ? (escapeHtml(weightDigits(topW)) + ' ' + units) : '—';
+      const ariaLbl = (l.name || code) + ' ' + wtStr + (isSelLift ? ', spotlight active, tap to show all lifts' : ', tap to spotlight');
+      return '<button type="button" class="v185-wt' + (isSelLift ? ' sel' : '') + (st === 'done' ? ' done' : '') + '" data-v185="lift:' + escapeHtml(l.id) + '" aria-pressed="' + isSelLift + '" aria-label="' + escapeHtml(ariaLbl) + '">'
+        + '<span>' + escapeHtml(code) + (st === 'done' ? ' ✓' : '') + '</span>'
+        + '<b>' + wtStr + '</b></button>';
+    }).join('');
+
+    // Work Logged Card (with lift-labeled 4-segment bar + test countdown)
+    let lb = 0, setsDone = 0, liftsDone = 0, segs = '';
+    // D.hist is cycle-scoped; sum every session in this program week across active lifts, regardless of spotlight.
+    D.hist.forEach(h => {
+      if (h.wave === wk.wave && h.phase === wk.phase && D.act.some(l => l.id === h.liftId))
+        lb += v185UnitAmt(historyRowTonnage(h), h.units);
+    });
+    D.act.forEach(l => {
+      const st = v17StateOf(D.tl, D.cur, D.hist, i, l.id);
+      const code = V17_CODE[l.id] || l.name.slice(0, 2).toUpperCase();
+      setsDone += Math.min(counted.length, D.hist.reduce((t, x) => t + ((x.liftId === l.id && x.wave === wk.wave && x.phase === wk.phase) ? historyRowSets(x).length : 0), 0));
+      if (st === 'done') liftsDone++;
+      const spotCls = (D.liftId && D.liftId === l.id) ? ' spot' : '';
+      segs += '<div class="v185-log-seg' + (st === 'done' ? ' done' : '') + spotCls + '"><i class="' + st + '"></i><span>' + escapeHtml(code) + '</span></div>';
+    });
+
+    // Test countdown relative to selected week
+    let testNote = '';
+    if (wk.phase === 'realization'){
+      testNote = 'Test week';
+    } else if (wk.phase === 'deload'){
+      testNote = 'Deload week';
+    } else {
+      const nxtT = D.tl.findIndex((x, k) => k >= i && x.phase === 'realization');
+      if (nxtT >= 0){
+        const diff = nxtT - i;
+        testNote = diff === 1 ? 'Test next wk' : 'Test in ' + diff + ' wk';
+      }
+    }
+
+    const totalSets = counted.length * D.act.length;
+    const name = wk.wave + ' ' + (V18_PHASE[wk.phase] || wk.phase);
+    return '<div class="v185-wk" aria-live="polite">'
+      + '<div class="v185-wk-h"><h3>Week ' + (i + 1) + ', ' + escapeHtml(name) + '</h3><div class="v185-wk-r">' + statusPill + '</div></div>'
+      + '<div class="v185-kpis">'
+        + '<div class="v185-kpi"><b>' + escapeHtml(setsNum) + '</b><span>SETS</span><em>' + escapeHtml(setsSub) + '</em></div>'
+        + '<div class="v185-kpi"><b>' + escapeHtml(repsNum) + '</b><span>REPS</span><em>' + escapeHtml(repsSub) + '</em></div>'
+        + '<div class="v185-kpi"><b style="color:' + col + '">' + escapeHtml(formatPercent(peakPct)) + '</b><span>PEAK TM</span><em>' + escapeHtml(peakSub) + '</em></div>'
+        + '<div class="v185-kpi"><b>' + escapeHtml(restTxt) + '</b><span>REST</span><em>' + escapeHtml(restSub) + '</em></div>'
+      + '</div>'
+      + '<div class="v185-wtrow" style="grid-template-columns:repeat(' + liftCols + ',minmax(0,1fr))">' + wtCards + '</div>'
+      + '<div class="v185-log">'
+        + '<div class="v185-log-h"><b>Week ' + (i + 1) + ' work logged</b><div class="v185-log-r"><b>' + escapeHtml(Math.round(lb).toLocaleString()) + ' ' + units + '</b>' + (testNote ? '<span>' + escapeHtml(testNote) + '</span>' : '') + '</div></div>'
+        + '<div class="v185-log-bars" style="grid-template-columns:repeat(' + liftCols + ',minmax(0,1fr))" role="img" aria-label="' + liftsDone + ' of ' + D.act.length + ' lifts done">' + segs + '</div>'
+        + (setsDone > 0 ? '<div class="v185-log-meta"><span>' + setsDone + ' of ' + totalSets + ' work set' + (totalSets === 1 ? '' : 's') + ' · ' + liftsDone + ' of ' + D.act.length + ' lift' + (D.act.length === 1 ? '' : 's') + '</span></div>' : '')
+      + '</div>'
+      + '</div>';
+  }
+
+  function v185CycleHtml(D, uid, rawSel){
+    const S = v185CycleStats(D);
+    const sel = (Number.isInteger(rawSel) && rawSel >= 0 && rawSel < S.N) ? rawSel : Math.max(0, S.N - 1);
+    const units = escapeHtml(unitLabel());
+    const C = 2 * Math.PI * 19;
+    const dashOff = (C * (1 - S.pctComplete / 100)).toFixed(2);
+    const selWaveIdx = Math.floor(sel / 4);
+
+    const streakLabel = S.streak > 0
+      ? ('🔥 ' + S.streak + '-wk streak · ' + S.paceText)
+      : S.paceText;
+
+    const hdr = '<div class="v185-hdr">'
+      + '<div class="v185-hdr-l">'
+        + '<div class="v185-hdr-top"><h2>Cycle ' + D.cycle + '</h2><span class="v185-streak' + (S.streakCls ? ' ' + S.streakCls : '') + '">' + escapeHtml(streakLabel) + '</span></div>'
+        + '<p class="v185-sub">' + (D.cur >= S.N ? 'Complete' : 'Week ' + (D.cur + 1) + ' of ' + S.N) + ' · ' + S.done + '/' + S.total + ' sessions' + (S.estStr ? ' · Est. ' + escapeHtml(S.estStr) : '') + '</p>'
+      + '</div>'
+      + '<div class="v185-ring" role="img" aria-label="Cycle completion ' + S.pctComplete + ' percent">'
+        + '<svg viewBox="0 0 44 44" aria-hidden="true"><circle class="v185-ring-bg" cx="22" cy="22" r="19"/><circle class="v185-ring-fg" cx="22" cy="22" r="19" stroke-dasharray="' + C.toFixed(2) + '" stroke-dashoffset="' + dashOff + '"/></svg>'
+        + '<span>' + S.pctComplete + '%</span>'
+      + '</div>'
+      + '</div>';
+
+    const tmGainRounded = Math.round(S.totalTmGain * 1e6) / 1e6;   // 18.5.1: 13.75 read 13.8
+    const tmGainStr = tmGainRounded > 0
+      ? ('+' + weightDigits(tmGainRounded) + ' ' + units + ' ↑')
+      : tmGainRounded < 0
+        ? (weightDigits(tmGainRounded) + ' ' + units)
+        : ('+0 ' + units);
+    const strip = '<div class="v185-strip">'
+      + '<div class="v185-strip-l"><b>' + escapeHtml(v185FmtTon(S.cycleTon)) + '</b><span>moved</span></div>'
+      + '<div class="v185-strip-r"><span class="lbl">TM</span> <span class="gain">' + escapeHtml(tmGainStr) + '</span>'
+      + (S.gainParts.length ? ' <span class="brk">· ' + escapeHtml(S.gainParts.join(' ')) + '</span>' : '') + '</div>'
+      + '</div>';
+
+    const waveRow = '<div class="v185-waves" role="group" aria-label="Cycle waves">'
+      + S.waves.map(w => '<button type="button" class="v185-wv' + (w.wi === selWaveIdx ? ' sel' : '') + '" style="--wc:' + w.color + '" data-v185="wave:' + w.startIdx + '" aria-pressed="' + (w.wi === selWaveIdx) + '" aria-label="' + escapeHtml(w.wv + ' wave: test at ' + w.testPct + '% of TM, ' + w.pct + '% of sessions done') + '">'
+        + '<div class="v185-wv-t"><b style="color:' + w.color + '">' + escapeHtml(w.wv) + '</b><span>' + w.testPct + '%</span></div>'
+        + '<div class="v185-wv-bar"><i style="width:' + w.pct + '%"></i></div>'
+        + '</button>').join('')
+      + '</div>';
+
+    const modes = [['sets', 'Sets'], ['tonnage', 'Tonnage'], ['readiness', 'Readiness']];
+    const lifts = [['', 'All']].concat(D.act.map(l => [l.id, V17_CODE[l.id] || l.name.slice(0, 2).toUpperCase()]));
+    const ctrl = '<div class="v185-ctrl">'
+      + '<div class="v185-seg" role="group" aria-label="Chart telemetry mode">'
+      + modes.map(m => '<button type="button" data-v185="mode:' + m[0] + '" aria-pressed="' + (_v185Mode === m[0]) + '">' + m[1] + '</button>').join('')
+      + '</div>'
+      + '<div class="v185-lifts" role="group" aria-label="Lift spotlight filter">'
+      + lifts.map(l => '<button type="button" data-v185="lift:' + escapeHtml(l[0]) + '" aria-pressed="' + (D.liftId === l[0]) + '">' + escapeHtml(l[1]) + '</button>').join('')
+      + '</div>'
+      + '</div>';
+
+    const keyHtml = v17MapKey(D).replace('Top set, % of TM', D.liftId ? ('Top set, ' + units) : 'Top set, % of TM');
+    return hdr + strip + waveRow + ctrl
+      + v17MapSvg(D, { sel, tap:true, home:true, anim:_v17Anim, uid })
+      + keyHtml
+      + v185LensStrip(D, S, sel)
+      + v185WeekDetail(D, sel)
+      + v17NextTest(D);
+  }
+
+  document.addEventListener('click', ev => {
+    const b = ev.target && ev.target.closest && ev.target.closest('[data-v185]');
+    if (!b) return;
+    const act = b.getAttribute('data-v185') || '';
+    v17Safe('v185 ' + act, () => {
+      if (act.indexOf('mode:') === 0){
+        const m = act.slice(5);
+        if (m === 'sets' || m === 'tonnage' || m === 'readiness'){
+          _v185Mode = m;
+          _v17Sig.homeMap = null;
+          v17HomeMap();
+          const nb = document.querySelector('#v17MapCard [data-v185="mode:' + m + '"]');
+          if (nb) nb.focus({ preventScroll:true });
+        }
+      } else if (act.indexOf('lift:') === 0){
+        const id = act.slice(5);
+        _v185Lift = (id && _v185Lift === id) ? '' : id;
+        _v17Sig.homeMap = null;
+        v17HomeMap();
+        const nb = document.querySelector('#v17MapCard .v185-lifts [data-v185="lift:' + _v185Lift + '"]');
+        if (nb) nb.focus({ preventScroll:true });
+      } else if (act.indexOf('wave:') === 0){
+        const startIdx = Number(act.slice(5));
+        if (Number.isInteger(startIdx) && startIdx >= 0){
+          const cur = currentMicrocycle().index;
+          const targetIdx = (cur >= startIdx && cur < startIdx + 4) ? cur : startIdx;
+          v18PickWeek(targetIdx);
+          const nb = document.querySelector('#v17MapCard [data-v185="wave:' + startIdx + '"]');
+          if (nb) nb.focus({ preventScroll:true });
+        }
+      }
+    });
+  });
+
   boot()
     .then(() => maybeSyncFormulaAccessories('boot').catch(() => {}))
-    .catch(err => { console.error(err); alert('Boot failed — check console.'); });
+    .catch(err => {   // 18.5.1: 'b' is the error tone ('e' is none), and if the toast cannot show, an alert says it
+      console.error('Boot failed:', err);
+      try{ toast('Boot failed — check console.', 'b'); }catch(_){ try{ alert('Boot failed — check console.'); }catch(__){} }
+    });
 })();
 </script>
 

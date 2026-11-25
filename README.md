@@ -1,6 +1,6 @@
 # Juggernaut
 
-Current release: **Juggernaut 18.4.1**. [Release notes](CHANGELOG-Juggernaut-18.4.1.md). Previous release: [18.4.0](CHANGELOG-Juggernaut-18.4.0.md).
+Current release: **Juggernaut 18.5.1**. [Release notes](CHANGELOG-Juggernaut-18.5.1.md). Previous release: [18.4.1](CHANGELOG-Juggernaut-18.4.1.md).
 
 ## Historical release: Juggernaut 2.4.1
 
