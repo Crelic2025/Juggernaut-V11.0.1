@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut v18 — 18.5.1</title>
+<title>Juggernaut v18 — 18.5.2</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -3939,20 +3939,7 @@ html[data-theme="light"] .v17m-cap{fill:var(--text2);filter:none}
 .v185-lifts button{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:11px;line-height:15px;font-weight:700;padding:4px 8px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s,background .15s}
 .v185-lifts button[aria-pressed="true"]{border-color:var(--sky);background:var(--blue-dim);color:var(--text)}
 
-/* Mode Telemetry Lens Strip (shown under existing graph in Tonnage or Readiness mode, zero changes to SVG layout) */
-.v185-lens{padding:10px 11px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-variant-numeric:tabular-nums}
-.v185-lens-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
-.v185-lens-h b{font-size:12px;font-weight:800;color:var(--text)}
-.v185-lens-h span{font-size:11.5px;font-weight:700;color:var(--mint)}
-.v185-lens-h span.rd{color:var(--sky)}
-.v185-lens-g{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px;align-items:end;height:36px}
-.v185-lens-c{appearance:none;border:none;background:transparent;padding:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;cursor:pointer}
-.v185-lens-c i{display:block;width:100%;min-height:3px;border-radius:3px;background:var(--panel3);transition:background .15s}
-.v185-lens-c.has i{background:var(--mint);opacity:.78}
-.v185-lens-c.rd.has i{background:var(--sky);opacity:.82}
-.v185-lens-c.sel i{opacity:1;box-shadow:0 0 0 1.5px var(--text)}
-.v185-lens-c em{font-style:normal;font-size:8.5px;line-height:10px;font-weight:700;color:var(--muted)}
-.v185-lens-c.sel em{color:var(--text);font-weight:800}
+/* 18.5.2: the strip of bars under the key is gone. The lenses that replace it are styled at the end of this block. */
 
 /* Selected Week Telemetry Panel */
 .v185-wk{padding:14px 2px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
@@ -4034,6 +4021,179 @@ html[data-theme="light"] .v185-kpi b[style*="#B7A6FF"]{color:#5b47c4 !important}
   .v185-kpi b{font-size:16.5px}
   .v185-wt b{font-size:12px}
   .v185-seg button{padding:5px 8px;font-size:11px}
+}
+
+/* ═══════════════ Juggernaut 18.5.2: Cycle Map telemetry (lenses, pins, read-out) ═══════════════
+   The tiers under the map are drawn in the map's units (a 388-wide viewBox), so their columns are the map's columns at any width. */
+.v1852-read{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.v1852-read-l{min-width:0;display:flex;flex-direction:column;gap:1px}
+.v1852-read-l b{display:flex;align-items:center;gap:7px;font-size:12.5px;line-height:17px;font-weight:800;color:var(--text)}
+.v1852-read-l b i{width:8px;height:8px;border-radius:50%;flex:none}
+.v1852-read-l span{font-size:11.5px;line-height:16px;font-weight:600;color:var(--text2)}
+.v1852-chip{flex:none;padding:4px 10px;border-radius:999px;font-size:11.5px;line-height:16px;font-weight:700;white-space:nowrap;color:var(--sky);background:var(--blue-dim);border:1px solid var(--blue-mid)}
+.v1852-chip.mint{color:var(--mint);background:rgba(62,224,161,.11);border-color:rgba(62,224,161,.28)}
+.v1852-chip.warn{color:var(--warn);background:rgba(255,183,3,.11);border-color:rgba(255,183,3,.28)}
+.v1852-chip.bad{color:var(--bad);background:rgba(255,68,88,.11);border-color:rgba(255,68,88,.32)}
+.v1852-chip.off{color:var(--text2);background:var(--panel3);border-color:var(--line2)}
+
+.v1852-view{display:flex;flex-direction:column;gap:6px}
+.v1852-stack{position:relative;isolation:isolate}
+.v1852-low{position:relative}
+.v1852-svg{display:block;width:100%;height:auto;overflow:visible;font-family:var(--font)}
+.v1852-svg text{font-variant-numeric:tabular-nums}
+.v185-lens.v1852-plot{position:relative;padding:0;border:none;border-radius:0;background:none}
+.v1852-plot::before{content:"";position:absolute;z-index:-1;left:6.959%;right:2.835%;top:9.783%;bottom:5.435%;border-radius:6px;background:#080C16;opacity:.7}   /* behind the week band, which is the map's own */
+.v1852-taps{position:absolute;inset:0}
+.v1852-taps button{position:absolute;top:0;height:100%;min-height:0;padding:0;margin:0;border:none;background:transparent;border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.v1852-taps button:focus-visible{outline:2px solid var(--sky);outline-offset:1px}
+
+.v1852-ax{font-size:10px;font-weight:700;fill:var(--muted)}
+.v1852-cap{font-size:9px;font-weight:800;letter-spacing:.02em}
+.v1852-grid{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 3;opacity:.8}
+.v1852-z.hi{fill:var(--mint);opacity:.13}
+.v1852-z.lo{fill:var(--warn);opacity:.13}
+.v1852-z.vlo{fill:var(--bad);opacity:.16}
+.v1852-zl{stroke-width:1;stroke-dasharray:2 3;opacity:.7}
+.v1852-zl.hi{stroke:var(--mint)}
+.v1852-zl.lo{stroke:var(--warn)}
+.v1852-zl.vlo{stroke:var(--bad)}
+.v1852-zt{font-size:9.5px;font-weight:700;paint-order:stroke;stroke:var(--panel);stroke-width:3px;stroke-linejoin:round}
+.v1852-zt.hi{fill:var(--mint)}
+.v1852-zt.lo{fill:var(--warn)}
+.v1852-zt.vlo{fill:var(--bad)}
+.v1852-zt.mid{fill:var(--sky)}
+.v1852-whisk{stroke:var(--sky);stroke-width:3;stroke-linecap:round;opacity:.38}
+.v1852-ln{fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.v1852-ln.sky{stroke:var(--sky)}
+.v1852-ln.mint{stroke:var(--mint);stroke-width:2.4}
+.v1852-ln.fut{stroke:var(--mint);stroke-width:1.8;stroke-dasharray:1 4.5;opacity:.85}
+.v1852-ln.link{stroke:var(--text2);stroke-width:1.4;stroke-dasharray:3 3;opacity:.8}
+.v1852-dot{fill:var(--sky);stroke:var(--panel);stroke-width:1.2}
+.v1852-dot.on{stroke-width:1.6}
+.v1852-dot.hi,.v1852-dot.tm{fill:var(--mint)}
+.v1852-dot.lo{fill:var(--warn)}
+.v1852-dot.vlo{fill:var(--bad)}
+.v1852-dia{fill:var(--text);stroke:var(--text);stroke-width:1.6;stroke-linejoin:round}
+.v1852-dia.lower{fill:var(--panel)}
+.v1852-val{font-size:11px;font-weight:800;fill:var(--text);paint-order:stroke;stroke:var(--panel);stroke-width:3.5px;stroke-linejoin:round}
+.v1852-val.mint{font-size:10px;fill:var(--mint)}
+.v1852-bar{opacity:.82}
+.v1852-bar.on{opacity:1}
+.v1852-bar.stress{fill:var(--sky)}
+.v1852-bar.ton{fill:var(--mint)}
+.v1852-bar.dl{fill:#B7A6FF}
+.v1852-tick{fill:var(--text)}
+.v1852-plan{fill:none;stroke-width:1.3;stroke-dasharray:2 2.5;opacity:.75}
+.v1852-plan.stress{stroke:var(--sky)}
+.v1852-plan.ton{stroke:var(--mint)}
+.v1852-plan.dl{stroke:#B7A6FF}
+.v1852-wr{fill:var(--sky);opacity:.10}
+
+.v1852-p-raise{fill:var(--mint)}
+.v1852-p-pend{fill:none;stroke:var(--warn);stroke-width:1.7;stroke-linejoin:round}
+.v1852-p-cut,.v1852-p-fire{font-size:10px;font-weight:800;font-family:var(--font);font-variant-numeric:tabular-nums}
+.v1852-p-cut{fill:var(--bad)}
+.v1852-p-fire{fill:var(--warn)}
+.v1852-p-part{fill:none;stroke:var(--text2);stroke-width:1.4}
+.v1852-p-partf{fill:var(--text2)}
+.v1852-p-weak{fill:none;stroke:var(--sky);stroke-width:1.7}
+.v1852-p-weakd{fill:var(--sky)}
+.v1852-p-watch{fill:none;stroke:var(--warn);stroke-width:1.6;stroke-linejoin:round}
+.v1852-p-watchf{fill:var(--warn)}
+.v1852-p-more{fill:var(--text2)}
+
+/* the lens caption: its name, what it covers, the picked week's value */
+.v185-lens-h{display:flex;align-items:baseline;gap:8px;margin:0;padding:0 2px;font-variant-numeric:tabular-nums}
+.v185-lens-h b{flex:none;font-size:12px;line-height:16px;font-weight:800;color:var(--text)}
+.v185-lens-h em{flex:1 1 auto;min-width:0;font-style:normal;font-size:11px;line-height:16px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v185-lens-h span{flex:none;margin-left:auto;font-size:11.5px;line-height:16px;font-weight:800;color:var(--mint);white-space:nowrap}
+.v185-lens-h span.rd{color:var(--sky)}
+
+/* the lens switch: four lenses and Off */
+.v185-ctrl .v185-seg button{padding:5px 8px}
+.v185-ctrl .v185-seg button[data-v185="mode:sets"]{min-width:44px}
+@media (max-width:389px){
+  .v185-ctrl .v185-seg{display:flex;width:100%}
+  .v185-ctrl .v185-seg button{flex:1 1 auto;min-width:0;padding:5px 3px}
+}
+
+/* week steppers either side of the wave buttons */
+.v185-waves.v1852-thumb{grid-template-columns:44px repeat(4,minmax(0,1fr)) 44px;gap:6px}
+.v1852-step{appearance:none;min-width:0;padding:0;border-radius:13px;border:1.5px solid var(--line);background:var(--panel2);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.v1852-step:disabled{opacity:.38;cursor:default}
+.v1852-thumb .v185-wv{padding:8px 8px 9px;justify-content:center;gap:7px}
+.v17-key .v1852-k svg{color:inherit}
+
+/* week section */
+.v185-kpi b.mint{color:var(--mint)}
+.v185-kpi b.warn{color:var(--warn)}
+.v185-kpi b.bad{color:var(--bad)}
+.v185-kpi b.dim{color:var(--text2)}
+.v185-kpi em.warn{color:var(--warn)}
+.v185-kpi em.bad{color:var(--bad)}
+.v185-wt>small{font-size:10.5px;line-height:13px;font-weight:600;color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.v185-wt>small.warn{color:var(--warn)}
+.v185-wt>small i{font-style:normal}
+.v185-wt.v1852-bl{display:grid;grid-template-columns:58px minmax(0,1fr) 84px;align-items:center;gap:10px;padding:9px 10px;text-align:left}
+.v1852-bl i{font-style:normal}
+.v1852-bl-w{display:flex;flex-direction:column;gap:3px;min-width:0}
+.v1852-bl-t{position:relative;display:block;height:36px}
+.v1852-bl-t>i{position:absolute;display:block}
+.v1852-bl-t>.bg{left:0;right:0;top:6px;height:10px;border-radius:5px;background:var(--panel3)}
+.v1852-bl-t>.fill{left:0;top:6px;height:10px;border-radius:5px;background:var(--mint)}
+.v1852-bl-t>.tk{top:1px;width:2px;height:20px;margin-left:-1px;background:var(--text)}
+.v1852-bl-t>.tk.up{background:var(--warn)}
+.v1852-bl-t>.lb{top:23px;font-size:9.5px;line-height:12px;font-weight:700;color:var(--text2);white-space:nowrap}
+.v1852-bl-t>.lb.up{color:var(--warn)}
+.v1852-bl-r{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:right}
+.v1852-bl-r strong{font-size:13px;line-height:17px;font-weight:800;color:var(--text);white-space:nowrap}
+.v1852-bl-r small{font-size:11px;line-height:14px;font-weight:700;color:var(--muted)}
+.v1852-bl-r small.mint{color:var(--mint)}
+.v1852-bl-r small.warn{color:var(--warn)}
+.v1852-notes{display:flex;flex-direction:column;gap:7px}
+.v1852-note{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-size:12px;line-height:17px;font-weight:600;color:var(--text2)}
+.v1852-note.warn{background:rgba(255,183,3,.07);border-color:rgba(255,183,3,.28)}
+.v1852-note svg{flex:none;margin-top:1.5px;overflow:visible}
+.v1852-note p{margin:0;min-width:0}
+.v1852-note b{font-weight:700;color:var(--text)}
+.v1852-note.watch b{font-weight:800;color:var(--warn)}
+
+/* The light theme left the map's top-set line and two marks of its key white on the white card. Dark is as it was. */
+html[data-theme="light"] .v17m-line{stroke:var(--text)}
+html[data-theme="light"] .v17-key svg{color:var(--text)}
+html[data-theme="light"] .v17-key .k-cap{background:var(--text2)}
+html[data-theme="light"] .v1852-plot::before{background:var(--panel2);opacity:1}
+html[data-theme="light"] .v1852-chip.mint{color:#0b6b4a;background:rgba(15,143,99,.10);border-color:rgba(15,143,99,.28)}
+html[data-theme="light"] .v1852-chip.warn{color:#8f5208;background:rgba(180,105,14,.10);border-color:rgba(180,105,14,.28)}
+html[data-theme="light"] .v1852-chip.bad{background:rgba(200,40,58,.08);border-color:rgba(200,40,58,.3)}
+html[data-theme="light"] .v1852-note.warn{background:rgba(180,105,14,.08);border-color:rgba(180,105,14,.28)}
+html[data-theme="light"] .v1852-note.watch b,
+html[data-theme="light"] .v185-kpi b.warn,
+html[data-theme="light"] .v185-kpi em.warn,
+html[data-theme="light"] .v185-wt>small.warn,
+html[data-theme="light"] .v1852-bl-r small.warn,
+html[data-theme="light"] .v1852-bl-t>.lb.up{color:#8f5208}
+html[data-theme="light"] .v185-kpi b.mint,
+html[data-theme="light"] .v1852-bl-r small.mint{color:#0b6b4a}
+html[data-theme="light"] .v1852-zt.hi,
+html[data-theme="light"] .v1852-val.mint{fill:#0b6b4a}
+html[data-theme="light"] .v1852-zt.lo{fill:#8f5208}
+html[data-theme="light"] .v1852-p-fire{fill:#8f5208}
+html[data-theme="light"] .v1852-bar{opacity:1}
+html[data-theme="light"] .v1852-ln.fut{opacity:1}
+html[data-theme="light"] .v1852-bar.dl{fill:#7c68d8}
+html[data-theme="light"] .v1852-plan.dl{stroke:#5b47c4}
+@media (max-width:374px){
+  .v185-ctrl .v185-seg button{padding:5px 2px;font-size:10px}
+  .v185-ctrl .v185-seg button[data-v185="mode:sets"]{min-width:38px}
+  .v185-waves.v1852-thumb{grid-template-columns:38px repeat(4,minmax(0,1fr)) 38px;gap:5px}
+  .v1852-thumb .v185-wv{padding:8px 6px 9px}
+  .v185-lens-h em{display:none}
+  .v185-wt>small i{display:none}
+  .v1852-zt{display:none}
+  .v1852-chip{padding:4px 8px;font-size:11px}
+  .v185-wt.v1852-bl{grid-template-columns:58px minmax(0,1fr) 74px;gap:7px;padding:9px 8px}
+  .v1852-bl-r small{font-size:10px}
 }
 
 </style>
@@ -4932,7 +5092,24 @@ html[data-theme="light"] .v185-kpi b[style*="#B7A6FF"]{color:#5b47c4 !important}
 
   <!-- WHAT CHANGED: one closed row (18.1). The note for each version is unchanged inside it. -->
   <details id="guide-changes" class="g181-changes">
-  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.5.1 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.5.2 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v1852">v18.5.2</h2><span class="g181-gist">Cycle map: lenses, pins and a week read-out</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>The cycle map says more about each week. The drawing is the same one, and so are the weights, how they progress, the program and what goes to Hermes. Nothing new is saved: it is all read from the workouts already logged.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Lenses under the map.</strong> Readiness, Strength, Stress and Tonnage, one at a time, drawn in the map’s own week columns. Off shows the map alone. They replace the Sets / Tonnage / Readiness switch and the row of bars under the key.</li>
+      <li><strong>Readiness.</strong> Your check-in score each week against the lines the app acts on: 23 and up an extra set is offered, under 15 a set is cut, under 8 two are. With all lifts shown, the dot is the week’s average and the faint bar runs from the lowest check-in to the highest.</li>
+      <li><strong>Strength.</strong> The training max the week ran on, stepping up after each test. With one lift picked, the diamonds are the tested max (hollow on the 10s and 8s tests, which estimate it more loosely).</li>
+      <li><strong>Stress.</strong> A rule of thumb called INOL: each set adds its reps divided by (100 − its percent of your max), over work, “+”, test and deload sets. Around 0.4 to 1.0 a lift is a normal working day. The white tick is what the plan called for; dashed bars are weeks still to come.</li>
+      <li><strong>Tonnage.</strong> Weight times reps logged each week, with the plan marked the same way.</li>
+      <li><strong>Pins.</strong> A row under the lift grid marks what happened that week: max raised, a raise waiting for your OK, a set cut for readiness, an extra set taken, a session ended early, a weak point flagged, and on this week the deload check when it is at Watch or higher. Only the pins on your map are in the key.</li>
+      <li><strong>Read-out and week buttons.</strong> The bar above the map says what the picked week was, or will be. The arrows either side of the wave buttons move one week at a time.</li>
+      <li><strong>Week section.</strong> Readiness, top RPE and stress for the week; sets done under each weight; a line for each thing a pin marks. On a test week each lift is a bar: reps done, the standard, and the reps that raise the max.</li>
+    </ul>
+  </div>
+  </details>
 
   <details class="g181-ch">
   <summary><h2 id="guide-v1851">v18.5.1</h2><span class="g181-gist">Fixes to the cycle map card</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -5853,7 +6030,7 @@ html[data-theme="light"] .v185-kpi b[style*="#B7A6FF"]{color:#5b47c4 !important}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '18.5.1';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.5.2';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -18760,7 +18937,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const D = v17MapData(liftFilter); if (!D){ box.hidden = true; return; }
     const sel = v18MapSel(D);
     const sig = JSON.stringify([D.cur, D.cycle, D.hist.length, state.program.completion, selectedLiftId(), D.act.map(l => trainingMax(state.lifts[l.id])), D.gains, _v18Week, unitLabel(), _v185Mode, liftFilter, state.settings.restMatrix || 0,
-      v1851PlanKey(D), v17Ymd(Date.now()), _previewWeekIdx]);   // 18.5.1: also the bar, plates and rounding the planned weights are built from (a change in Settings left the weight cards on the old weight), and the day (pace, finish date)
+      v1851PlanKey(D), v17Ymd(Date.now()), _previewWeekIdx, v1852SigKey(D)]);   // 18.5.1: also the bar, plates and rounding the planned weights are built from (a change in Settings left the weight cards on the old weight), and the day (pace, finish date)
     v17Once('homeMap', sig, () => {
       box.innerHTML = v185CycleHtml(D, 'hm', sel);
       _v17Anim = false;
@@ -19250,7 +19427,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (wkb){   // v16's own handler has just moved the week; redraw, and keep the keyboard where it was
         const onMap = !!wkb.closest('.v17-taps'), i = wkb.getAttribute('data-v16-week');
         if (wkb.closest('#v17MapCard')){   // v18: a week tapped on Home's map shows that week's summary under the map and stays on Home (2.2 to 2.4 opened Program)
-          v18PickWeek(Number(i));
+          v18PickWeek(Number(i), wkb.closest('.v1852-taps') ? '.v1852-taps' : '');   // 18.5.2: a tap under the map leaves the keyboard under the map
           return;
         }
         v17Safe('program', v17Program);
@@ -20702,11 +20879,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
   /* ── the cycle map: the week picked on Home, and its summary under the key ── */
   function v18MapSel(D){ const N = D.tl.length; return (_v18Week !== null && _v18Week >= 0 && _v18Week < N) ? _v18Week : (D.cur < N ? D.cur : -1); }
-  function v18PickWeek(i){
+  function v18PickWeek(i, host){   // 18.5.2: host, the row of week buttons the tap came from (the map's own when not given)
     const N = buildTimeline().length, cur = currentMicrocycle().index;
     _v18Week = (Number.isInteger(i) && i >= 0 && i < N && i !== cur) ? i : null;
     v17Safe('home map', v17HomeMap);
-    const sel = _v18Week === null ? cur : _v18Week, nb = document.querySelector('#v17MapCard .v17-taps [data-v16-week="' + sel + '"]'); if (nb) nb.focus({ preventScroll:true });
+    const sel = _v18Week === null ? cur : _v18Week, at = '[data-v16-week="' + sel + '"]';
+    const nb = (host ? document.querySelector('#v17MapCard ' + host + ' ' + at) : null) || document.querySelector('#v17MapCard .v17-taps ' + at); if (nb) nb.focus({ preventScroll:true });
   }
   function v18SetChips(sets, phase){
     if (!sets || !sets.length) return '';
@@ -21494,7 +21672,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
 
   /* ═══════════════ Juggernaut 18.5.0: Cycle Map Full Telemetry Engine (graph layout untouched) ═══════════════ */
-  let _v185Mode = 'sets';   // 'sets' | 'tonnage' | 'readiness'
+  let _v185Mode = 'readiness';   // 18.5.2: the lens under the map: 'readiness' | 'strength' | 'stress' | 'tonnage', or 'sets' for none (Off). Not saved.
   let _v185Lift = '';       // '' (All) | 'squat' | 'bench' | 'deadlift' | 'ohp'
 
   function v185FmtTon(ton){
@@ -21623,37 +21801,493 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     };
   }
 
-  function v185LensStrip(D, S, sel){
-    if (_v185Mode !== 'tonnage' && _v185Mode !== 'readiness') return '';
-    const isRd = _v185Mode === 'readiness';
-    const vals = isRd ? S.weekRd : S.weekTon;
-    const maxVal = isRd ? 30 : Math.max(1, ...vals);
-    const selVal = (sel >= 0 && sel < vals.length) ? vals[sel] : null;
-    const selLabel = isRd
-      ? (selVal !== null ? 'W' + (sel + 1) + ' avg ' + readinessScoreText(selVal) + '/30' : 'W' + (sel + 1) + ' no check-in')
-      : ('W' + (sel + 1) + ': ' + v185FmtTon(selVal || 0));
+  /* ═══════════════ Juggernaut 18.5.2: Cycle Map telemetry: lenses, pins and the week read-out ═══════════════
+     Built around the illustration, never inside it: v17MapSvg, v17MapData and v17MapKey are as they were. Under the map,
+     in the map's own sixteen columns, come a row of pins (what happened that week) and one lens at a time (readiness,
+     strength, stress, tonnage). Everything is read from the saved history and the plan; nothing new is stored. */
+  const V1852_LENSES = [['readiness', 'Readiness'], ['strength', 'Strength'], ['stress', 'Stress'], ['tonnage', 'Tonnage']];
+  const V1852_PIN_ORDER = ['watch', 'cut', 'pending', 'weak', 'partial', 'fire', 'raise'];   // which pins a crowded week keeps
+  const V1852_PIN_KEY = [['raise', 'Max raised'], ['pending', 'Raise waiting'], ['cut', 'Sets cut'], ['fire', 'Extra set'], ['partial', 'Ended early'], ['weak', 'Weak point'], ['watch', 'Deload check']];
+  const V1852_PINS_H = 30, V1852_PLOT_H = 92, V1852_YT = 12, V1852_YB = 84;   // in the map's units (its viewBox is 388 wide)
 
-    const cols = D.tl.map((wk, i) => {
-      const v = vals[i];
-      const has = isRd ? (v !== null && v > 0) : (v > 0);
-      const hPct = has ? Math.max(16, Math.min(100, Math.round((v / maxVal) * 100))) : 12;
-      const title = isRd
-        ? ('Week ' + (i + 1) + ': ' + (has ? readinessScoreText(v) + '/30' : 'no readiness logged'))
-        : ('Week ' + (i + 1) + ': ' + v185FmtTon(v || 0));
-      return '<button type="button" class="v185-lens-c' + (isRd ? ' rd' : '') + (has ? ' has' : '') + (i === sel ? ' sel' : '') + '" data-v16-week="' + i + '" aria-label="' + escapeHtml(title) + '" title="' + escapeHtml(title) + '">'
-        + '<i style="height:' + hPct + '%"></i><em>' + (i + 1) + '</em></button>';
-    }).join('');
+  function v1852Geo(N){   // the columns v17MapSvg draws in
+    const W = 388, gl = 31, g1 = 5, g2 = 14, bw = Math.floor((W - gl - 12 * g1 - 3 * g2) / 16);
+    const xs = Array.from({ length:N }, (_, i) => gl + i * (bw + g1) + Math.floor(i / 4) * (g2 - g1));
+    const edge = (i, side) => side < 0 ? xs[i] - (i ? (i % 4 === 0 ? g2 : g1) / 2 : 3) : xs[i] + bw + (i < N - 1 ? (i % 4 === 3 ? g2 : g1) / 2 : 3);
+    return { W, gl, bw, xs, edge, cx:i => xs[i] + bw / 2, x0:xs[0] - 4, x1:xs[N - 1] + bw + 4 };
+  }
+  function v1852F(v){ return Math.round(v * 10) / 10; }
+  function v1852Wt(x){ return weightDigits(Math.round(x * 1e6) / 1e6); }   // as the app writes a weight: 3.75 stays 3.75
+  function v1852Big(x){ const v = Number(v1852Wt(x)); return Number.isFinite(v) ? v.toLocaleString(undefined, { maximumFractionDigits:2 }) : '—'; }
+  function v1852Code(l){ return V17_CODE[l.id] || String(l.name || '').slice(0, 2).toUpperCase(); }
+  function v1852Rpe(x){ return Number.isInteger(x) ? String(x) : x.toFixed(1); }
+  function v1852Zone(v){ return v < 8 ? 'vlo' : v < 15 ? 'lo' : v >= 23 ? 'hi' : 'mid'; }   // the lines the app acts on (readinessSetPlan)
 
-    return '<div class="v185-lens">'
-      + '<div class="v185-lens-h"><b>' + (isRd ? 'Weekly readiness (avg / 30)' : 'Weekly tonnage logged') + '</b>'
-      + '<span class="' + (isRd ? 'rd' : '') + '">' + escapeHtml(selLabel) + '</span></div>'
-      + '<div class="v185-lens-g" role="group" aria-label="' + (isRd ? 'Weekly readiness bars' : 'Weekly tonnage bars') + '">' + cols + '</div></div>';
+  // Stress: INOL, a rule of thumb. One set adds its reps over (100 − % of the max); the TM is 90% of the max.
+  // Counted on the sets the tonnage counts (work, "+", test, deload), never on ramp or lead-in sets.
+  function v1852Inol(reps, pctTM){
+    const r = n(reps), p = n(pctTM);
+    return (r > 0 && p > 0) ? r / Math.max(5, 100 - 90 * p) : 0;
+  }
+  function v1852RaiseAt(tm, weight, std, lower){   // the fewest reps that raise the max, by the app's own rule
+    if (!(tm > 0) || !(weight > 0) || !std) return 0;
+    for (let r = std + 1; r <= std + TM_RULE.maxExtraReps; r++) if (bookTmUpdate(tm, weight, r, std, lower).amount > 0) return r;
+    return 0;
+  }
+  function v1852DeloadCheck(D){   // today's deload check, shown on the current week under the rule that shows the banner
+    const none = { show:false, a:null, label:'' };
+    if (D.cur >= D.tl.length) return none;
+    let a = null;
+    try{ a = computeDeloadAssessment(); }catch(_){ return none; }
+    if (!a || !a.severity || a.severity === 'none' || deloadBannerSuppressed()) return none;
+    return { show:true, a, label:({ watch:'Watch', caution:'Caution', deload:'Deload suggested' })[a.severity] || 'Watch' };
   }
 
-  function v185WeekDetail(D, selIdx){
+  // One week across some lifts: what the lenses, the pins and the week section all read.
+  function v1852WeekRow(D, X, i, lifts){
+    const wk = D.tl[i], wi = PROGRAM.waves.indexOf(wk.wave), u = unitLabel();
+    const cs = lifts.map(l => ({ l, c:X.cell[l.id][i] })), on = cs.filter(x => x.c.n > 0);
+    const rds = [];
+    on.forEach(x => x.c.rd.forEach(v => rds.push({ v, id:x.l.id })));
+    const w = { i, wk, lifts:on.length, of:lifts.length, pins:[],
+      ready:rds.length ? rds.reduce((a, x) => a + x.v, 0) / rds.length : null, readyN:rds.length,
+      readyLow:rds.reduce((m, x) => (!m || x.v < m.v) ? x : m, null), readyHigh:rds.reduce((m, x) => (!m || x.v > m.v) ? x : m, null),
+      ton:on.reduce((a, x) => a + x.c.ton, 0), tonPlan:cs.reduce((a, x) => a + x.c.plan.ton, 0),
+      inol:on.length ? on.reduce((a, x) => a + x.c.inol, 0) / on.length : null,
+      inolPlan:cs.length ? cs.reduce((a, x) => a + x.c.plan.inol, 0) / cs.length : 0,
+      sets:cs.reduce((a, x) => a + Math.min(x.c.sets, x.c.plan.sets), 0), setsPlan:cs.reduce((a, x) => a + x.c.plan.sets, 0),
+      tm:lifts.reduce((a, l) => a + (X.tm[l.id][i] || 0), 0), gain:0 };
+    const add = (kind, text, num) => {
+      let p = w.pins.find(x => x.kind === kind);
+      if (!p){ p = { kind, n:0, text:[] }; w.pins.push(p); }
+      p.n += (num || 1); p.text.push(text);
+    };
+    cs.forEach(x => {
+      const c = x.c, nm = x.l.name;
+      if (c.cut) add('cut', nm + ': ' + c.cut + ' set' + (c.cut === 1 ? '' : 's') + ' cut for readiness', c.cut);
+      if (c.fire) add('fire', nm + ': extra set taken');
+      if (c.partial) add('partial', nm + ' ended early');
+      if (c.weak) add('weak', nm + ' weak point: ' + c.weak);
+      const t = (wk.phase === 'realization' && wi >= 0) ? X.tests[x.l.id][wi] : null;
+      if (t && t.waiting) add('pending', nm + ': +' + v1852Wt(t.amount) + ' ' + u + ' waiting for your OK');
+      else if (t && t.raised){ add('raise', nm + ' max +' + v1852Wt(t.amount) + ' ' + u); w.gain += t.amount; }
+    });
+    if (X.chk.show && i === D.cur) add('watch', 'Deload check: ' + X.chk.label);
+    w.pins.sort((a, b) => V1852_PIN_ORDER.indexOf(a.kind) - V1852_PIN_ORDER.indexOf(b.kind));
+    return w;
+  }
+
+  function v1852Data(D){
+    const N = D.tl.length, cyc = D.cycle, scope = D.liftId ? D.act.filter(l => l.id === D.liftId) : D.act;
+    const X = { N, scope, tests:{}, tm:{}, tmNow:{}, cell:{}, chk:v1852DeloadCheck(D), weeks:[], anyPins:false };
+    D.act.forEach(l => {
+      const lift = state.lifts[l.id], now = trainingMax(lift);
+      X.tmNow[l.id] = now;
+      // each wave's test, the one the wave recap picks: the latest logged for that wave in this cycle. Weights in the unit shown now.
+      const mine = liftTests(l.id).filter(z => (z.h.cycle || 1) === cyc);
+      const T = X.tests[l.id] = PROGRAM.waves.map(wv => {
+        const x = mine.filter(z => z.h.wave === wv).pop();
+        if (!x) return null;
+        const t = x.t, tc = t.tmChange || {}, un = x.h.units, old = !!t.ruleVersion, wait = tc.awaitingConfirmation === true;
+        const from = v185UnitAmt(tc.from, un), to = v185UnitAmt(tc.to, un), amount = old ? 0 : v185UnitAmt(tc.amount, un), reps = Math.floor(n(t.reps));
+        // The reps that would have raised the max, by today's rule. Kept only where the saved result agrees with it:
+        // a test from before the rule, or one decided by hand, shows no line it did not answer to.
+        const ra = old ? 0 : v1852RaiseAt(n(tc.from), n(t.weight), t.standard, isLowerBody(l.id));
+        return { h:x.h, old, reps, standard:t.standard, weight:v185UnitAmt(t.weight, un), planned:v185UnitAmt(t.plannedWeight, un),
+          from, to:(old || wait || !(to > 0)) ? from : to, amount, waiting:wait && amount > 0, raised:!wait && amount > 0,
+          e1rm:n(t.e1rm) > 0 ? v185UnitAmt(t.e1rm, un) : null, lower:t.confidence === 'lower',
+          raiseAt:(ra && (amount > 0 ? reps >= ra : reps < ra)) ? ra : 0 };
+      });
+      // the TM each week ran on. A tested wave says so itself (from, then to once the test is done). A wave not tested yet
+      // runs on today's TM; one left behind without a test takes the TM the next test started from. A test saved before
+      // v14 has no TM on record (entryTest works one back from the weight), so it is left out of the line.
+      const S = T.map(t => (t && !t.old && t.from > 0) ? t.from : null), E = T.map(t => (t && !t.old && t.from > 0) ? t.to : null);
+      X.tm[l.id] = D.tl.map((wk, i) => {
+        const wi = PROGRAM.waves.indexOf(wk.wave);
+        if (wi >= 0 && S[wi] !== null) return wk.phase === 'deload' ? E[wi] : S[wi];
+        const testAt = D.tl.findIndex(k => k.wave === wk.wave && k.phase === 'realization');
+        if (testAt < 0 || testAt >= D.cur) return now;
+        for (let k = wi + 1; k < S.length; k++) if (S[k] !== null) return S[k];
+        return now;
+      });
+      X.cell[l.id] = D.tl.map((wk, i) => {
+        const plan = plannedSets(l.id, wk.wave, wk.phase, cyc).filter(s => s.role !== 'ramp' && s.role !== 'leadin');
+        const tmW = X.tm[l.id][i], own = wk.phase !== 'deload' && tmW > 0 && Math.abs(tmW - now) > 0.005;   // planned from another TM than today's
+        let pTon = 0, pInol = 0;
+        plan.forEach(s => {
+          const w = own ? workingWeightFromPctTM(lift, s.pctTM, tmW) : n(s.weight);
+          pTon += (w || 0) * (n(s.targetReps) || 0);
+          pInol += v1852Inol(s.targetReps, s.pctTM);
+        });
+        const es = D.hist.filter(h => h && h.liftId === l.id && h.wave === wk.wave && h.phase === wk.phase).sort(_byCompleted);
+        const c = { n:es.length, plan:{ sets:plan.length, ton:pTon, inol:pInol }, ton:0, inol:0, sets:0, rd:[], cut:0, fire:false, partial:null, weak:'',
+          rpe:null, rpeRole:'', plus:null, top:es.length ? v1851WeekTop(D.hist, wk, l.id) : 0 };
+        es.forEach(h => {   // every entry of the lift that week counts (two can only come from an import)
+          c.ton += v185UnitAmt(historyRowTonnage(h), h.units);
+          const rows = historyRowSets(h);
+          c.sets += rows.length;
+          rows.forEach((s, k) => {
+            let pct = n(s.pctTM);
+            if (!(pct > 0)){ const p = plan[Math.min(k, plan.length - 1)]; pct = p ? n(p.pctTM) : NaN; }   // an old entry without it: the plan's
+            c.inol += v1852Inol(s.performedReps, pct);
+            const r = n(s.rpe);
+            if (Number.isFinite(r) && r > 0 && (c.rpe === null || r > c.rpe)){ c.rpe = r; c.rpeRole = setRole(s, h.phase); }
+          });
+          const sc = readinessScoreAnswered(h.readiness);
+          if (Number.isFinite(sc)) c.rd.push(sc);
+          c.cut += readinessDroppedSets(h.readiness);
+          if (h.readiness && h.readiness.fireDay === true) c.fire = true;
+          if (h.partial === true){ const pc = partialSetCounts(h); c.partial = { done:pc.done, planned:pc.planned, reason:END_EARLY_LABELS[h.endReason] || '' }; }
+          if (typeof h.weakPoint === 'string' && h.weakPoint && h.weakPoint !== 'No issues') c.weak = h.weakPoint;
+          const a = _sessionAmrap(h);
+          if (a && Number.isFinite(n(a.reps))) c.plus = { reps:Math.floor(n(a.reps)), role:a.role };
+        });
+        return c;
+      });
+    });
+    X.weeks = D.tl.map((_, i) => v1852WeekRow(D, X, i, scope));
+    X.anyPins = X.weeks.some(w => w.pins.length > 0);
+    return X;
+  }
+
+  function v1852SigKey(D){   // what the tiers read that can change while the number of sessions stays the same
+    const ux = state.deloadUX || {};
+    return [(state.history || []).length, ux.dismissedAtIndex == null ? '' : ux.dismissedAtIndex]
+      .concat(D.hist.map(h => (h.revision || 0) + '|' + (h.weakPoint || '') + '|' + ((h.test && h.test.tmChange && h.test.tmChange.awaitingConfirmation) ? 'a' : '') + '|' + (h.partial ? 'p' : ''))).join(';');
+  }
+
+  /* ── pins ── */
+  function v1852Glyph(kind, x, y, num){   // one pin, centred on x,y, about ten units across
+    const f = v1852F;
+    if (kind === 'raise') return '<path class="v1852-p-raise" d="M' + f(x) + ' ' + f(y - 4.6) + ' L' + f(x + 4.8) + ' ' + f(y + 3.6) + ' L' + f(x - 4.8) + ' ' + f(y + 3.6) + ' Z"/>';
+    if (kind === 'pending') return '<path class="v1852-p-pend" d="M' + f(x) + ' ' + f(y - 4.6) + ' L' + f(x + 4.6) + ' ' + f(y) + ' L' + f(x) + ' ' + f(y + 4.6) + ' L' + f(x - 4.6) + ' ' + f(y) + ' Z"/>';
+    if (kind === 'cut') return '<text class="v1852-p-cut" x="' + f(x) + '" y="' + f(y + 3.6) + '" text-anchor="middle">−' + Math.min(9, num || 1) + '</text>';
+    if (kind === 'fire') return '<text class="v1852-p-fire" x="' + f(x) + '" y="' + f(y + 3.6) + '" text-anchor="middle">+' + Math.min(9, num || 1) + '</text>';
+    if (kind === 'partial') return '<rect class="v1852-p-part" x="' + f(x - 4.5) + '" y="' + f(y - 4.5) + '" width="9" height="9" rx="2.5"/>'
+      + '<path class="v1852-p-partf" d="M' + f(x - 4.5) + ' ' + f(y - 2) + ' a2.5 2.5 0 0 1 2.5 -2.5 h2 v9 h-2 a2.5 2.5 0 0 1 -2.5 -2.5 Z"/>';
+    if (kind === 'weak') return '<circle class="v1852-p-weak" cx="' + f(x) + '" cy="' + f(y) + '" r="4.1"/><circle class="v1852-p-weakd" cx="' + f(x) + '" cy="' + f(y) + '" r="1.5"/>';
+    if (kind === 'watch') return '<path class="v1852-p-watch" d="M' + f(x) + ' ' + f(y - 5) + ' L' + f(x + 5.4) + ' ' + f(y + 4.2) + ' L' + f(x - 5.4) + ' ' + f(y + 4.2) + ' Z"/>'
+      + '<rect class="v1852-p-watchf" x="' + f(x - .75) + '" y="' + f(y - 1.8) + '" width="1.5" height="3.2" rx=".7"/><circle class="v1852-p-watchf" cx="' + f(x) + '" cy="' + f(y + 2.6) + '" r=".95"/>';
+    if (kind === 'more') return [-3.4, 0, 3.4].map(d => '<circle class="v1852-p-more" cx="' + f(x + d) + '" cy="' + f(y) + '" r="1.25"/>').join('');
+    return '';
+  }
+  function v1852PinsSvg(X){   // '' when the cycle has no pin yet: no empty row
+    if (!X.anyPins) return '';
+    const G = v1852Geo(X.N);
+    let s = '<text class="v1852-ax v1852-cap" x="' + (G.gl - 6) + '" y="20" text-anchor="end">PINS</text>';
+    X.weeks.forEach((w, i) => {
+      if (!w.pins.length) return;
+      const show = w.pins.length > 2 ? [w.pins[0], { kind:'more' }] : w.pins;   // two fit; a third or more shows as dots, and the week section lists them all
+      show.forEach((p, k) => { s += v1852Glyph(p.kind, G.cx(i), show.length === 1 ? 16.5 : (10.5 + k * 12.5), p.n); });
+    });
+    return '<svg class="v1852-svg v1852-pins" viewBox="0 0 ' + G.W + ' ' + V1852_PINS_H + '" aria-hidden="true">' + s + '</svg>';
+  }
+
+  /* ── lenses: each draws between yt and yb in the map's columns ── */
+  function v1852Nice(lo, hi, want){   // round values inside lo..hi, at most `want` of them
+    const span = Math.max(1e-9, hi - lo), steps = [0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000];
+    const step = steps.find(st => span / st <= want) || steps[steps.length - 1], out = [];
+    for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + 1e-9; v += step) out.push(Math.round(v * 100) / 100);
+    return out;
+  }
+  function v1852K(v){ return v >= 1000 ? (Math.round(v / 100) / 10).toFixed(1).replace(/\.0$/, '') + 'k' : String(Math.round(v)); }
+  function v1852LensReadiness(D, X, sel, G){
+    const yt = V1852_YT, yb = V1852_YB, f = v1852F, wd = G.x1 - G.x0, Y = v => yb - Math.max(0, Math.min(30, v)) / 30 * (yb - yt);
+    let s = '';
+    [[23, 30, 'hi'], [8, 15, 'lo'], [0, 8, 'vlo']].forEach(z => { s += '<rect class="v1852-z ' + z[2] + '" x="' + G.x0 + '" y="' + f(Y(z[1])) + '" width="' + wd + '" height="' + f(Y(z[0]) - Y(z[1])) + '"/>'; });
+    [[23, 'hi'], [15, 'lo'], [8, 'vlo']].forEach(z => {
+      s += '<line class="v1852-zl ' + z[1] + '" x1="' + G.x0 + '" y1="' + f(Y(z[0])) + '" x2="' + G.x1 + '" y2="' + f(Y(z[0])) + '"/>'
+        + '<text class="v1852-ax" x="' + (G.gl - 6) + '" y="' + f(Y(z[0]) + 3.5) + '" text-anchor="end">' + z[0] + '</text>';
+    });
+    [[26.5, 'hi', 'extra set offered'], [11.5, 'lo', '1 set cut'], [4, 'vlo', '2 sets cut']].forEach(z => {
+      s += '<text class="v1852-zt ' + z[1] + '" x="' + (G.x1 - 4) + '" y="' + f(Y(z[0]) + 3.5) + '" text-anchor="end">' + z[2] + '</text>';
+    });
+    let d = '', prev = -9;
+    X.weeks.forEach((w, i) => {
+      if (w.ready === null) return;
+      if (w.readyN > 1 && w.readyHigh.v > w.readyLow.v)   // the lowest check-in to the highest
+        s += '<line class="v1852-whisk" x1="' + f(G.cx(i)) + '" y1="' + f(Y(w.readyHigh.v)) + '" x2="' + f(G.cx(i)) + '" y2="' + f(Y(w.readyLow.v)) + '"/>';
+      d += (prev === i - 1 ? ' L' : ' M') + f(G.cx(i)) + ' ' + f(Y(w.ready)); prev = i;   // the line stops at a week with no check-in
+    });
+    if (d) s += '<path class="v1852-ln sky" d="' + d.trim() + '"/>';
+    X.weeks.forEach((w, i) => {
+      if (w.ready === null) return;
+      const z = v1852Zone(w.readyLow.v), zc = (z === 'hi' && w.ready < 23) ? 'mid' : z;
+      s += '<circle class="v1852-dot ' + zc + (i === sel ? ' on' : '') + '" cx="' + f(G.cx(i)) + '" cy="' + f(Y(w.ready)) + '" r="' + (i === sel ? 4.4 : 2.9) + '"/>';
+    });
+    const w = X.weeks[sel];
+    if (w && w.ready !== null){
+      const y = Y(w.ready), up = y - 8 >= yt - 3;
+      s += '<text class="v1852-val" x="' + f(G.cx(sel)) + '" y="' + f(up ? y - 8 : y + 15) + '" text-anchor="middle">' + escapeHtml(readinessScoreText(w.ready)) + '</text>';
+    }
+    return s;
+  }
+  function v1852LensStrength(D, X, sel, G){
+    const yt = V1852_YT, yb = V1852_YB, f = v1852F, N = X.N, one = X.scope.length === 1 ? X.scope[0] : null;
+    const tmS = X.weeks.map(w => w.tm), dia = [];
+    if (one) X.tests[one.id].forEach((t, wi) => {   // a tested max is one lift's: no diamonds when the lifts are added up
+      if (!t || !(t.e1rm > 0)) return;
+      const i = D.tl.findIndex(k => k.wave === PROGRAM.waves[wi] && k.phase === 'realization');
+      if (i >= 0) dia.push({ i, v:t.e1rm, lower:t.lower });
+    });
+    const all = tmS.concat(dia.map(x => x.v)).filter(v => v > 0);
+    if (!all.length) return '';
+    let lo = Math.min(...all), hi = Math.max(...all);
+    const pad = Math.max((hi - lo) * 0.2, hi * 0.015, 2.5);
+    lo -= pad; hi += pad * 1.7;
+    const Y = v => yb - (v - lo) / (hi - lo) * (yb - yt), ys = tmS.map(Y);
+    let s = '';
+    let ticks = v1852Nice(lo + pad * 0.5, hi - pad * 0.7, 3);
+    if (ticks.length < 2) ticks = v1852Nice(lo + pad * 0.5, hi - pad * 0.7, 6);   // a narrow range still gets two lines to read against
+    ticks.forEach(v => {
+      s += '<line class="v1852-grid" x1="' + G.x0 + '" y1="' + f(Y(v)) + '" x2="' + G.x1 + '" y2="' + f(Y(v)) + '"/>'
+        + '<text class="v1852-ax" x="' + (G.gl - 6) + '" y="' + f(Y(v) + 3.5) + '" text-anchor="end">' + escapeHtml(v >= 10000 ? v1852K(v) : String(v)) + '</text>';
+    });
+    const path = (a, b) => { let d = 'M' + f(G.edge(a, -1)) + ' ' + f(ys[a]); for (let i = a; i <= b; i++){ d += ' H' + f(G.edge(i, 1)); if (i < b) d += ' V' + f(ys[i + 1]); } return d; };
+    const last = Math.min(D.cur, N - 1);
+    s += '<path class="v1852-ln mint" d="' + path(0, last) + '"/>';
+    if (last < N - 1) s += '<path class="v1852-ln fut" d="M' + f(G.edge(last, 1)) + ' ' + f(ys[last]) + ' V' + f(ys[last + 1]) + path(last + 1, N - 1).replace(/^M[\d.]+ [\d.]+/, '') + '"/>';
+    if (dia.length > 1) s += '<path class="v1852-ln link" d="M' + dia.map(x => f(G.cx(x.i)) + ' ' + f(Y(x.v))).join(' L') + '"/>';
+    dia.forEach(x => {
+      const cx = G.cx(x.i), y = Y(x.v), r = 4.8;
+      s += '<path class="v1852-dia' + (x.lower ? ' lower' : '') + '" d="M' + f(cx) + ' ' + f(y - r) + ' L' + f(cx + r) + ' ' + f(y) + ' L' + f(cx) + ' ' + f(y + r) + ' L' + f(cx - r) + ' ' + f(y) + ' Z"/>'
+        + '<text class="v1852-val" x="' + f(cx - 7) + '" y="' + f(y - 7) + '" text-anchor="end">' + escapeHtml(v1852Big(Math.round(x.v))) + '</text>';
+    });
+    if (!one) X.weeks.forEach((w, i) => {   // lifts added up: what each test week put on
+      if (w.gain > 0 && i < N - 1) s += '<text class="v1852-val mint" x="' + f(G.cx(i + 1)) + '" y="' + f(ys[i + 1] - 6) + '" text-anchor="middle">+' + escapeHtml(v1852Wt(w.gain)) + '</text>';
+    });
+    if (sel < N - 3){   // where the line ends up; left out when the picked week's own dot sits there (the caption says its TM)
+      const ye = ys[N - 1] + 13 <= yb + 2 ? ys[N - 1] + 13 : ys[N - 1] - 6;
+      s += '<text class="v1852-val mint" x="' + (G.x1 - 4) + '" y="' + f(ye) + '" text-anchor="end">TM ' + escapeHtml(v1852Big(tmS[N - 1])) + '</text>';
+    }
+    if (sel >= 0 && sel < N) s += '<circle class="v1852-dot tm on" cx="' + f(G.cx(sel)) + '" cy="' + f(ys[sel]) + '" r="4.2"/>';
+    return s;
+  }
+  function v1852LensBars(D, X, sel, G, o){   // o: { vals, plan, top, cls, ticks:[[value, label]], band:[lo, hi, label], fmt }
+    const yt = V1852_YT, yb = V1852_YB, f = v1852F, wd = G.x1 - G.x0, Y = v => yb - Math.min(v, o.top) / o.top * (yb - yt);
+    let s = '';
+    if (o.band) s += '<rect class="v1852-wr" x="' + G.x0 + '" y="' + f(Y(o.band[1])) + '" width="' + wd + '" height="' + f(Y(o.band[0]) - Y(o.band[1])) + '"/>'
+      + '<text class="v1852-zt mid" x="' + (G.x1 - 4) + '" y="' + f(Y(o.band[1]) + 10) + '" text-anchor="end">' + o.band[2] + '</text>';
+    o.ticks.forEach(t => {
+      s += '<line class="v1852-grid" x1="' + G.x0 + '" y1="' + f(Y(t[0])) + '" x2="' + G.x1 + '" y2="' + f(Y(t[0])) + '"/>'
+        + '<text class="v1852-ax" x="' + (G.gl - 6) + '" y="' + f(Y(t[0]) + 3.5) + '" text-anchor="end">' + t[1] + '</text>';
+    });
+    X.weeks.forEach((w, i) => {
+      const v = o.vals[i] || 0, p = o.plan[i] || 0, c = o.cls + (w.wk.phase === 'deload' ? ' dl' : ''), past = i < D.cur;
+      if (v > 0) s += '<rect class="v1852-bar ' + c + (i === sel ? ' on' : '') + '" x="' + G.xs[i] + '" y="' + f(Y(v)) + '" width="' + G.bw + '" height="' + f(Math.max(2, yb - Y(v))) + '" rx="3.5"/>';
+      if (p > 0 && past) s += '<rect class="v1852-tick" x="' + (G.xs[i] - 1.5) + '" y="' + f(Y(p) - .9) + '" width="' + (G.bw + 3) + '" height="1.8" rx=".9"/>';   // a week behind: the plan as a tick
+      if (p > 0 && !past) s += '<rect class="v1852-plan ' + c + '" x="' + (G.xs[i] + .65) + '" y="' + f(Y(p) + .65) + '" width="' + (G.bw - 1.3) + '" height="' + f(Math.max(2, yb - Y(p) - 1.3)) + '" rx="3.5"/>';   // this week and ahead: the plan as an outline
+    });
+    if (sel >= 0 && sel < X.N){
+      const v = o.vals[sel] || 0, p = o.plan[sel] || 0;
+      if (v > 0 || p > 0) s += '<text class="v1852-val" x="' + f(G.cx(sel)) + '" y="' + f(Math.max(yt - 1, Y(Math.max(v, p)) - 5)) + '" text-anchor="middle">' + escapeHtml(o.fmt(v > 0 ? v : p)) + '</text>';
+    }
+    return s;
+  }
+  // The lens in use: its plot, the caption under it, the picked week's read-out and the chip for the bar above the map.
+  function v1852Lens(D, X, sel){
+    const mode = _v185Mode, def = V1852_LENSES.find(l => l[0] === mode);
+    if (!def) return null;
+    const G = v1852Geo(X.N), w = X.weeks[sel], u = unitLabel(), Wn = 'W' + (sel + 1), one = X.scope.length === 1 ? X.scope[0] : null;
+    const who = one ? String(V17_SHORT[one.id] || one.name).toLowerCase() : 'all lifts';
+    const soFar = D.cur < X.N && sel === D.cur && w.lifts > 0 && w.lifts < w.of;
+    let body = '', sub = '', read = '', readCls = '', chip = '', chipCls = '', cell = () => '';
+    if (mode === 'readiness'){
+      body = v1852LensReadiness(D, X, sel, G);
+      sub = who + ', out of 30'; readCls = 'rd';
+      const spread = w.ready !== null && w.readyN > 1 && w.readyLow.v < w.ready - 0.05;
+      read = w.ready !== null ? Wn + ' avg ' + readinessScoreText(w.ready) + '/30' + (spread ? ' · low ' + readinessScoreText(w.readyLow.v) : '') : Wn + ' no check-in';
+      chip = w.ready !== null ? 'Ready ' + readinessScoreText(w.ready) : 'No check-in';
+      chipCls = w.ready === null ? 'off' : ({ vlo:'bad', lo:'warn', hi:(w.ready >= 23 ? 'mint' : ''), mid:'' })[v1852Zone(w.readyLow.v)];
+      cell = i => { const x = X.weeks[i]; return x.ready !== null ? readinessScoreText(x.ready) + '/30' : 'no readiness logged'; };
+    } else if (mode === 'strength'){
+      body = v1852LensStrength(D, X, sel, G);
+      sub = one ? 'TM · tested max' : 'TMs added up';
+      const nxt = sel < X.N - 1 ? X.weeks[sel + 1].tm : w.tm, steps = w.wk.phase === 'realization' && Math.abs(nxt - w.tm) > 0.005;
+      read = Wn + ': TM ' + v1852Big(w.tm) + (steps ? ' → ' + v1852Big(nxt) : '') + ' ' + u;
+      chip = 'TM ' + v1852Big(w.tm); chipCls = 'mint';
+      cell = i => 'TM ' + v1852Big(X.weeks[i].tm) + ' ' + u;
+    } else if (mode === 'stress'){
+      const vals = X.weeks.map(x => x.inol || 0), plan = X.weeks.map(x => x.inolPlan || 0);
+      body = v1852LensBars(D, X, sel, G, { vals, plan, top:Math.max(1.4, Math.max(...vals, ...plan) * 1.12), cls:'stress',
+        ticks:[[1, '1.0'], [0.4, '0.4']], band:[0.4, 1, 'working range'], fmt:v => v.toFixed(2) });
+      sub = one ? 'INOL, ' + who : 'INOL, per-lift average'; readCls = 'rd';
+      read = w.inol !== null ? Wn + ': ' + w.inol.toFixed(2) + (soFar ? ' so far' : ' · plan ' + w.inolPlan.toFixed(2)) : Wn + ': plan ' + w.inolPlan.toFixed(2);
+      chip = w.inol !== null ? 'Stress ' + w.inol.toFixed(2) : 'Plan ' + w.inolPlan.toFixed(2); chipCls = w.inol !== null ? '' : 'off';
+      cell = i => { const x = X.weeks[i]; return x.inol !== null ? 'stress ' + x.inol.toFixed(2) : 'planned stress ' + x.inolPlan.toFixed(2); };
+    } else {
+      const vals = X.weeks.map(x => x.ton || 0), plan = X.weeks.map(x => x.tonPlan || 0), top = Math.max(1, ...vals, ...plan) * 1.18;
+      body = v1852LensBars(D, X, sel, G, { vals, plan, top, cls:'ton', ticks:v1852Nice(top * 0.25, top * 0.92, 3).map(v => [v, v1852K(v)]), fmt:v1852K });
+      sub = who;
+      read = Wn + ': ' + v185FmtTon(w.ton || 0) + (soFar ? ' so far' : (w.tonPlan > 0 ? ' · plan ' + v1852K(w.tonPlan) : ''));
+      chip = w.ton > 0 ? v185FmtTon(w.ton) : 'Plan ' + v185FmtTon(w.tonPlan); chipCls = w.ton > 0 ? 'mint' : 'off';
+      cell = i => v185FmtTon(X.weeks[i].ton || 0);
+    }
+    const said = def[1] + ', ' + sub + '. ' + read + '.';
+    return { mode, title:def[1], sub, read, chip, chipCls, cell,
+      html:'<div class="v185-lens v1852-plot"><svg class="v1852-svg" viewBox="0 0 ' + G.W + ' ' + V1852_PLOT_H + '" role="img" aria-label="' + escapeHtml(said) + '">' + body + '</svg></div>',
+      cap:'<div class="v185-lens-h"><b>' + escapeHtml(def[1]) + '</b><em>' + escapeHtml(sub) + '</em><span' + (readCls ? ' class="' + readCls + '"' : '') + '>' + escapeHtml(read) + '</span></div>' };
+  }
+
+  /* ── the bar above the map: what the picked week was, or will be ── */
+  function v1852Readout(D, X, sel, lens){
+    const w = X.weeks[sel], wk = w.wk, u = unitLabel(), isCur = D.cur < X.N && sel === D.cur, wi = PROGRAM.waves.indexOf(wk.wave);
+    const def = getPhaseDef(wk.wave, wk.phase) || {}, std = PROGRAM.waveTargetReps[wk.wave], wt = v => v1852Wt(v) + ' ' + u;
+    const title = 'W' + (sel + 1) + ' · ' + wk.wave + ' ' + (V18_PHASE[wk.phase] || wk.phase) + (isCur ? ' · this week' : '');
+    let detail = '';
+    if (X.scope.length === 1){
+      const l = X.scope[0], code = v1852Code(l), c = X.cell[l.id][sel], st = v17StateOf(D.tl, D.cur, D.hist, sel, l.id);
+      const plan = plannedSets(l.id, wk.wave, wk.phase, D.cycle), counted = plan.filter(s => s.role !== 'ramp' && s.role !== 'leadin');
+      const top = plan.reduce((m, s) => Math.max(m, n(s.weight) || 0), 0);
+      if (c.n > 0){
+        const t = (wk.phase === 'realization' && wi >= 0) ? X.tests[l.id][wi] : null;
+        if (wk.phase === 'realization') detail = t ? code + ' test: ' + t.reps + ' rep' + (t.reps === 1 ? '' : 's') + ' at ' + wt(t.weight) + ' · '
+            + (t.waiting ? '+' + wt(t.amount) + ' waiting' : t.raised ? 'max +' + wt(t.amount) : t.old ? 'tested' : 'max held') : code + ' test logged';
+        else if (wk.phase === 'deload') detail = code + ' deload: ' + c.sets + ' set' + (c.sets === 1 ? '' : 's') + ', top ' + wt(c.top);
+        else detail = code + ' ' + c.sets + ' × ' + (def.reps || '') + ' at ' + wt(c.top)
+          + (c.cut ? ' · ' + c.cut + ' set' + (c.cut === 1 ? '' : 's') + ' cut' : c.fire ? ' · extra set' : c.partial ? ' · ended early' : c.plus ? ' · ' + c.plus.reps + ' on the + set' : '');
+      } else if (st === 'skipped') detail = code + ' skipped';
+      else if (st === 'missed') detail = code + ' not logged';
+      else if (wk.phase === 'realization') detail = code + ' test: ' + std + ' or more at ' + wt(top);
+      else if (wk.phase === 'deload') detail = code + ' deload: ' + counted.length + ' × ' + (counted[0] ? counted[0].targetReps : 5) + ', up to ' + wt(top);
+      else detail = code + ' plan: ' + counted.length + ' × ' + (def.reps || '') + ' at ' + wt(top);
+    } else if (w.lifts > 0){
+      detail = wk.phase === 'realization' ? w.lifts + ' of ' + w.of + ' test' + (w.of === 1 ? '' : 's') + ' done · ' + Math.round(w.ton).toLocaleString() + ' ' + u
+        : w.lifts + ' of ' + w.of + ' lift' + (w.of === 1 ? '' : 's') + ' · ' + w.sets + ' of ' + w.setsPlan + ' sets' + (lens && lens.mode === 'tonnage' ? '' : ' · ' + v185FmtTon(w.ton));
+    } else if (sel < D.cur) detail = 'Nothing logged';
+    else {
+      const ref = X.scope[0] ? plannedSets(X.scope[0].id, wk.wave, wk.phase, D.cycle).filter(s => s.role !== 'ramp' && s.role !== 'leadin') : [];
+      const peak = ref.reduce((m, s) => Math.max(m, n(s.pctTM) || 0), 0);
+      detail = wk.phase === 'realization' ? 'Test: ' + std + ' or more at ' + formatPercent(def.testPctTM || peak)
+        : wk.phase === 'deload' ? 'Deload: ' + ref.length + ' easy sets, up to ' + formatPercent(peak)
+        : 'Plan: ' + ref.length + ' × ' + (def.reps || '') + ' at ' + formatPercent(peak);
+    }
+    return '<div class="v1852-read"><div class="v1852-read-l"><b><i style="background:' + v17Col(wk) + '"></i>' + escapeHtml(title) + '</b><span>' + escapeHtml(detail) + '</span></div>'
+      + (lens ? '<span class="v1852-chip' + (lens.chipCls ? ' ' + lens.chipCls : '') + '">' + escapeHtml(lens.chip) + '</span>' : '') + '</div>';
+  }
+
+  /* ── the map with its tiers: the map's own HTML, then the pins and the lens in the same columns ── */
+  function v1852Stack(D, X, sel, lens, mapHtml){
+    const G = v1852Geo(X.N), pins = v1852PinsSvg(X), extra = (pins ? V1852_PINS_H : 0) + (lens ? V1852_PLOT_H : 0);
+    if (!extra) return mapHtml;
+    // The week band stays the map's own rectangle: only its height is longer, so it runs down through the tiers.
+    const map = mapHtml.replace(/(<rect x="[^"]+" y="[^"]+" width="[^"]+" height=")([^"]+)(" rx="10" class="v17m-band"\/>)/, (m, a, h, c) => a + (Number(h) + extra - 6) + c);
+    const pc = v => (v / G.W * 100).toFixed(3) + '%';
+    const taps = '<div class="v1852-taps" role="group" aria-label="Weeks, under the map">' + X.weeks.map((w, i) => {
+      const bits = [lens ? lens.cell(i) : ''].concat(w.pins.map(p => p.text.join('; '))).filter(Boolean);
+      return '<button type="button" class="v1852-tap" data-v16-week="' + i + '" aria-label="' + escapeHtml('Week ' + (i + 1) + ': ' + (bits.length ? bits.join('. ') : 'nothing flagged')) + '" aria-pressed="' + (i === sel) + '"'
+        + ' style="left:' + pc(G.xs[i] - 2.5) + ';width:' + pc(G.bw + 5) + '"></button>';
+    }).join('') + '</div>';
+    return '<div class="v1852-view"><div class="v1852-stack">' + map + '<div class="v1852-low">' + pins + (lens ? lens.html : '') + taps + '</div></div>' + (lens ? lens.cap : '') + '</div>';
+  }
+
+  /* ── under the map: a week at a time, or a wave at a time ── */
+  function v1852Thumb(S, sel){
+    const selWave = Math.floor(sel / 4);
+    const chev = d => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + (d < 0 ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6') + '"/></svg>';
+    const step = (d, said, off) => '<button type="button" class="v1852-step" data-v185="step:' + d + '" aria-label="' + said + '"' + (off ? ' disabled' : '') + '>' + chev(d) + '</button>';
+    return '<div class="v185-waves v1852-thumb" role="group" aria-label="Move through the weeks">' + step(-1, 'Previous week', sel <= 0)
+      + S.waves.map(w => '<button type="button" class="v185-wv' + (w.wi === selWave ? ' sel' : '') + '" style="--wc:' + w.color + '" data-v185="wave:' + w.startIdx + '" aria-pressed="' + (w.wi === selWave) + '" aria-label="' + escapeHtml(w.wv + ' wave: test at ' + w.testPct + '% of TM, ' + w.pct + '% of sessions done') + '">'
+        + '<div class="v185-wv-t"><b style="color:' + w.color + '">' + escapeHtml(w.wv) + '</b></div>'
+        + '<div class="v185-wv-bar"><i style="width:' + w.pct + '%"></i></div>'
+        + '</button>').join('')
+      + step(1, 'Next week', sel >= S.N - 1) + '</div>';
+  }
+  function v1852Key(X, keyHtml){   // the map's key, then only the pins that are on the map now
+    const have = V1852_PIN_KEY.filter(k => X.weeks.some(w => w.pins.some(p => p.kind === k[0])));
+    if (!have.length) return keyHtml;
+    return keyHtml.replace(/<\/div>$/, have.map(k => '<span class="v1852-k"><svg width="14" height="14" viewBox="-7 -7 14 14" aria-hidden="true">' + v1852Glyph(k[0], 0, 0, 1) + '</svg>' + k[1] + '</span>').join('') + '</div>');
+  }
+
+  /* ── the week section's new rows ── */
+  function v1852Signals(D, X, i){   // readiness, top RPE and stress for the week, every lift (the week section is never one lift's)
+    const A = v1852WeekRow(D, X, i, D.act), isCur = D.cur < X.N && i === D.cur;
+    let rdNum = '—', rdSub = 'no check-in', rdCls = '', rdSubCls = '';
+    if (A.ready !== null){
+      rdNum = readinessScoreText(A.ready);
+      rdCls = ({ vlo:' bad', lo:' warn', hi:' mint', mid:'' })[v1852Zone(A.ready)];
+      const low = A.readyLow, lz = v1852Zone(low.v), ll = D.act.find(l => l.id === low.id);
+      if (A.readyN > 1 && low.v < A.ready - 0.05){ rdSub = 'low ' + readinessScoreText(low.v) + (ll ? ' · ' + v1852Code(ll) : ''); rdSubCls = lz === 'vlo' ? ' bad' : lz === 'lo' ? ' warn' : ''; }
+      else rdSub = A.lifts < A.of ? A.lifts + ' of ' + A.of + ' lifts' : 'of 30';
+    }
+    const rp = D.act.map(l => ({ l, c:X.cell[l.id][i] })).filter(x => x.c.rpe !== null), best = rp.reduce((m, x) => Math.max(m, x.c.rpe), 0);
+    const role = { plus:'+ set', test:'test', work:'work set', deload:'deload' };
+    let rpNum = '—', rpSub = 'not rated';
+    if (rp.length){
+      const tops = rp.filter(x => x.c.rpe === best), same = tops.every(x => x.c.rpeRole === tops[0].c.rpeRole);
+      rpNum = v1852Rpe(best);
+      rpSub = tops.length === 1 ? v1852Code(tops[0].l) + ' ' + (role[tops[0].c.rpeRole] || 'set') : same ? (role[tops[0].c.rpeRole] || 'set') + 's' : tops.length + ' lifts';
+    }
+    const stNum = A.inol !== null ? A.inol.toFixed(2) : A.inolPlan.toFixed(2);
+    const stSub = A.inol === null ? 'plan' : (isCur && A.lifts < A.of) ? 'so far' : 'plan ' + A.inolPlan.toFixed(2);
+    const cl = c => c.trim() ? ' class="' + c.trim() + '"' : '';
+    return '<div class="v185-kpis v1852-sig" style="grid-template-columns:repeat(3,minmax(0,1fr))">'
+      + '<div class="v185-kpi"><b' + cl(rdCls) + '>' + escapeHtml(rdNum) + '</b><span>READY</span><em' + cl(rdSubCls) + '>' + escapeHtml(rdSub) + '</em></div>'
+      + '<div class="v185-kpi"><b>' + escapeHtml(rpNum) + '</b><span>TOP RPE</span><em>' + escapeHtml(rpSub) + '</em></div>'
+      + '<div class="v185-kpi"><b' + (A.inol === null ? ' class="dim"' : '') + '>' + escapeHtml(stNum) + '</b><span>STRESS</span><em>' + escapeHtml(stSub) + '</em></div>'
+      + '</div>';
+  }
+  function v1852SetsLine(c, st){   // under a weight: the sets done of the plan, or where the session stands
+    if (c.n > 0){   // an extra set taken on a strong day reads over the plan (5 of 4); otherwise never more than the plan
+      const pl = c.plan.sets, done = (c.fire && c.sets > pl) ? c.sets : Math.min(c.sets, pl), tail = ' set' + (pl === 1 ? '' : 's');
+      return { text:done + ' of ' + pl + tail, html:done + ' of ' + pl + '<i>' + tail + '</i>', cls:c.sets < pl ? ' warn' : '' };   // the <i> folds away on a narrow screen
+    }
+    const t = st === 'skipped' ? 'skipped' : st === 'missed' ? 'not logged' : st === 'future' ? 'planned' : 'to do';
+    return { text:t, html:t, cls:'' };
+  }
+  // A test week: a row a lift. The bar is the reps done, with a tick at the standard and one at the reps that raise the max.
+  function v1852TestRow(D, X, i, l, topW){
+    const wk = D.tl[i], wi = PROGRAM.waves.indexOf(wk.wave), u = unitLabel(), code = v1852Code(l), st = v17StateOf(D.tl, D.cur, D.hist, i, l.id);
+    const t = wi >= 0 ? X.tests[l.id][wi] : null, std = PROGRAM.waveTargetReps[wk.wave] || 0;
+    const raiseAt = t ? t.raiseAt : (i >= D.cur ? testRaiseReps(l.id, wk.wave) : 0), reps = t ? t.reps : 0;
+    const top = Math.max(std + 5, raiseAt + 2, reps + 1), pc = v => (Math.max(0, Math.min(v, top)) / top * 100).toFixed(2) + '%';
+    const isSel = D.liftId === l.id, wtStr = topW > 0 ? (escapeHtml(weightDigits(topW)) + ' ' + escapeHtml(u)) : '—';
+    let r1, r2 = '', r2c = '';
+    if (t){
+      r1 = t.reps + ' rep' + (t.reps === 1 ? '' : 's');
+      if (t.waiting){ r2 = '+' + v1852Wt(t.amount) + ' ' + u + ' waiting'; r2c = ' warn'; }
+      else if (t.raised){ r2 = '+' + v1852Wt(t.amount) + ' ' + u; r2c = ' mint'; }
+      else if (!t.old) r2 = 'max held';
+    } else r1 = st === 'skipped' ? 'Skipped' : st === 'missed' ? 'Not logged' : st === 'future' ? 'Planned' : 'To do';
+    const upRight = raiseAt > 0 && raiseAt / top > 0.62;
+    const said = l.name + ', ' + (topW > 0 ? weightDigits(topW) + ' ' + u : 'no weight') + '. ' + (t && r2 ? r1 + ', ' + r2 : r1) + '. Standard ' + std + (raiseAt ? ', ' + raiseAt + ' raises the max' : '') + '. '
+      + (isSel ? 'Spotlight active, tap to show all lifts' : 'Tap to spotlight');
+    return '<button type="button" class="v185-wt v1852-bl' + (isSel ? ' sel' : '') + (st === 'done' ? ' done' : '') + '" data-v185="lift:' + escapeHtml(l.id) + '" aria-pressed="' + isSel + '" aria-label="' + escapeHtml(said) + '">'
+      + '<i class="v1852-bl-w"><span>' + escapeHtml(code) + (st === 'done' ? ' ✓' : '') + '</span><b>' + wtStr + '</b></i>'
+      + '<i class="v1852-bl-t" aria-hidden="true"><i class="bg"></i>' + (t ? '<i class="fill" style="width:' + pc(reps) + '"></i>' : '')
+        + '<i class="tk" style="left:' + pc(std) + '"></i><i class="lb" style="' + (std / top < 0.42 ? 'left:0' : 'right:calc(100% - ' + pc(std) + ' + 4px)') + '">' + std + ' pass</i>'
+        + (raiseAt ? '<i class="tk up" style="left:' + pc(raiseAt) + '"></i><i class="lb up" style="' + (upRight ? 'right:0' : 'left:calc(' + pc(raiseAt) + ' + 4px)') + '">' + raiseAt + ' raise</i>' : '')
+      + '</i>'
+      + '<i class="v1852-bl-r"><strong>' + escapeHtml(r1) + '</strong>' + (r2 ? '<small' + (r2c ? ' class="' + r2c.trim() + '"' : '') + '>' + escapeHtml(r2) + '</small>' : '') + '</i></button>';
+  }
+  function v1852Notes(D, X, i){   // in words, what the week's pins mark
+    const wk = D.tl[i], wi = PROGRAM.waves.indexOf(wk.wave), u = unitLabel(), out = [], wt = v => v1852Wt(v) + ' ' + u;
+    const note = (kind, cls, html, num) => out.push('<div class="v1852-note ' + cls + '"><svg width="14" height="14" viewBox="-7 -7 14 14" aria-hidden="true">' + v1852Glyph(kind, 0, 0, num || 1) + '</svg><p>' + html + '</p></div>');
+    D.act.forEach(l => {
+      const c = X.cell[l.id][i], nm = escapeHtml(l.name);
+      if (!c.n) return;
+      const lowRd = c.rd.length ? Math.min(...c.rd) : null, highRd = c.rd.length ? Math.max(...c.rd) : null;
+      if (c.cut){
+        const pl = c.plan.sets;
+        note('cut', 'warn', '<b>' + nm + (lowRd !== null ? ' readiness was ' + escapeHtml(readinessScoreText(lowRd)) + ' of 30.' : ': a low check-in.') + '</b> '
+          + (c.cut === 1 ? 'One work set was' : c.cut + ' work sets were') + ' cut: ' + pl + ' sets became ' + Math.max(0, pl - c.cut) + '.', c.cut);
+      }
+      if (c.fire) note('fire', 'info', '<b>' + nm + (highRd !== null ? ' readiness was ' + escapeHtml(readinessScoreText(highRd)) + ' of 30.' : ': a strong check-in.') + '</b> An extra set was offered and taken.');
+      if (c.partial) note('partial', 'info', '<b>' + nm + ' ended early.</b> ' + c.partial.done + ' of ' + c.partial.planned + ' sets done' + (c.partial.reason ? ' (' + escapeHtml(c.partial.reason.toLowerCase()) + ')' : '') + '.');
+      if (c.weak) note('weak', 'info', '<b>' + nm + ' weak point:</b> ' + escapeHtml(c.weak) + '.');
+      const t = (wk.phase === 'realization' && wi >= 0) ? X.tests[l.id][wi] : null;
+      if (t && t.waiting) note('pending', 'warn', '<b>' + nm + ' raise is waiting for your OK.</b> Tested at ' + escapeHtml(wt(t.weight)) + ' instead of ' + escapeHtml(wt(t.planned)) + ': +' + escapeHtml(wt(t.amount)) + '.');
+    });
+    if (X.chk.show && i === D.cur)
+      note('watch', 'warn watch', '<b>Deload check: ' + escapeHtml(X.chk.label) + ' · ' + escapeHtml(String(X.chk.a.score)) + '</b>' + (X.chk.a.evidence || []).map(e => '<br>' + escapeHtml(e)).join(''));
+    return out.length ? '<div class="v1852-notes">' + out.join('') + '</div>' : '';
+  }
+
+  function v185WeekDetail(D, selIdx, X0){   // 18.5.2: X0, the telemetry already worked out for the card
     const N = D.tl.length;
     const i = (Number.isInteger(selIdx) && selIdx >= 0 && selIdx < N) ? selIdx : (N - 1);
     if (i < 0 || i >= N) return '';
+    const X = X0 || v1852Data(D);
     const wk = D.tl[i], def = getPhaseDef(wk.wave, wk.phase), isCur = (D.cur < N && i === D.cur);
     const ref = (D.liftId && isActiveLift(D.liftId)) ? D.liftId : (D.act[0] ? D.act[0].id : '');
     const planned = ref ? plannedSets(ref, wk.wave, wk.phase, D.cycle) : [];
@@ -21732,10 +22366,12 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       }
       const isSelLift = D.liftId === l.id;
       const wtStr = topW > 0 ? (escapeHtml(weightDigits(topW)) + ' ' + units) : '—';
-      const ariaLbl = (l.name || code) + ' ' + wtStr + (isSelLift ? ', spotlight active, tap to show all lifts' : ', tap to spotlight');
+      if (wk.phase === 'realization') return v1852TestRow(D, X, i, l, topW);   // 18.5.2: a test week is a row a lift: reps against the standard and the raise
+      const sl = v1852SetsLine(X.cell[l.id][i], st);   // 18.5.2: the sets done of the plan, under the weight
+      const ariaLbl = (l.name || code) + ' ' + wtStr + ', ' + sl.text + (isSelLift ? ', spotlight active, tap to show all lifts' : ', tap to spotlight');
       return '<button type="button" class="v185-wt' + (isSelLift ? ' sel' : '') + (st === 'done' ? ' done' : '') + '" data-v185="lift:' + escapeHtml(l.id) + '" aria-pressed="' + isSelLift + '" aria-label="' + escapeHtml(ariaLbl) + '">'
         + '<span>' + escapeHtml(code) + (st === 'done' ? ' ✓' : '') + '</span>'
-        + '<b>' + wtStr + '</b></button>';
+        + '<b>' + wtStr + '</b><small' + (sl.cls ? ' class="' + sl.cls.trim() + '"' : '') + '>' + sl.html + '</small></button>';
     }).join('');
 
     // Work Logged Card (with lift-labeled 4-segment bar + test countdown)
@@ -21778,7 +22414,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
         + '<div class="v185-kpi"><b style="color:' + col + '">' + escapeHtml(formatPercent(peakPct)) + '</b><span>PEAK TM</span><em>' + escapeHtml(peakSub) + '</em></div>'
         + '<div class="v185-kpi"><b>' + escapeHtml(restTxt) + '</b><span>REST</span><em>' + escapeHtml(restSub) + '</em></div>'
       + '</div>'
-      + '<div class="v185-wtrow" style="grid-template-columns:repeat(' + liftCols + ',minmax(0,1fr))">' + wtCards + '</div>'
+      + v1852Signals(D, X, i)
+      + '<div class="v185-wtrow' + (wk.phase === 'realization' ? ' v1852-bul' : '') + '" style="grid-template-columns:' + (wk.phase === 'realization' ? 'minmax(0,1fr)' : 'repeat(' + liftCols + ',minmax(0,1fr))') + '">' + wtCards + '</div>'
+      + v1852Notes(D, X, i)
       + '<div class="v185-log">'
         + '<div class="v185-log-h"><b>Week ' + (i + 1) + ' work logged</b><div class="v185-log-r"><b>' + escapeHtml(Math.round(lb).toLocaleString()) + ' ' + units + '</b>' + (testNote ? '<span>' + escapeHtml(testNote) + '</span>' : '') + '</div></div>'
         + '<div class="v185-log-bars" style="grid-template-columns:repeat(' + liftCols + ',minmax(0,1fr))" role="img" aria-label="' + liftsDone + ' of ' + D.act.length + ' lifts done">' + segs + '</div>'
@@ -21793,7 +22431,6 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     const units = escapeHtml(unitLabel());
     const C = 2 * Math.PI * 19;
     const dashOff = (C * (1 - S.pctComplete / 100)).toFixed(2);
-    const selWaveIdx = Math.floor(sel / 4);
 
     const streakLabel = S.streak > 0
       ? ('🔥 ' + S.streak + '-wk streak · ' + S.paceText)
@@ -21822,30 +22459,26 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       + (S.gainParts.length ? ' <span class="brk">· ' + escapeHtml(S.gainParts.join(' ')) + '</span>' : '') + '</div>'
       + '</div>';
 
-    const waveRow = '<div class="v185-waves" role="group" aria-label="Cycle waves">'
-      + S.waves.map(w => '<button type="button" class="v185-wv' + (w.wi === selWaveIdx ? ' sel' : '') + '" style="--wc:' + w.color + '" data-v185="wave:' + w.startIdx + '" aria-pressed="' + (w.wi === selWaveIdx) + '" aria-label="' + escapeHtml(w.wv + ' wave: test at ' + w.testPct + '% of TM, ' + w.pct + '% of sessions done') + '">'
-        + '<div class="v185-wv-t"><b style="color:' + w.color + '">' + escapeHtml(w.wv) + '</b><span>' + w.testPct + '%</span></div>'
-        + '<div class="v185-wv-bar"><i style="width:' + w.pct + '%"></i></div>'
-        + '</button>').join('')
-      + '</div>';
-
-    const modes = [['sets', 'Sets'], ['tonnage', 'Tonnage'], ['readiness', 'Readiness']];
+    // 18.5.2: the lens switch (four lenses and Off, which keeps the old 'sets' value: the map with nothing under it but its pins), then the lift spotlight
     const lifts = [['', 'All']].concat(D.act.map(l => [l.id, V17_CODE[l.id] || l.name.slice(0, 2).toUpperCase()]));
     const ctrl = '<div class="v185-ctrl">'
-      + '<div class="v185-seg" role="group" aria-label="Chart telemetry mode">'
-      + modes.map(m => '<button type="button" data-v185="mode:' + m[0] + '" aria-pressed="' + (_v185Mode === m[0]) + '">' + m[1] + '</button>').join('')
+      + '<div class="v185-seg" role="group" aria-label="Lens under the map">'
+      + V1852_LENSES.map(m => '<button type="button" data-v185="mode:' + m[0] + '" aria-pressed="' + (_v185Mode === m[0]) + '">' + m[1] + '</button>').join('')
+      + '<button type="button" data-v185="mode:sets" aria-pressed="' + !V1852_LENSES.some(m => m[0] === _v185Mode) + '" aria-label="Lens off: the map and its pins only">Off</button>'
       + '</div>'
       + '<div class="v185-lifts" role="group" aria-label="Lift spotlight filter">'
       + lifts.map(l => '<button type="button" data-v185="lift:' + escapeHtml(l[0]) + '" aria-pressed="' + (D.liftId === l[0]) + '">' + escapeHtml(l[1]) + '</button>').join('')
       + '</div>'
       + '</div>';
 
-    const keyHtml = v17MapKey(D).replace('Top set, % of TM', D.liftId ? ('Top set, ' + units) : 'Top set, % of TM');
-    return hdr + strip + waveRow + ctrl
-      + v17MapSvg(D, { sel, tap:true, home:true, anim:_v17Anim, uid })
+    const X = v1852Data(D), lens = v1852Lens(D, X, sel);
+    const keyHtml = v1852Key(X, v17MapKey(D).replace('Top set, % of TM', D.liftId ? ('Top set, ' + units) : 'Top set, % of TM'));
+    return hdr + strip + ctrl
+      + v1852Readout(D, X, sel, lens)
+      + v1852Stack(D, X, sel, lens, v17MapSvg(D, { sel, tap:true, home:true, anim:_v17Anim, uid }))
+      + v1852Thumb(S, sel)
       + keyHtml
-      + v185LensStrip(D, S, sel)
-      + v185WeekDetail(D, sel)
+      + v185WeekDetail(D, sel, X)
       + v17NextTest(D);
   }
 
@@ -21856,7 +22489,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
     v17Safe('v185 ' + act, () => {
       if (act.indexOf('mode:') === 0){
         const m = act.slice(5);
-        if (m === 'sets' || m === 'tonnage' || m === 'readiness'){
+        if (m === 'sets' || V1852_LENSES.some(l => l[0] === m)){   // 18.5.2: four lenses, and 'sets' for Off
           _v185Mode = m;
           _v17Sig.homeMap = null;
           v17HomeMap();
@@ -21877,6 +22510,14 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           const targetIdx = (cur >= startIdx && cur < startIdx + 4) ? cur : startIdx;
           v18PickWeek(targetIdx);
           const nb = document.querySelector('#v17MapCard [data-v185="wave:' + startIdx + '"]');
+          if (nb) nb.focus({ preventScroll:true });
+        }
+      } else if (act.indexOf('step:') === 0){   // 18.5.2: one week back or on
+        const d = Number(act.slice(5)) < 0 ? -1 : 1, N = buildTimeline().length, cur = currentMicrocycle().index;
+        const at = (_v18Week !== null && _v18Week >= 0 && _v18Week < N) ? _v18Week : Math.min(cur, N - 1), to = at + d;
+        if (to >= 0 && to < N){
+          v18PickWeek(to);
+          const nb = document.querySelector('#v17MapCard [data-v185="step:' + d + '"]:not([disabled])') || document.querySelector('#v17MapCard [data-v185^="step:"]:not([disabled])');
           if (nb) nb.focus({ preventScroll:true });
         }
       }
