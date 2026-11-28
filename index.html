@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Juggernaut">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Juggernaut v18 — 18.5.2</title>
+<title>Juggernaut v18 — 18.5.4</title>
 <style>
 /* Juggernaut v15.0.0 visual system. See DESIGN.md. Manual Hallmark adaptation (app screens, bounded redesign); sloplint not run. */
 /* v17.1 (H3): Montserrat (latin, variable weight; SIL Open Font License) embedded, so start-up asks no other host for anything. */
@@ -4195,6 +4195,32 @@ html[data-theme="light"] .v1852-plan.dl{stroke:#5b47c4}
   .v185-wt.v1852-bl{grid-template-columns:58px minmax(0,1fr) 74px;gap:7px;padding:9px 8px}
   .v1852-bl-r small{font-size:10px}
 }
+/* 18.5.3: session time on the lift card. One row, closed until it is tapped. */
+.v1853-time{box-sizing:border-box;width:calc(100% + 12px);min-height:44px;margin:-7px -6px;padding:0 6px;display:flex;align-items:center;gap:10px;border:none;border-radius:10px;background:none;font:inherit;color:inherit;text-align:left}
+.v1853-time-l{flex:1 1 auto;min-width:0;font-size:13px;line-height:16px;font-weight:700;color:var(--text)}
+.v1853-time-v{flex:none;height:30px;padding:0 12px;box-sizing:border-box;display:flex;align-items:center;border:1px solid var(--line2);border-radius:9px;font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.v1853-time-v i{font-style:normal;white-space:pre}
+.v1853-time > svg{flex:none;color:var(--sky)}
+.v1853-box{margin-top:16px}
+.v1853-bar{display:flex;gap:3px;height:8px}
+.v1853-bar i{display:block;min-width:6px;border-radius:4px}
+.v1853-bar i.warm,.v1853-leg i.warm{opacity:.6}
+.v1853-leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:9px;font-size:12px;line-height:16px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.v1853-leg span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.v1853-leg i{flex:none;width:8px;height:8px;border-radius:3px}
+.v1853-leg b{font-weight:800;color:var(--text)}
+.v1853-note{margin:9px 0 0;font-size:12px;line-height:17px;font-weight:500;color:var(--muted)}
+.v1853-note b{font-weight:700;color:var(--text2)}
+@media (max-width:340px){ .v1853-time-v i{display:none} }
+html[data-theme="light"] .v1853-bar i.lift,html[data-theme="light"] .v1853-leg i.lift{box-shadow:inset 0 0 0 1px rgba(15,23,42,.3)}   /* a pale wave colour keeps an edge on white */
+/* 18.5.4: which pace the row is showing, and the two paces side by side when it is open */
+.v1853-time-l small{display:block;font-size:11px;line-height:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+.v1854-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.v1854-r{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:13px;line-height:18px;font-weight:600;color:var(--muted)}
+.v1854-r b{font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.v1854-r.on{color:var(--text)}
+.v1854-r.on b{font-weight:800;color:var(--text)}
+.v1854-r b.wait{font-weight:600;color:var(--muted)}
 
 </style>
 </head>
@@ -5092,7 +5118,32 @@ html[data-theme="light"] .v1852-plan.dl{stroke:#5b47c4}
 
   <!-- WHAT CHANGED: one closed row (18.1). The note for each version is unchanged inside it. -->
   <details id="guide-changes" class="g181-changes">
-  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.5.2 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <summary><span class="g181-sum-t">What changed</span><span class="g181-sum-s">v18.5.4 back to 2.0</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v1854">v18.5.4</h2><span class="g181-gist">Your pace beside typical session pace</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>The Session time row on the lift card now learns how long your own sessions run. Open it to see <strong>Your pace</strong> beside <strong>Typical session pace</strong>. The weights, the program and what goes to Hermes are unchanged.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>What is new on the card.</strong> Under “Session time” the row says which number it is showing: your pace, or typical session pace until yours is known. Opened, it shows both, the split, and how far you run over or under typical.</li>
+      <li><strong>What is saved.</strong> One new thing: when you complete a workout, the app keeps how long its lift part ran (the Duration on the finish screen, pauses left out), with the rest time in force and the number of warm-up steps. It is kept with that workout, so it is in your backups. It is not sent to Hermes. Workouts logged before this version have no time and are left as they are.</li>
+      <li><strong>Your pace.</strong> Each timed workout is compared with typical for the sets it had. Your pace is today’s typical time scaled by the middle value of your last 8 timed workouts. It shows after 3. A workout that ran under 0.4 or over 2.5 times typical is left out, such as one left open for hours.</li>
+      <li><strong>Accessories.</strong> No new data: the time from completing the lift to the last accessory you logged, within 3 hours, against 1:40 a set. It joins your pace once 3 sessions have accessories logged; until then accessories count at typical.</li>
+      <li><strong>Typical session pace.</strong> As in 18.5.3: worked out from the plan on the card.</li>
+    </ul>
+  </div>
+  </details>
+
+  <details class="g181-ch">
+  <summary><h2 id="guide-v1853">v18.5.3</h2><span class="g181-gist">Session time on the lift card</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+  <div class="section">
+    <p>The lift card on Home says about how long today’s session will take. It is one row, closed until you tap it. Nothing is timed and nothing new is saved: it is worked out from the plan on the card. The weights, the program and what goes to Hermes are unchanged.</p>
+    <ul style="margin-left:18px;line-height:1.6">
+      <li><strong>Session time.</strong> Under Plates and Rest. Tap it to see the split between the warm-up, the lift and accessories. Tap again to close it. It starts closed each time the app opens.</li>
+      <li><strong>How it is worked out.</strong> A warm-up step counts as 1:30. A set counts as 15 seconds plus 4 seconds a rep, with your rest time between sets. On a test day, where rest is your call, 3:00 between sets is assumed. An accessory set counts as 1:40 with its changeover. Sets cut for today’s readiness are left out, and an offered extra set is not counted.</li>
+    </ul>
+  </div>
+  </details>
 
   <details class="g181-ch">
   <summary><h2 id="guide-v1852">v18.5.2</h2><span class="g181-gist">Cycle map: lenses, pins and a week read-out</span><svg class="g181-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -6030,7 +6081,7 @@ html[data-theme="light"] .v1852-plan.dl{stroke:#5b47c4}
   //   D13    an AMRAP entry more than 8 reps over its target is confirmed before it is logged.
   //   D14    after a TM cut, another cut for that lift needs a new workout of it that still shows fatigue;
   //          the per-lift gate (lifts[id].tmCutGate) outlives the 50-entry action log, reloads and export/import.
-  const APP_VERSION = '18.5.2';   // also names the export file, the service-worker cache and packets' meta.appVersion
+  const APP_VERSION = '18.5.4';   // also names the export file, the service-worker cache and packets' meta.appVersion
                                   // (14.0.1 and 14.0.2 = 14.0 with the corrections from Hermes's audit and re-audit of
                                   // 2026-10-16; 14.0 and 14.0.1 were never published)
   // v12: longitudinal coaching tunables
@@ -7325,6 +7376,7 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     if (o.test != null) o.test = _normTest(h.test);
     if (o.plusSet != null) o.plusSet = _normPlusSet(h.plusSet);
     if (o.coachReview != null) o.coachReview = _normCoachReview(h.coachReview);
+    if ('timing' in o){ const tm = _normTiming(h.timing); if (tm) o.timing = tm; else delete o.timing; }   // 18.5.4
     if (o.sessionDifficulty != null) o.sessionDifficulty = _int(h.sessionDifficulty, null, 1, 10);
     // v15 (round 5, D9): a session ended early. Anything else (absent, damaged) is a complete session and carries
     // none of these fields.
@@ -7342,6 +7394,14 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     return o;
   }
   // v15 (round 5, D3): a set that was planned but not performed. It records the plan only: no done flag, no reps.
+  // 18.5.4: how long a workout's lift part ran. liftSec: active seconds from Start to Complete (pauses left out);
+  // restSec: the rest in force (0 is "your call"); warmSteps: guided warm-up steps. Anything else, or any part of it
+  // damaged, and the workout simply has no timing.
+  function _normTiming(t){
+    const whole = (v, max) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= max;
+    if (!_isObj(t) || !whole(t.liftSec, 86400) || !whole(t.restSec, 3600) || !whole(t.warmSteps, 10)) return null;
+    return { liftSec:Math.floor(t.liftSec), restSec:Math.floor(t.restSec), warmSteps:Math.floor(t.warmSteps) };
+  }
   function _normNotPerformed(x){
     const o = { index:_int(x.index, 0, 0, 999), weight:_num(x.weight, 0, 0, 5000), targetReps:_int(x.targetReps, 0, 0, 999) };
     if (SET_ROLES.includes(x.role)) o.role = x.role;
@@ -7377,6 +7437,14 @@ ui:{ haptics:true, wakeLock:true, sound:false, performanceMode:false },
     const out = { reps:_int(p.reps, null, 0, 100), targetReps:_int(p.targetReps, null, 1, 100),
       stopRule:_enum(p.stopRule, ['2-3 short', '1-2 short'], '2-3 short'), pctTm:_num(p.pctTm, null, 0, 1.2), weight:_num(p.weight, null, 0, 5000) };
     if (out.reps === null || out.targetReps === null || out.pctTm === null || out.weight === null) return null;
+    // 18.5.4 repair: keep the saved comparison with the earlier cycle. null (there was none) stays null, a sound one is
+    // kept, a damaged one is dropped, and an entry saved without the field still has none.
+    const s = p.sameWeekLastCycle;
+    if (s === null) out.sameWeekLastCycle = null;
+    else if (_isObj(s)){
+      const c = { cycle:_int(s.cycle, null, 1, 1000), reps:_int(s.reps, null, 0, 1000), weight:_num(s.weight, null, 0, 5000) };
+      if (c.cycle !== null && c.reps !== null && c.weight !== null) out.sameWeekLastCycle = c;
+    }
     return out;
   }
   // v14: the in-app coach request record on a history entry (BRIDGE_SPEC 8.1): saved before the request is sent.
@@ -9374,6 +9442,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
 
       const recordRating = (rating) => {
         const step = ramp[stepIdx];
+        if (!step) return;   // 18.5.4 repair: a late or double tap after the last step has nothing left to rate
         _warmupFeedbackLog.push({ setIdx: stepIdx, weight: step.weight, reps: step.reps, rating });
         stepIdx++;
         renderStep();
@@ -9398,8 +9467,42 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
   function closeWarmupModal(){
     if (!el.warmupModal) return;
     el.warmupModal.classList.remove('show');
+    _warmupClosedAt = performance.now();   // 18.5.4 tap: starts the stray-tap window below
     setTimeout(() => { el.warmupModal.hidden = true; }, 220);
   }
+  // 18.5.4 tap: a finger touch that goes down while the warm-up sheet is closing, or just after it has gone, was aimed at
+  // the sheet (the tail of a double tap on a rating or on Skip). It must not reach what the sheet uncovers: Log, the reps
+  // steppers, the weight, the swipe between sets, the test question. Held back: real touches and pointers that go down
+  // within WARMUP_CLOSE_GUARD_MS of the close (the 220 ms fade plus 380 ms), and the click such a touch ends in. Never held
+  // back: keyboard activation (a click with detail 0), scripted clicks, and any touch that goes down later. Timed on the
+  // monotonic clock, so it cannot outlast the window.
+  // r2: a held-back touch is held back whole: its move, lift and cancel too, however late they come. r1 hid only the
+  // touchstart, so the card's swipe handler got a touchend with no start and measured it against a stale x.
+  const WARMUP_CLOSE_GUARD_MS = 600;
+  let _warmupClosedAt = -Infinity, _warmupStrayTap = false;
+  const _warmupStray = new Set();   // the touches and pointers that went down inside the window and have not lifted yet
+  function warmupCloseGuard(e){
+    if (!e.isTrusted) return;
+    const closing = performance.now() - _warmupClosedAt < WARMUP_CLOSE_GUARD_MS;
+    if (e.type === 'click'){
+      if (e.detail === 0) return;
+      const stray = closing || _warmupStrayTap; _warmupStrayTap = false;
+      if (stray){ e.stopImmediatePropagation(); e.preventDefault(); }
+      return;
+    }
+    const down = e.type === 'touchstart' || e.type === 'pointerdown', up = /(end|up|cancel)$/.test(e.type);
+    const ids = e.changedTouches ? Array.from(e.changedTouches, t => 't' + t.identifier) : ['p' + e.pointerId];
+    let stray = false;
+    for (const id of ids){
+      if (down){ if (closing) _warmupStray.add(id); else _warmupStray.delete(id); }   // a later touch that reuses an id starts clean
+      if (_warmupStray.has(id)) stray = true;
+      if (up) _warmupStray.delete(id);
+    }
+    if (down) _warmupStrayTap = closing;
+    if (stray) e.stopImmediatePropagation();
+  }
+  document.addEventListener('click', warmupCloseGuard, true);
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(t => document.addEventListener(t, warmupCloseGuard, { capture:true, passive:true }));
 
   function computeWarmupAdjustment(session){
     // Look at the last 2 warmup ratings. If both fire → +1 increment. If both poop → -2 increments.
@@ -15832,6 +15935,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       movementQuality:_movementQuality || 'normal',
       units:unitLabel()   // v13.2.1: the unit this workout was logged in
     };
+    try{ const tm = v1854Stamp(session); if (tm) entry.timing = tm; }catch(_){}   // 18.5.4: how long the lift part ran, for "your pace" on the Home card. Not sent to Hermes.
     if (early){   // v15 (round 5, D2-D3): marked partial; the sets not done are listed as planned, never as performed
       entry.partial = true;
       if (END_EARLY_REASONS.includes(opts.reason)) entry.endReason = opts.reason;
@@ -20646,6 +20750,129 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       + '<div class="v18-pr-r"><div class="v18-pr-h"><b>Rest</b></div><div class="v18-rest">' + (P.rest > 0 ? escapeHtml(formatDuration(P.rest)) : 'Your call') + '</div></div></div>'
       + (fit ? '<div class="v18-fit">' + fit + '</div>' : '');
   }
+  /* ── 18.5.3, 18.5.4: session time on the lift card ──
+     Closed, it is one row. Tapped, it opens to "Your pace" beside "Typical session pace", and the split.
+     Typical is worked out from the plan on the card each time the card is drawn.
+     Your pace (18.5.4) is typical scaled by how long your own recent sessions ran against the same sum. completeSession
+     saves the lift part's active time on the workout (timing); the accessories part is read from the times accessories
+     were logged, which were already saved. The open or closed choice is not saved. */
+  const V1853_T = { warm:90, set:15, rep:4, open:180, acc:100 };   // seconds: a warm-up step · a set is 15 + 4 a rep · the rest assumed when rest is "your call" · an accessory set with its changeover
+  const V1854_P = { need:3, last:8, lo:0.4, hi:2.5, accMax:3 * 3600, scan:40 };   // sessions needed before a pace is shown · how many recent ones it uses · the ratios believed · the longest accessories part believed (s) · how many of the newest workouts it looks through
+  let _v1853Time = false;   // the row is closed until it is tapped. Not saved.
+  function v1853LiftSec(sets, restSec, warmSteps){   // typical seconds for a lift part: the warm-up steps, the sets, the rests between them
+    const rest = restSec > 0 ? restSec : V1853_T.open, k = sets.length;
+    const work = sets.reduce((a, s) => a + V1853_T.set + V1853_T.rep * (Number.isFinite(s.targetReps) ? s.targetReps : 5), 0);
+    return { warm:warmSteps * V1853_T.warm, lift:k ? work + rest * (k - 1) : 0, rest };
+  }
+  function v1853Time(P, E){
+    const phase = P.wk.phase, drop = (E && Array.isArray(E.dropIdx)) ? E.dropIdx : [];
+    const sets = P.sets.filter((_, i) => drop.indexOf(i) < 0);   // sets cut for today's readiness are left out; an offered extra set is not counted
+    let warm = 0;
+    if (phase !== 'deload' && state.settings.amrap?.enableGuidedWarmup !== false){   // the same warm-ups the Set list shows
+      try{ warm = buildWarmupRamp({ liftId:P.id, sets:P.sets.map(s => ({ ...s, isRamp:s.role === 'ramp' })) }).filter(w => !w.fromRealization).length; }catch(_){ warm = 0; }
+    }
+    let accSets = 0;
+    const tpl = ((state.accessories && state.accessories.byLift && state.accessories.byLift[P.id]) || {}).templates;   // read only: nothing is built or stored here
+    for (const t of (Array.isArray(tpl) ? tpl : [])){
+      const k = (t && Number.isFinite(t.sets)) ? t.sets : 0;
+      if (k > 0) accSets += phase === 'deload' ? Math.max(1, Math.ceil(k / 2)) : k;   // a deload week halves accessory sets, as the accessories screen does
+    }
+    const S = v1853LiftSec(sets, P.rest, warm);
+    return { sec:{ warm:S.warm, lift:S.lift, acc:accSets * V1853_T.acc }, warm, sets, rest:S.rest, open:!(P.rest > 0), accSets };
+  }
+  function v1853Parts(P, sec){   // whole minutes a part, and their sum
+    const min = s => Math.max(1, Math.round(s / 60)), parts = [];
+    if (sec.warm > 0) parts.push({ k:'warm', name:'Warm-up', m:min(sec.warm) });
+    if (sec.lift > 0) parts.push({ k:'lift', name:P.short, m:min(sec.lift) });
+    if (sec.acc > 0) parts.push({ k:'acc', name:'Accessories', m:min(sec.acc) });
+    return { parts, total:parts.reduce((a, p) => a + p.m, 0) };
+  }
+  function v1853Basis(P, T){   // what typical counted, in a sentence
+    const bits = [], k = T.sets.length, plural = (c, w) => c + ' ' + w + (c === 1 ? '' : 's');
+    if (T.warm) bits.push(plural(T.warm, 'warm-up step'));
+    if (P.wk.phase === 'realization'){
+      const r = T.sets.filter(s => s.role === 'ramp').length;
+      bits.push((r ? plural(r, 'ramp set') + ' and ' : '') + 'the test with ' + formatDuration(T.rest) + ' rests' + (T.open ? ' (rest is your call)' : ''));
+    } else bits.push(plural(k, 'set') + ' at ' + formatDuration(T.rest) + ' rest' + (T.open ? ' (rest is your call)' : ''));
+    if (T.accSets) bits.push(plural(T.accSets, 'accessory set'));
+    return bits.join(', ') + '.';
+  }
+  // 18.5.4. Called by completeSession as the workout is saved: the lift part's active time (the recap's Duration: start
+  // to finish, pauses left out), the rest in force and the warm-up steps, so typical can be worked out for it later.
+  function v1854Stamp(session){
+    const t0 = (session && session.createdAt) ? new Date(session.createdAt).getTime() : NaN;
+    if (!Number.isFinite(t0)) return null;
+    const pausedMs = (Number(session._pauseOffset) || 0) + (session._pausedAt ? Math.max(0, Date.now() - session._pausedAt) : 0);
+    let warm = 0;
+    if (session.phase !== 'deload' && state.settings.amrap?.enableGuidedWarmup !== false){ try{ warm = buildWarmupRamp(session).filter(w => !w.fromRealization).length; }catch(_){ warm = 0; } }
+    return _normTiming({ liftSec:Math.max(0, Math.floor((Date.now() - t0 - pausedMs) / 1000)), restSec:restSecondsForSession(session), warmSteps:warm });
+  }
+  function v1854Median(a){ const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+  // How your recent sessions ran against typical: one ratio for the lift part (from timing) and one for accessories (from
+  // the last accessory logged after that workout, within 3 hours). Each is the median of the last 8 that can be believed;
+  // with fewer than 3 there is no pace yet. Read only.
+  function v1854Pace(){
+    const ok = r => Number.isFinite(r) && r >= V1854_P.lo && r <= V1854_P.hi, when = x => (x && typeof x.completedAt === 'string') ? Date.parse(x.completedAt) : NaN;
+    // newest workouts by their own time, whatever order they are stored in
+    const hist = (state.history || []).map(h => [when(h), h]).filter(x => Number.isFinite(x[0])).sort((a, b) => a[0] - b[0]).slice(-V1854_P.scan);
+    if (!hist.length) return { lift:null, nLift:0, acc:null, nAcc:0 };
+    const from = hist[0][0], logs = [];
+    for (const l of ((state.accessories && Array.isArray(state.accessories.history)) ? state.accessories.history : [])){
+      const t = when(l);
+      if (Number.isFinite(t) && t > from && Array.isArray(l.reps) && l.reps.length) logs.push({ liftId:l.liftId, t, k:l.reps.length });
+    }
+    const lift = [], acc = [];
+    for (let i = hist.length - 1; i >= 0 && (lift.length < V1854_P.last || acc.length < V1854_P.last); i--){
+      const t0 = hist[i][0], h = hist[i][1], tm = h.timing, sets = Array.isArray(h.sets) ? h.sets : [];
+      if (lift.length < V1854_P.last && _isObj(tm) && sets.length){
+        const S = v1853LiftSec(sets, tm.restSec, tm.warmSteps), plan = S.warm + S.lift, r = plan > 0 ? tm.liftSec / plan : NaN;
+        if (ok(r)) lift.push(r);
+      }
+      if (acc.length < V1854_P.last){
+        let last = 0, k = 0;
+        for (const l of logs){ const d = (l.t - t0) / 1000; if (l.liftId === h.liftId && d > 0 && d <= V1854_P.accMax){ k += l.k; if (d > last) last = d; } }
+        const r = k > 0 ? last / (k * V1853_T.acc) : NaN;
+        if (ok(r) && last >= 60) acc.push(r);
+      }
+    }
+    return { lift:lift.length >= V1854_P.need ? v1854Median(lift) : null, nLift:lift.length, acc:acc.length >= V1854_P.need ? v1854Median(acc) : null, nAcc:acc.length };
+  }
+  function v1854View(P, E){
+    const T = v1853Time(P, E), typ = v1853Parts(P, T.sec);
+    let pace = { lift:null, nLift:0, acc:null, nAcc:0 };
+    try{ pace = v1854Pace(); }catch(_){}   // a fault in the pace leaves typical showing
+    const mine = pace.lift !== null ? v1853Parts(P, { warm:T.sec.warm * pace.lift, lift:T.sec.lift * pace.lift, acc:T.sec.acc * (pace.acc !== null ? pace.acc : 1) }) : null;
+    return { T, typ, mine, pace };
+  }
+  function v1853TimeHtml(P, E){
+    let V; try{ V = v1854View(P, E); }catch(_){ return ''; }   // a fault here leaves the card as it was
+    if (!V.typ.parts.length || !(V.typ.total > 0)) return '';
+    const yours = !!(V.mine && V.mine.total > 0), head = yours ? V.mine : V.typ, T = V.T, pace = V.pace;
+    const col = { warm:'var(--muted)', lift:v17Col(P.wk), acc:'var(--blue)' };
+    let out = '<div class="v18-rule" aria-hidden="true"></div>'
+      + '<button type="button" class="v1853-time" data-v18="time" aria-expanded="' + _v1853Time + '"' + (_v1853Time ? ' aria-controls="v1853TimeBox"' : '')
+      + ' aria-label="Session time, about ' + head.total + ' minutes, ' + (yours ? 'your pace' : 'typical session pace') + '. ' + (_v1853Time ? 'Hide' : 'Show') + ' the split">'
+      + '<span class="v1853-time-l">Session time<small>' + (yours ? 'your pace' : 'typical session pace') + '</small></span>'
+      + '<span class="v1853-time-v"><i>About </i>' + head.total + ' min</span>' + v18Ic(_v1853Time ? 'up' : 'down', 16, 2.6) + '</button>';
+    if (_v1853Time){
+      const more = V1854_P.need - pace.nLift;
+      let note;
+      if (yours){
+        const d = V.mine.total - V.typ.total, pct = Math.round(Math.abs(d) / V.typ.total * 100);
+        note = '<b>' + (d === 0 ? 'Right on typical' : 'About ' + Math.abs(d) + ' min (' + pct + '%) ' + (d > 0 ? 'longer' : 'shorter') + ' than typical') + '</b>, going by your last ' + pace.nLift + ' timed sessions.'
+          + ((pace.acc === null && T.accSets) ? ' Accessories count at typical until 3 sessions have them logged.' : '');
+      } else note = '<b>Your pace</b> shows once ' + V1854_P.need + ' sessions have been timed (' + pace.nLift + ' so far).';
+      out += '<div class="v1853-box" id="v1853TimeBox">'
+        + '<div class="v1854-rows"><div class="v1854-r' + (yours ? ' on' : '') + '"><span>Your pace</span>'
+        + (yours ? '<b>About ' + V.mine.total + ' min</b>' : '<b class="wait">after ' + more + (pace.nLift ? ' more' : '') + ' session' + (more === 1 ? '' : 's') + '</b>') + '</div>'
+        + '<div class="v1854-r' + (yours ? '' : ' on') + '"><span>Typical session pace</span><b>About ' + V.typ.total + ' min</b></div></div>'
+        + '<div class="v1853-bar" aria-hidden="true">' + head.parts.map(p => '<i class="' + p.k + '" style="flex:' + p.m + ' 1 0;background:' + col[p.k] + '"></i>').join('') + '</div>'
+        + '<div class="v1853-leg" role="img" aria-label="' + escapeHtml((yours ? 'Your pace: ' : 'Typical: ') + head.parts.map(p => p.name + ' ' + p.m + (p.m === 1 ? ' minute' : ' minutes')).join(', ')) + '">'
+        + head.parts.map(p => '<span><i class="' + p.k + '" style="background:' + col[p.k] + '"></i>' + escapeHtml(p.name) + ' <b>' + p.m + '</b></span>').join('') + '</div>'
+        + '<p class="v1853-note">' + note + ' Typical is the plan: ' + escapeHtml(v1853Basis(P, T)) + '</p></div>';
+    }
+    return out;
+  }
   function v18ReadyHtml(P, R, E){
     if (!R || R.off) return '<div class="v18-rd off"><div class="v18-rd-h"><span>Readiness</span><em>Check is off</em></div><p>Turn it on in Settings, under AI &amp; Readiness. Sets stay as written.</p></div>';
     const has = Number.isFinite(R.v), z = has ? v17ZoneOf(R.v) : -1, live = has && !R.used;
@@ -20693,7 +20920,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       if (P.st) body = v18HandledHtml(P);
       else {
         const R = v18Ready(), E = v18Effect(P, R);
-        body = v18LoadHtml(P) + '<div class="v18-rule full" aria-hidden="true"></div>' + v18LadderHtml(P, R, E) + '<div class="v18-rule" aria-hidden="true"></div>' + v18PlatesHtml(P) + v183HomeCueSetupHtml(P);
+        body = v18LoadHtml(P) + '<div class="v18-rule full" aria-hidden="true"></div>' + v18LadderHtml(P, R, E) + '<div class="v18-rule" aria-hidden="true"></div>' + v18PlatesHtml(P) + v1853TimeHtml(P, E) + v183HomeCueSetupHtml(P);   // 18.5.3: session time, one row, closed until tapped
         ready = P.previewing ? '' : v18ReadyHtml(P, R, E);
       }
       v18Put('v18Top', top); v18Put('v18Body', body); v18Put('v18Ready', ready);
@@ -20960,6 +21187,7 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
       v18Safe('card', () => {
         if (a === 'about'){ _v18About = !_v18About; v18Card(); const f = document.querySelector('#v18Top [data-v18="about"]'); if (f) f.focus({ preventScroll:true }); }
         else if (a === 'list'){ _v18List = !_v18List; v18Card(); const f = document.querySelector('#v18Body [data-v18="list"]'); if (f) f.focus({ preventScroll:true }); }
+        else if (a === 'time'){ _v1853Time = !_v1853Time; v18Card(); const f = document.querySelector('#v18Body [data-v18="time"]'); if (f) f.focus({ preventScroll:true }); }   // 18.5.3
         else if (a.indexOf('pick:') === 0) v18PickLift(a.slice(5));
         else if (a === 'week:cur') v18PickWeek(-1);
         else if (a.indexOf('ex:') === 0) v182Explain(a.slice(3));
@@ -21473,7 +21701,9 @@ base.settings.ui = { ...base.settings.ui, ...((parsed.settings||{}).ui||{}) };
           const ta = ed && ed.querySelector('textarea');
           const entry = (state.history || []).find(h => h.id === hid);
           if (!entry || !ta) return;
+          const before = entry.userNote || '';
           entry.userNote = String(ta.value || '').trim().slice(0, 600);
+          if (entry.userNote !== before) hermesSessionChanged(entry);   // 18.5.4 repair: a changed note is a new revision for Hermes, as on the finish screen
           saveState().then(() => { renderHistory(); toast('Session note updated.', 'g'); })
             .catch(err => { console.error('note save failed', err); toast('Could not save note.', 'b'); });
         }
